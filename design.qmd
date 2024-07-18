@@ -1,0 +1,191 @@
+---
+title: "Experiment Design"
+format: html
+---
+
+In this document, I will propose an experimental design for comparing 2d and 3d heat maps. 
+
+Treatments
+
+- Media (2d digital, 3d interactive with color, 3d interactive without color, 3d printed)
+- Context (unrestricted, correlation matrix)
+    - Unrestricted: no inherent structure in grid
+    - Correlation matrix: matrix of variables with high/low correlations
+- Ratios (0.1, 0.2, ..., 1.0)
+- Variation (5) 
+    - Note: this is where additional structure are introduced, specific to the context
+
+
+
+Questions to ask participants
+
+- Which value of the marked pair is smaller?
+- Assume that the larger value of the marked pair is 100 units. Use the slider to estimate the magnitude of the *smaller* value of the marked pair.
+- Using the value that you specified as smaller, identify a location on the grid that is similar in value/magnitude.
+
+
+# Context
+
+## Unrestricted
+
+```{r}
+# Scaling function
+
+scale0to100 <- function(x){
+  (x-min(x))/(max(x)-min(x))
+}
+
+x = 1:10
+y = 1:10
+
+empty_grid <- expand_grid(x,y)
+
+set.seed(2104)
+
+# Variation 1: Spherical around center
+data_unrestricted_var1 <- empty_grid %>% 
+  mutate(z = 7^2 - (x-5)^2 - (y-5)^2 + rnorm(100, 0, sd = 3),
+         z = scale0to100(z))
+
+ggplot(data_unrestricted_var1, aes(x = x, y = y, fill = z)) + 
+  geom_tile() + scale_fill_gradient(low = 'white', high = 'darkblue')
+
+# Variation 2: Saddle Point
+data_unrestricted_var2 <- empty_grid %>% 
+  mutate(z = scale0to100((x-5)^2 - (y-5)^2 + rnorm(100, 0, 3)))
+ggplot(data_unrestricted_var2, aes(x = x, y = y, fill = z)) + 
+  geom_tile() + scale_fill_gradient(low = 'white', high = 'darkblue')
+
+# Variation 3: Gradient across x only
+data_unrestricted_var3 <- empty_grid %>% 
+  mutate(z = scale0to100(2*x + rnorm(100, 0, 3)))
+ggplot(data_unrestricted_var3, aes(x = x, y = y, fill = z)) + 
+  geom_tile() + scale_fill_gradient(low = 'white', high = 'darkblue')
+
+# Variation 4: Gradient across x and y
+data_unrestricted_var4 <- empty_grid %>% 
+  mutate(z = scale0to100(2*x + y + rnorm(100, 0, 3)))
+ggplot(data_unrestricted_var4, aes(x = x, y = y, fill = z)) + 
+  geom_tile() + scale_fill_gradient(low = 'white', high = 'darkblue')
+
+# Variation 5: No structure
+data_unrestricted_var5 <- empty_grid %>% 
+  mutate(z = scale0to100(rnorm(100, 0, 3)))
+ggplot(data_unrestricted_var5, aes(x = x, y = y, fill = z)) + 
+  geom_tile() + scale_fill_gradient(low = 'white', high = 'darkblue')
+
+```
+
+
+## Correlation Matrix
+
+Here, variations are based on the number of correlated variables. First, all variables are assumed to have low correlation $|\rho|<0.3$. Then, a random selection of variable pairs are chosen to have a high correlation $0.7<|\rho|<1$. 
+
+```{r}
+library(MASS)
+
+# Sigma with low correlations
+Sigma <- matrix(runif(100, -0.3, 0.3),
+       nrow = 10)
+
+# Change Sigma to be symmetric
+for(i in 1:nrow(Sigma)){
+  Sigma[i,i] <- 1
+  for(j in 1:i){
+    Sigma[i,j] <- Sigma[j,i]
+  }
+}
+
+# Establishing pairs of variables to have high correlation
+num_sets <- 20
+var_pairs <- t(expand.grid(x = x, y = y) %>% filter(x < y))
+high_corr_locs <- var_pairs[,sample(1:ncol(var_pairs), size = num_sets, replace = F)]
+
+for(i in 1:ncol(high_corr_locs)){
+  Sigma[high_corr_locs[1,i], high_corr_locs[2,i]] <- 
+    Sigma[high_corr_locs[2,i], high_corr_locs[1,i]] <- 
+    sample(c(-1,1),1)*runif(1, 0.7, 1)
+}
+
+
+
+data_corr <- data.frame(mvrnorm(100, sample(1:100, size = 10), Sigma = 10*Sigma, tol = 1))
+cor(tmp)
+clst <- hclust(as.dist(1 - abs(cor(tmp))), method = 'ward.D2')
+
+data_corr <- cor(tmp)[clst$order,clst$order] %>% data.frame() %>% 
+  mutate(row = row_number()) %>% 
+  pivot_longer(cols = 1:10) %>%
+  mutate(col = factor(name, ordered = T, levels = paste0('X',clst$order))) %>%
+  mutate(value = scale0to100(value))
+
+tmp_graph <- ggplot(data_corr, mapping = aes(x = col, y = row, fill = value)) + 
+  geom_tile() + scale_fill_gradient(low = 'white', high = 'darkblue')
+tmp_graph + coord_fixed()
+# with(data_corr, plot3d(col, row, value))
+# library(rayshader)
+# plot_gg(tmp_graph + coord_fixed())
+
+corrgram::corrgram(tmp, order = T)
+
+
+```
+
+
+
+# Conditions for each grid
+
+Each grid needs to satisfy the following conditions:
+
+- Each pair of values is within 3 to 4 units of each other, as measured by the Manhattan distance
+
+- All 10 ratios appear in the grid
+
+Since a random process is used to create data, we need to ensure that the conditions are met. 
+The following function checks these conditions by performing the following steps:
+
+- From a proposed data set, get all possible combinations of coordinates and arrange such that the first value is smaller than the second value (to reduce number of computations)
+- Calculate Manhattan distance of coordinates and ratio of values
+- Round ratio to closest required ratio (e.g., 0.34 becomes 0.3)
+- Calculate the difference of the ratio to its closest ratio
+- Filter by Manhattan distance / distance to closest to ratio 
+- Check that all of the required ratios are within the data set
+- Return the data set of pairs and statement that conditions are met
+
+```{r}
+
+check_conditions <- function(proposed_data, distance_threshold = c(3,4), req_ratios = (1:10)/10, adj_threshold = 0.02){
+  acceptable_pairs <- proposed_data %>% 
+  mutate(dummy = 1) %>% 
+  full_join(mutate(proposed_data, dummy = 1),
+            by = 'dummy',
+            suffix = c('.pair1', '.pair2'),
+            relationship = 'many-to-many') %>% 
+    filter(z.pair1 <= z.pair2, z.pair1 > 0) %>% 
+  mutate(distance = abs(x.pair1-x.pair2) + abs(y.pair1-y.pair2),
+         ratio = z.pair1 / z.pair2,
+         closest_ratio = round(ratio,1),
+         dist_to_closest = abs(ratio-closest_ratio)) %>% 
+    filter(distance %in% distance_threshold, dist_to_closest <= adj_threshold)
+  
+  if(all(req_ratios %in% acceptable_pairs$closest_ratio)){
+    meet_all_conditions <- TRUE
+  } else {
+    meet_all_conditions <- FALSE
+  }
+  
+  return(list(pairs = acceptable_pairs, valid = meet_all_conditions))
+}
+
+check_conditions(data_unrestricted_var1)
+
+```
+
+
+<!-- # ```{r} -->
+<!-- # df <- read.csv('/Users/tylerwiederich/Downloads/Beach_Water_Quality_-_Automated_Sensors_20240717.csv') -->
+<!-- # dplyr::select(df, Water.Temperature:Battery.Life) %>%  -->
+<!-- #   cor(use = 'complete.obs') %>%  -->
+<!-- #   heatmap() -->
+<!-- # ``` -->
+
