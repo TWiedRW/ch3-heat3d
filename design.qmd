@@ -464,7 +464,7 @@ Each grid needs to satisfy the following conditions:
 - Each pair of values is within 3 to 4 units of each other, as measured by the Manhattan distance
 
 - All 10 ratios appear in the grid
-
+ 
 Since a random process is used to create data, we need to ensure that the conditions are met. 
 The following function checks these conditions by performing the following steps:
 
