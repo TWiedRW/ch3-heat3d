@@ -514,3 +514,4 @@ check_conditions(data_unrestricted_var1)
 <!-- #   heatmap() -->
 <!-- # ``` -->
 
+Test upload to GitHub
