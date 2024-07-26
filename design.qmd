@@ -44,6 +44,14 @@ Questions to ask participants
 
 ## Unrestricted
 
+Here, I propose the following structures:
+
+    - Semi-spherical around center
+    - Saddle point
+    - Gradient increase across x only
+    - Gradient increase across x and y
+    - Completely at random
+
 ```{r}
 # Scaling function
 
@@ -118,14 +126,7 @@ ggplot(corr1.0, mapping = aes(x = X1, y = X2)) + geom_point() + ggtitle('rho = 1
 
 **Depreciated**
 
-Here, variations are based on the number of correlated variables. 
-However, one limitation of 3D printing is that we do not have good access to negative z-axis representations. 
-Therefore, the correlation matrix here will use absolute values to denote the strength of correlation rather than direction.
-First, all variables are assumed to have low correlation $| \rho |<0.4$. 
-Then, a random selection of variable pairs are chosen to have a high correlation $0.7< | \rho | < 1$. 
-With 10 variables, there are ${10 \choose 2} = 45$ options for bivariate relationships. 
-After arbitrarily assigning high and low correlations, variables are generated 
-Here, the options for 6, 12, 18, 24, and 30 variable pairs are chosen to be highly correlated.
+~~Here, variations are based on the number of correlated variables. However, one limitation of 3D printing is that we do not have good access to negative z-axis representations. Therefore, the correlation matrix here will use absolute values to denote the strength of correlation rather than direction. First, all variables are assumed to have low correlation $| \rho |<0.4$. Then, a random selection of variable pairs are chosen to have a high correlation $0.7< | \rho | < 1$. With 10 variables, there are ${10 \choose 2} = 45$ options for bivariate relationships. After arbitrarily assigning high and low correlations, variables are generated. Here, the options for 6, 12, 18, 24, and 30 variable pairs are chosen to be highly correlated.~~
 
 *My research shows that Sigma needs to be positive definite! New approach needed!*
 
@@ -212,20 +213,32 @@ table(tmp_num_high_corr/2)
 
 **New version!**
 
-A correlation matrix is required to be positive definite. 
+Simulating correlated data allows us to have more control over the inherent structure than with real data.
+It would be worth including a real data set into the study line up across all participants regardless of incomplete blocking. 
+
+- I think I remember one study saying that the context did not really do anything when asking the same types of questions that we are asking, so we could add interpretation questions too?
+
+A correlation matrix for a multinomial normal distribution is required to be positive definite. 
 Matrices of this form can be simulated using a Wishart distribution.
 ~~From my understanding, the cross product of a positive definite matrix will be positive definite, so this is a perfect candidate to use as a covariance matrix.~~ **Step not needed, see note below.**
 Using a covariance matrix from the cross product, data is simulated from a multivariate normal distribution.
+
 - Via simulation, I found that using the cross product of the Wishart matrix produces larger numbers of variable pairs that are of high correlation (struggles after 15+ pairs, but possible). Using the cross product of the cross product easily spans the entire set of possible variable pairings for high correlation. I'm not sure why this is, but it works :)
 
 
 ```{r}
-corr_create <- function(grid_size = 10, sample_size = 100){
+corr_create <- function(grid_size = 10, sample_size = 100, num_crossprod = 1){
   n <- grid_size
   pd <- matrix(rWishart(1,n,diag(n)), nrow = n)
+  Sigma <- pd
+  if(num_crossprod > 0){
+    for(i in 1:num_crossprod){
+      Sigma <- crossprod(Sigma)
+    }
+  }
   
   ran_data <- mvrnorm(n = sample_size, mu = rep(0, times = grid_size),
-                      Sigma = crossprod(pd))
+                      Sigma = Sigma)
   corr_mat <- cor(ran_data)
   return(corr_mat)
 }
@@ -233,36 +246,58 @@ corr_create <- function(grid_size = 10, sample_size = 100){
 
 Because of the positive definite requirement, my approach to generating correlated pairs of variables will be via simulation. 
 When using 10 variables, there are ${10 \choose 2}=45$ options for variable pairings.
-The following table shows how many times out of 100,000 simulations that the number of high correlation variable pairings appear.
+The following tables shows how many times out of 10,000 simulations that the number of high correlation variable pairings appear. 
+Interestingly, changing the number of times that the cross product is used on the Wishart matrix increases the number of highly correlated variables (abs(rho) > 0.7)
 
 ```{r}
 set.seed(3201)
-N <- 100000
+N <- 10000
 num_high <- numeric(N)
-# pb <- txtProgressBar(min = 1, max = N, style = 3)
 for(i in 1:N){
-  tmp_corr_mat <- corr_create()
+  tmp_corr_mat <- corr_create(num_crossprod = 0)
   num_high[i] <- (sum(abs(tmp_corr_mat) > 0.7) - nrow(tmp_corr_mat))/2
-  # setTxtProgressBar(pb, i)
 }
-# close(pb)
+
+table(num_high)
+```
+
+```{r}
+set.seed(3201)
+N <- 10000
+num_high <- numeric(N)
+for(i in 1:N){
+  tmp_corr_mat <- corr_create(num_crossprod = 1)
+  num_high[i] <- (sum(abs(tmp_corr_mat) > 0.7) - nrow(tmp_corr_mat))/2
+}
+
+table(num_high)
+```
+
+```{r}
+set.seed(3201)
+N <- 10000
+num_high <- numeric(N)
+for(i in 1:N){
+  tmp_corr_mat <- corr_create(num_crossprod = 2)
+  num_high[i] <- (sum(abs(tmp_corr_mat) > 0.7) - nrow(tmp_corr_mat))/2
+}
 
 table(num_high)
 ```
 
 
-As shown by simulation, it takes many attempts to surpass 15+ variable pairings.
+As shown by simulation, it takes many attempts to surpass 15+ variable pairings of a single cross product of the Wishart matrix.
 Because of the computational demand, I will currently focus on 4, 8, 12, 16, and 20 highly correlated variable pairs.
 
 Next, data is simulate such that it meets the following criteria:
 
 - Number of correlated sets is in sequence of 4-20 by 4's
-- Number of low correlation pairs (abs(rho) < 0.3) is 2/3 of the remaining variable pairs
-    - Example: If 20 out of the 45 variable pairs are set to be highly correlated, then 25 of the variable pairs are less than the high correlation threshold. 2/3 of these must be at or below a threshold for low correlation (abs(rho) <= 0.3), which would be 25/45 * 2/3 = 37% of the variable pairs than need to have a correlation magnitude that is less than 0.3.
+- Number of low correlation pairs (abs(rho) < 0.3) is 1/2 of the remaining variable pairs
+    - Example: If 20 out of the 45 variable pairs are set to be highly correlated, then 25 of the variable pairs are less than the high correlation threshold. 1/2 of these must be at or below a threshold for low correlation (abs(rho) <= 0.3), which would be 25/45 * 1/2 = 37% of the variable pairs than need to have a correlation magnitude that is less than 0.3. This percentage is adjustable as needed, 1/2 seems to make it so that there is a greater separation between number of high/low correlations with respect to controlling the variations.
 
 
 ```{r}
-#| eval: false
+#| cache: true
 set.seed(1024)
 corr_data <- list()
 
@@ -280,8 +315,8 @@ for(i in num_high_corr){
     tmp_num_high <- (sum(abs(tmp_corr_mat) > 0.7) - nrow(tmp_corr_mat))/2
     tmp_num_low <- (sum(abs(tmp_corr_mat) < 0.3) - nrow(tmp_corr_mat))/2
     
-    # Require that at least 2/3 of non-high correlated variables are low correlation
-    tmp_min_low_pct <- (1 - tmp_num_high/tmp_combs)*(2/3)
+    # Require that at least 1/2 of non-high correlated variables are low correlation
+    tmp_min_low_pct <- (1 - tmp_num_high/tmp_combs)*(1/2)
     
     if(tmp_num_high == i & tmp_num_low/tmp_combs >= tmp_min_low_pct){
       corr_data[[j]] <- tmp_corr_mat
@@ -291,161 +326,9 @@ for(i in num_high_corr){
   }
 }
 
-dput(corr_data)
-
 ```
 
-```{r}
-# Output from previous chunk, just to save some time... I suppose that cache can help too
-corr_data <- list(structure(c(1, 0.906732813923399, 0.243340379378227, -0.113817674512382, 
--0.381110276974071, -0.187810607571818, 0.144681668567833, -0.281919434336212, 
-0.0896622103911797, 0.0786793434633186, 0.906732813923399, 1, 
-0.0567898213060744, 0.22680657952117, -0.283829605315803, 0.0466643823438784, 
--0.0981447329639578, -0.608191827907691, 0.171372919628112, -0.0236303643843168, 
-0.243340379378227, 0.0567898213060744, 1, -0.684228048453298, 
-0.164577759925802, -0.838201124203554, 0.00432290661966634, 0.458971754872209, 
-0.270061199150839, -0.161618324224807, -0.113817674512382, 0.22680657952117, 
--0.684228048453298, 1, 0.0777141051010266, 0.89362551442119, 
--0.0453352610156944, -0.631742372436823, 0.149090126939304, -0.0358353483379827, 
--0.381110276974071, -0.283829605315803, 0.164577759925802, 0.0777141051010266, 
-1, -0.141178193956172, -0.0821060998230732, -0.0511483496071596, 
--0.259124865754171, -0.892977714678237, -0.187810607571818, 0.0466643823438784, 
--0.838201124203554, 0.89362551442119, -0.141178193956172, 1, 
-0.0911786255346799, -0.380120693295081, 0.110863616304554, 0.175835969985161, 
-0.144681668567833, -0.0981447329639578, 0.00432290661966634, 
--0.0453352610156944, -0.0821060998230732, 0.0911786255346799, 
-1, 0.376824597569211, -0.342501606430542, 0.284183551623178, 
--0.281919434336212, -0.608191827907691, 0.458971754872209, -0.631742372436823, 
--0.0511483496071596, -0.380120693295081, 0.376824597569211, 1, 
-0.179515702311922, 0.234502040165049, 0.0896622103911797, 0.171372919628112, 
-0.270061199150839, 0.149090126939304, -0.259124865754171, 0.110863616304554, 
--0.342501606430542, 0.179515702311922, 1, 0.210354252438082, 
-0.0786793434633186, -0.0236303643843168, -0.161618324224807, 
--0.0358353483379827, -0.892977714678237, 0.175835969985161, 0.284183551623178, 
-0.234502040165049, 0.210354252438082, 1), dim = c(10L, 10L)), 
-    structure(c(1, -0.294870299777679, 0.0703923059175397, -0.244178288412787, 
-    -0.0721774473135405, 0.0156699284724222, -0.0994440887161269, 
-    0.014830855404022, 0.187264915180332, 0.761877859121311, 
-    -0.294870299777679, 1, -0.0984260402679743, 0.0824920543546224, 
-    -0.378352053735929, 0.358672298419447, 0.214149084872215, 
-    0.13044726409634, 0.240747106677573, -0.426100593395649, 
-    0.0703923059175397, -0.0984260402679743, 1, 0.83118413304072, 
-    0.898719981303382, 0.0980221106464306, 0.79297872371835, 
-    -0.26927020198349, 0.547471100776168, 0.256088175512134, 
-    -0.244178288412787, 0.0824920543546224, 0.83118413304072, 
-    1, 0.833935133100258, -0.0780583319514087, 0.876495660153188, 
-    0.122354803727651, 0.126319388149633, -0.131927944005881, 
-    -0.0721774473135405, -0.378352053735929, 0.898719981303382, 
-    0.833935133100258, 1, -0.114800794665521, 0.727597311806363, 
-    -0.116954758340443, 0.210933842575287, 0.0896398439624061, 
-    0.0156699284724222, 0.358672298419447, 0.0980221106464306, 
-    -0.0780583319514087, -0.114800794665521, 1, 0.0776145302288004, 
-    -0.697566603282188, 0.582323488867912, -0.147032222350376, 
-    -0.0994440887161269, 0.214149084872215, 0.79297872371835, 
-    0.876495660153188, 0.727597311806363, 0.0776145302288004, 
-    1, 0.0581303827350189, 0.248921384157501, -0.130332422722853, 
-    0.014830855404022, 0.13044726409634, -0.26927020198349, 0.122354803727651, 
-    -0.116954758340443, -0.697566603282188, 0.0581303827350189, 
-    1, -0.736264962581588, -0.242738450964759, 0.187264915180332, 
-    0.240747106677573, 0.547471100776168, 0.126319388149633, 
-    0.210933842575287, 0.582323488867912, 0.248921384157501, 
-    -0.736264962581588, 1, 0.418390243301847, 0.761877859121311, 
-    -0.426100593395649, 0.256088175512134, -0.131927944005881, 
-    0.0896398439624061, -0.147032222350376, -0.130332422722853, 
-    -0.242738450964759, 0.418390243301847, 1), dim = c(10L, 10L
-    )), structure(c(1, -0.0279569291641271, 0.68114721237717, 
-    -0.197138661414038, -0.217372917042713, 0.247542513020683, 
-    -0.217229594687371, 0.124023726713051, -0.0704456401439883, 
-    -0.46024057818142, -0.0279569291641271, 1, 0.0120621351215896, 
-    -0.0376082743063045, -0.863553312812202, -0.806655982735773, 
-    -0.237780433644193, -0.955981361219028, -0.857942405471154, 
-    0.0790009801867906, 0.68114721237717, 0.0120621351215896, 
-    1, -0.291822794840632, -0.139656795911438, 0.219201199085023, 
-    -0.154765883428833, 0.0636254151950062, -0.229568639601309, 
-    -0.155089486401696, -0.197138661414038, -0.0376082743063045, 
-    -0.291822794840632, 1, -0.129393474190515, -0.277066700469028, 
-    0.865429011868441, -0.116154717492536, 0.0296952793193585, 
-    0.63082581420659, -0.217372917042713, -0.863553312812202, 
-    -0.139656795911438, -0.129393474190515, 1, 0.762772283810209, 
-    0.172229343332205, 0.824122899374695, 0.74231202221866, -0.118171714352594, 
-    0.247542513020683, -0.806655982735773, 0.219201199085023, 
-    -0.277066700469028, 0.762772283810209, 1, 0.0276892204058888, 
-    0.885950303166257, 0.770072216158299, -0.288704956444743, 
-    -0.217229594687371, -0.237780433644193, -0.154765883428833, 
-    0.865429011868441, 0.172229343332205, 0.0276892204058888, 
-    1, 0.130944142782469, 0.104178277202652, 0.730188319703328, 
-    0.124023726713051, -0.955981361219028, 0.0636254151950062, 
-    -0.116154717492536, 0.824122899374695, 0.885950303166257, 
-    0.130944142782469, 1, 0.794543485013543, -0.0874516624911011, 
-    -0.0704456401439883, -0.857942405471154, -0.229568639601309, 
-    0.0296952793193585, 0.74231202221866, 0.770072216158299, 
-    0.104178277202652, 0.794543485013543, 1, -0.289062082329565, 
-    -0.46024057818142, 0.0790009801867906, -0.155089486401696, 
-    0.63082581420659, -0.118171714352594, -0.288704956444743, 
-    0.730188319703328, -0.0874516624911011, -0.289062082329565, 
-    1), dim = c(10L, 10L)), structure(c(1, -0.888493613688534, 
-    0.819486694169124, -0.147825865511674, 0.942897629512706, 
-    0.0975903474263957, 0.115423364421149, 0.782536069698355, 
-    -0.811551972627385, 0.028090335152264, -0.888493613688534, 
-    1, -0.849435213986988, -0.0566628374365096, -0.85037828375267, 
-    0.281086888172439, 0.106401755098292, -0.718067929420189, 
-    0.801055213392283, -0.0131662515836489, 0.819486694169124, 
-    -0.849435213986988, 1, -0.0156013985760992, 0.802677531202688, 
-    -0.209377506029008, -0.175300332033932, 0.951650819403475, 
-    -0.86111520444422, -0.0591565782583427, -0.147825865511674, 
-    -0.0566628374365096, -0.0156013985760992, 1, 0.0272084199787394, 
-    -0.599091178871819, -0.841718091376793, -0.150534455185389, 
-    -0.139518308340746, 0.182987094757479, 0.942897629512706, 
-    -0.85037828375267, 0.802677531202688, 0.0272084199787394, 
-    1, 0.0769586334321479, -0.0321583556996346, 0.716248578539773, 
-    -0.754263220063282, 0.228871180378067, 0.0975903474263957, 
-    0.281086888172439, -0.209377506029008, -0.599091178871819, 
-    0.0769586334321479, 1, 0.618481990400384, -0.0339045220033618, 
-    0.250295485192304, 0.251611036562893, 0.115423364421149, 
-    0.106401755098292, -0.175300332033932, -0.841718091376793, 
-    -0.0321583556996346, 0.618481990400384, 1, -0.0525815756816333, 
-    0.214466896088338, -0.252664512464007, 0.782536069698355, 
-    -0.718067929420189, 0.951650819403475, -0.150534455185389, 
-    0.716248578539773, -0.0339045220033618, -0.0525815756816333, 
-    1, -0.866329627264442, -0.208625200415389, -0.811551972627385, 
-    0.801055213392283, -0.86111520444422, -0.139518308340746, 
-    -0.754263220063282, 0.250295485192304, 0.214466896088338, 
-    -0.866329627264442, 1, 0.348304600790341, 0.028090335152264, 
-    -0.0131662515836489, -0.0591565782583427, 0.182987094757479, 
-    0.228871180378067, 0.251611036562893, -0.252664512464007, 
-    -0.208625200415389, 0.348304600790341, 1), dim = c(10L, 10L
-    )), structure(c(1, -0.00236258177787643, -0.327982734990184, 
-    -0.210114458657699, -0.163871053760036, 0.281370107637684, 
-    0.246248656399945, -0.227968217709537, 0.0280819602508723, 
-    0.386284243235899, -0.00236258177787643, 1, 0.0544936897651125, 
-    -0.912350330476876, -0.767730285095778, 0.918561834110736, 
-    0.226039693646843, -0.693456969813965, -0.909523763813209, 
-    0.825456785523111, -0.327982734990184, 0.0544936897651125, 
-    1, 0.193289204079536, -0.110013079370664, -0.239962828273556, 
-    0.0152949127524906, 0.205689377419085, -0.0766896133498034, 
-    -0.149115913139135, -0.210114458657699, -0.912350330476876, 
-    0.193289204079536, 1, 0.74850052772694, -0.957643634184407, 
-    -0.186946317721116, 0.780627236413012, 0.835094844901204, 
-    -0.903483252394529, -0.163871053760036, -0.767730285095778, 
-    -0.110013079370664, 0.74850052772694, 1, -0.743474638095742, 
-    0.167466574597771, 0.933816837016388, 0.847852366827537, 
-    -0.824037130537815, 0.281370107637684, 0.918561834110736, 
-    -0.239962828273556, -0.957643634184407, -0.743474638095742, 
-    1, 0.27524200745856, -0.757835242815106, -0.787908565878199, 
-    0.87188575954411, 0.246248656399945, 0.226039693646843, 0.0152949127524906, 
-    -0.186946317721116, 0.167466574597771, 0.27524200745856, 
-    1, 0.175822452690949, 0.0192713384229615, 0.0737035049004889, 
-    -0.227968217709537, -0.693456969813965, 0.205689377419085, 
-    0.780627236413012, 0.933816837016388, -0.757835242815106, 
-    0.175822452690949, 1, 0.800433914007865, -0.850051586480364, 
-    0.0280819602508723, -0.909523763813209, -0.0766896133498034, 
-    0.835094844901204, 0.847852366827537, -0.787908565878199, 
-    0.0192713384229615, 0.800433914007865, 1, -0.887580182934476, 
-    0.386284243235899, 0.825456785523111, -0.149115913139135, 
-    -0.903483252394529, -0.824037130537815, 0.87188575954411, 
-    0.0737035049004889, -0.850051586480364, -0.887580182934476, 
-    1), dim = c(10L, 10L)))
-```
+
 
 
 
@@ -460,23 +343,23 @@ corr_data_df <- map(corr_data, \(x)(pivot_longer(data.frame(x) %>%
 
 ggplot(corr_data_df[[1]], aes(x = as.numeric(row), y = as.numeric(col), fill = value_magnitude)) + 
   geom_tile() + scale_fill_gradient(low = 'white', high = 'darkblue', limits = c(0,1)) + 
-  geom_point(aes(shape = factor(high_corr)), color = 'red') +
+  geom_point(aes(shape = factor(high_corr)), color = 'black') +
   ggtitle('4 pairs of high correlated data')
 ggplot(corr_data_df[[2]], aes(x = as.numeric(row), y = as.numeric(col), fill = value_magnitude)) + 
   geom_tile() + scale_fill_gradient(low = 'white', high = 'darkblue', limits = c(0,1)) + 
-  geom_point(aes(shape = factor(high_corr)), color = 'red') +
+  geom_point(aes(shape = factor(high_corr)), color = 'black') +
   ggtitle('8 pairs of high correlated data')
 ggplot(corr_data_df[[3]], aes(x = as.numeric(row), y = as.numeric(col), fill = value_magnitude)) + 
   geom_tile() + scale_fill_gradient(low = 'white', high = 'darkblue', limits = c(0,1)) + 
-  geom_point(aes(shape = factor(high_corr)), color = 'red') +
+  geom_point(aes(shape = factor(high_corr)), color = 'black') +
   ggtitle('12 pairs of high correlated data')
 ggplot(corr_data_df[[4]], aes(x = as.numeric(row), y = as.numeric(col), fill = value_magnitude)) + 
   geom_tile() + scale_fill_gradient(low = 'white', high = 'darkblue', limits = c(0,1)) + 
-  geom_point(aes(shape = factor(high_corr)), color = 'red') +
+  geom_point(aes(shape = factor(high_corr)), color = 'black') +
   ggtitle('16 pairs of high correlated data')
 ggplot(corr_data_df[[5]], aes(x = as.numeric(row), y = as.numeric(col), fill = value_magnitude)) + 
   geom_tile() + scale_fill_gradient(low = 'white', high = 'darkblue', limits = c(0,1)) + 
-  geom_point(aes(shape = factor(high_corr)), color = 'red') +
+  geom_point(aes(shape = factor(high_corr)), color = 'black') +
   ggtitle('20 pairs of high correlated data')
 
 ```
