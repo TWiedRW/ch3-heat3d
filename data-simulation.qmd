@@ -1,0 +1,236 @@
+---
+title: "Data Simulation"
+author: "Tyler Wiederich"
+format: html
+---
+
+```{r}
+library(tidyverse)
+set.seed(2026)
+```
+
+# Introduction
+
+This document outlines the steps for data creation for the 3d heatmap study. 
+The original document is located in `design.qmd`, but has since had major revisions. 
+
+Our currently proposed research questions consist of numerical estimation of value pairs, locate a coordinate with a similar value, and, in the case of correlated data, identify how many pairs of variables are highly correlated.
+
+# Value Pairs
+
+The first step is to establish common value pairs to be used across all graphs. 
+In Cleveland and McGill, they chose pairs of values generated on a log scale. 
+The follow graph shows the combination pairs of values from 10 to 100 and if their ratios are perfectly within 10% increments from 10% to 100%. 
+
+```{r}
+s = 10:100
+var.pair <- expand.grid(s,s) %>% 
+  mutate(percent = 100*Var1/Var2,
+         mean_val = (Var1 + Var2) / 2) %>% 
+  filter(percent <= 100) %>% 
+  mutate(in_percent = ifelse(percent %in% (10*(1:10)), 'Yes', 'No'))
+
+
+ggplot(var.pair, mapping = aes(x = Var1, y = Var2, 
+                               fill = in_percent
+                               )) + 
+  geom_tile(color = NA) + 
+  scale_fill_manual(values = c("Yes" = 'grey10', "No" = 'grey90')) +
+  theme_bw() +
+  labs(title = 'Pairs of all integers (10 to 100)',
+       x = 'Smaller value',
+       y = 'Larger value') +
+  theme(aspect.ratio = 1) 
+  
+```
+
+
+
+One possible way to choose value pairs is to randomly sample from the pool of pairs where the ratio is exactly equal to the 10% increments.
+With this sampling method, we can control for excessively small values that could be influenced by either extreme differences in surround values or just noticeable differences. 
+By weighting the value pairs by their averages, we ensure that larger values are favored over smaller values. 
+The following plot shows 1,000 samples taken using the described method.
+What we see is that the average of value pairs tend to be between 50 and 70.
+
+
+```{r}
+var.valid <- var.pair %>% 
+  group_by(percent) %>% 
+  filter((percent > 0) & (percent %in% (10*(0:10))))
+var.samples <- var.valid %>% 
+  slice_sample(n = 1000, weight_by = mean_val, replace = T)
+
+var.errbar <- var.samples %>% 
+  group_by(percent) %>% 
+  summarize(lower.p = quantile(mean_val, 0.35),
+            upper.p = quantile(mean_val, 0.65))
+
+var.samples %>% 
+  ggplot(mapping = aes(x = percent, y = mean_val)) + 
+  geom_jitter(width = 1/2, alpha = 1/100) + 
+  geom_smooth() + 
+  geom_errorbar(data = var.errbar, mapping = aes(x = percent, y = NULL, ymin = lower.p, ymax = upper.p), width = 3, color = 'red') + 
+  scale_y_continuous(breaks = seq(0, 100, 10)) +
+  labs(title = 'Average value pair from weighted sampling',
+       subtitle = 'Error bars represent 35th and 65th percentiles of average value',
+       x = 'Percent (Var1/Var2)', y = 'Average value',
+       caption = 'group n = 1000') + 
+  theme_classic()
+```
+
+```{r}
+#| eval: false
+#| echo: false
+
+# Statistics of sample
+var.samples %>% 
+  group_by(percent) %>% 
+  summarize(mean = mean(mean_val),
+            sd = sd(mean_val),
+            span = diff(range(mean_val)))
+```
+
+To finalize the selection of samples, we fit the same generalized additive model from `geom_smooth()` using `mgcv::gam()`. 
+From here, we can identify the value pairs that are closest to the predicted values from the GAM model.
+However, the value of 70 occurred frequently for the larger value of the pair, so we will consider average values that are within the 35th and 65th percentiles of their respective percent.
+Lastly, a randomized selection from the acceptable pairs is chosen.
+
+
+```{r}
+library(mgcv)
+mod <- gam(mean_val ~ s(percent, bs = 'cs'),
+    data = var.samples)
+
+var.final <- var.samples %>% 
+  ungroup() %>% 
+  mutate(p = predict(mod)) %>% 
+  mutate(diff = abs(mean_val - p)) %>% 
+  group_by(percent) %>% 
+  # filter(diff <= min(diff) + 10) %>%
+  filter(mean_val <= quantile(mean_val, 0.65) & mean_val >= quantile(mean_val, 0.35)) %>%
+  slice_sample(n = 1)
+var.final
+```
+
+# Experimental Design
+
+With value pairs selected, we turn our attention to the design of the experiment. 
+My proposal consists of media, ratio, context, and variation.
+
+- Media: physical form of the graph (2d, 3d-digital, 3d-printed)
+- Ratio: ratio of value pairs (10%, 20%, ... , 100%)
+- Context: situational context (response surface, correlation)
+- Variation: different forms for data set to take on (5)
+
+There are 300 units available under a full factorial treatment design.
+It stands to reason that context is the whole plot factor, where each participant goes through two segments of each context. 
+From here, we would want a randomized order of media, ratio, and variation. 
+Figure @fig-FullDesign shows the full design without any blocking conditions.
+For simplicity, we currently assume that media is a split-plot. In practice, we will fully randomize the order, but this will allow for an easier experience in utilizing an incomplete block design for ratio and variation.
+
+
+```{r}
+#| label: fig-fullDesign
+#| fig-cap: "Full design"
+
+library(edibble)
+library(deggust)
+
+des <- design('Heat3d Units') %>% 
+  set_units(context = c('response', 'corr'),
+            fullmedia = nested_in(context,3),
+            order = nested_in(fullmedia, 50))
+serve_table(des) %>% autoplot()
+trt <- design('Heat3d Trts') %>% 
+  set_trts(ratio = 10,
+           vars = 5)
+
+(des + trt) %>% 
+  allot_trts(ratio:vars ~ order
+             ) %>% 
+  assign_trts(order = c("random"),
+              seed = 2023) %>% 
+  serve_table() %>% autoplot(shape = 'circle')
+
+```
+
+```{r}
+#| label: fig-fullDesignOneUnit
+#| fig-cap: "One unit of full design"
+
+library(edibble)
+library(deggust)
+
+des <- design('Heat3d Units') %>% 
+  set_units(order = 50)
+trt <- design('Heat3d Trts') %>% 
+  set_trts(ratio = 10,
+           vars = 5)
+
+(des + trt) %>% 
+  allot_trts(ratio:vars ~ order
+             ) %>% 
+  assign_trts(order = c("random"),
+              seed = 2023) %>% 
+  serve_table() %>% autoplot(shape = 'circle')
+
+```
+
+With 300 trials per participant, we will want to use some sort of incomplete blocking structure.
+
+```{r}
+#| eval: false
+#| echo: false
+# bibd <- takeout(menu_bibd(t = 10, r = 2, k = 5))
+# examine_recipe(bibd)
+# examine_recipe(takeout(menu_lsd(t=5)))
+
+des <- design('Heat3d Units') %>% 
+  set_units(context = c('response', 'corr'),
+            fullmedia = nested_in(context,3),
+            order = nested_in(fullmedia, 10))
+serve_table(des) %>% autoplot()
+
+lr <- design("Latin Rectangle Design") %>%
+  set_units(ratio = 5,
+            vars = 10,
+            unit = crossed_by(ratio, vars)) %>%
+  set_trts(block = 5) %>%
+  allot_trts(block ~ unit) %>%
+  assign_trts("random", seed = 195)
+
+
+
+
+```
+
+
+
+
+
+
+
+```{r}
+
+library(edibble)
+library(deggust)
+
+des <- design('Heat3d Units') %>% 
+  set_units(context = c('response', 'corr'),
+            fullmedia = nested_in(context,3),
+            order = nested_in(fullmedia, 10))
+serve_table(des) %>% autoplot()
+trt <- design('Heat3d Trts') %>% 
+  set_trts(ratio = 10)
+
+(des + trt) %>% 
+  allot_trts(ratio ~ order
+             ) %>% 
+  assign_trts(order = c("random"),
+              seed = 2023) %>% 
+  serve_table() %>% autoplot(shape = 'circle')
+
+```
+
+
+
