@@ -178,36 +178,6 @@ trt <- design('Heat3d Trts') %>%
 
 With 300 trials per participant, we will want to use some sort of incomplete blocking structure.
 
-```{r}
-#| eval: false
-#| echo: false
-# bibd <- takeout(menu_bibd(t = 10, r = 2, k = 5))
-# examine_recipe(bibd)
-# examine_recipe(takeout(menu_lsd(t=5)))
-
-des <- design('Heat3d Units') %>% 
-  set_units(context = c('response', 'corr'),
-            fullmedia = nested_in(context,3),
-            order = nested_in(fullmedia, 10))
-serve_table(des) %>% autoplot()
-
-lr <- design("Latin Rectangle Design") %>%
-  set_units(ratio = 5,
-            vars = 10,
-            unit = crossed_by(ratio, vars)) %>%
-  set_trts(block = 5) %>%
-  allot_trts(block ~ unit) %>%
-  assign_trts("random", seed = 195)
-
-
-
-
-```
-
-
-
-
-
 
 
 ```{r}

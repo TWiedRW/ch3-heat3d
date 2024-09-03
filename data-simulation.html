@@ -133,16 +133,19 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">percent =</span> <span class="dv">100</span><span class="sc">*</span>Var1<span class="sc">/</span>Var2,</span>
 <span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>         <span class="at">mean_val =</span> (Var1 <span class="sc">+</span> Var2) <span class="sc">/</span> <span class="dv">2</span>) <span class="sc">%&gt;%</span> </span>
 <span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(percent <span class="sc">&lt;=</span> <span class="dv">100</span>) <span class="sc">%&gt;%</span> </span>
-<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">in_percent =</span> <span class="fu">ifelse</span>(percent <span class="sc">%in%</span> (<span class="dv">10</span><span class="sc">*</span>(<span class="dv">1</span><span class="sc">:</span><span class="dv">10</span>)), T, F))</span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">in_percent =</span> <span class="fu">ifelse</span>(percent <span class="sc">%in%</span> (<span class="dv">10</span><span class="sc">*</span>(<span class="dv">1</span><span class="sc">:</span><span class="dv">10</span>)), <span class="st">'Yes'</span>, <span class="st">'No'</span>))</span>
 <span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a><span class="co">#If sampling from regions</span></span>
-<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a>km <span class="ot">&lt;-</span> <span class="fu">kmeans</span>(var.pair<span class="sc">$</span>percent, <span class="at">centers =</span> <span class="dv">10</span>)</span>
-<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(var.pair, <span class="at">mapping =</span> <span class="fu">aes</span>(<span class="at">x =</span> Var1, <span class="at">y =</span> Var2, <span class="co">#fill = factor(km$cluster)</span></span>
-<span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a>                               <span class="at">fill =</span> in_percent</span>
-<span id="cb4-13"><a href="#cb4-13" aria-hidden="true" tabindex="-1"></a>                               )) <span class="sc">+</span> </span>
-<span id="cb4-14"><a href="#cb4-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_tile</span>(<span class="at">color =</span> <span class="cn">NA</span>) <span class="sc">+</span> </span>
-<span id="cb4-15"><a href="#cb4-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">aspect.ratio =</span> <span class="dv">1</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(var.pair, <span class="at">mapping =</span> <span class="fu">aes</span>(<span class="at">x =</span> Var1, <span class="at">y =</span> Var2, </span>
+<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a>                               <span class="at">fill =</span> in_percent</span>
+<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a>                               )) <span class="sc">+</span> </span>
+<span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_tile</span>(<span class="at">color =</span> <span class="cn">NA</span>) <span class="sc">+</span> </span>
+<span id="cb4-13"><a href="#cb4-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_fill_manual</span>(<span class="at">values =</span> <span class="fu">c</span>(<span class="st">"Yes"</span> <span class="ot">=</span> <span class="st">'grey10'</span>, <span class="st">"No"</span> <span class="ot">=</span> <span class="st">'grey90'</span>)) <span class="sc">+</span></span>
+<span id="cb4-14"><a href="#cb4-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_bw</span>() <span class="sc">+</span></span>
+<span id="cb4-15"><a href="#cb4-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">'Pairs of all integers (10 to 100)'</span>,</span>
+<span id="cb4-16"><a href="#cb4-16" aria-hidden="true" tabindex="-1"></a>       <span class="at">x =</span> <span class="st">'Smaller value'</span>,</span>
+<span id="cb4-17"><a href="#cb4-17" aria-hidden="true" tabindex="-1"></a>       <span class="at">y =</span> <span class="st">'Larger value'</span>) <span class="sc">+</span></span>
+<span id="cb4-18"><a href="#cb4-18" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">aspect.ratio =</span> <span class="dv">1</span>) </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <div>
 <figure class="figure">
@@ -181,7 +184,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <div class="cell-output-display">
 <div>
 <figure class="figure">
-<p><img src="data-simulation_files/figure-html/unnamed-chunk-4-1.png" class="img-fluid figure-img" width="672"></p>
+<p><img src="data-simulation_files/figure-html/unnamed-chunk-3-1.png" class="img-fluid figure-img" width="672"></p>
 </figure>
 </div>
 </div>
@@ -220,17 +223,17 @@ Attaching package: 'nlme'</code></pre>
 <pre><code># A tibble: 10 × 7
 # Groups:   percent [10]
     Var1  Var2 percent mean_val in_percent         p      diff
-   &lt;int&gt; &lt;int&gt;   &lt;dbl&gt;    &lt;dbl&gt; &lt;lgl&gt;      &lt;dbl[1d]&gt; &lt;dbl[1d]&gt;
- 1    10   100      10     55   TRUE            54.9    0.0659
- 2    18    90      20     54   TRUE            47.3    6.74  
- 3    21    70      30     45.5 TRUE            49.2    3.68  
- 4    30    75      40     52.5 TRUE            50.1    2.36  
- 5    33    66      50     49.5 TRUE            52.2    2.74  
- 6    42    70      60     56   TRUE            56.3    0.258 
- 7    49    70      70     59.5 TRUE            60.5    0.966 
- 8    48    60      80     54   TRUE            61.3    7.26  
- 9    72    80      90     76   TRUE            67.1    8.95  
-10    68    68     100     68   TRUE            68.2    0.209 </code></pre>
+   &lt;int&gt; &lt;int&gt;   &lt;dbl&gt;    &lt;dbl&gt; &lt;chr&gt;      &lt;dbl[1d]&gt; &lt;dbl[1d]&gt;
+ 1    10   100      10     55   Yes             54.9    0.0655
+ 2    17    85      20     51   Yes             47.2    3.75  
+ 3    24    80      30     52   Yes             49.2    2.84  
+ 4    26    65      40     45.5 Yes             50.1    4.61  
+ 5    38    76      50     57   Yes             52.1    4.87  
+ 6    48    80      60     64   Yes             56.4    7.63  
+ 7    49    70      70     59.5 Yes             60.6    1.09  
+ 8    56    70      80     63   Yes             61.2    1.80  
+ 9    72    80      90     76   Yes             67.0    9.03  
+10    64    64     100     64   Yes             68.2    4.23  </code></pre>
 </div>
 </div>
 </section>
@@ -330,6 +333,39 @@ Figure&nbsp;3: One unit of full design
 </div>
 </div>
 <p>With 300 trials per participant, we will want to use some sort of incomplete blocking structure.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb21"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(edibble)</span>
+<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(deggust)</span>
+<span id="cb21-3"><a href="#cb21-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb21-4"><a href="#cb21-4" aria-hidden="true" tabindex="-1"></a>des <span class="ot">&lt;-</span> <span class="fu">design</span>(<span class="st">'Heat3d Units'</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb21-5"><a href="#cb21-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">set_units</span>(<span class="at">context =</span> <span class="fu">c</span>(<span class="st">'response'</span>, <span class="st">'corr'</span>),</span>
+<span id="cb21-6"><a href="#cb21-6" aria-hidden="true" tabindex="-1"></a>            <span class="at">fullmedia =</span> <span class="fu">nested_in</span>(context,<span class="dv">3</span>),</span>
+<span id="cb21-7"><a href="#cb21-7" aria-hidden="true" tabindex="-1"></a>            <span class="at">order =</span> <span class="fu">nested_in</span>(fullmedia, <span class="dv">10</span>))</span>
+<span id="cb21-8"><a href="#cb21-8" aria-hidden="true" tabindex="-1"></a><span class="fu">serve_table</span>(des) <span class="sc">%&gt;%</span> <span class="fu">autoplot</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="data-simulation_files/figure-html/unnamed-chunk-8-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+<div class="sourceCode cell-code" id="cb22"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a>trt <span class="ot">&lt;-</span> <span class="fu">design</span>(<span class="st">'Heat3d Trts'</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">set_trts</span>(<span class="at">ratio =</span> <span class="dv">10</span>)</span>
+<span id="cb22-3"><a href="#cb22-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-4"><a href="#cb22-4" aria-hidden="true" tabindex="-1"></a>(des <span class="sc">+</span> trt) <span class="sc">%&gt;%</span> </span>
+<span id="cb22-5"><a href="#cb22-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">allot_trts</span>(ratio <span class="sc">~</span> order</span>
+<span id="cb22-6"><a href="#cb22-6" aria-hidden="true" tabindex="-1"></a>             ) <span class="sc">%&gt;%</span> </span>
+<span id="cb22-7"><a href="#cb22-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">assign_trts</span>(<span class="at">order =</span> <span class="fu">c</span>(<span class="st">"random"</span>),</span>
+<span id="cb22-8"><a href="#cb22-8" aria-hidden="true" tabindex="-1"></a>              <span class="at">seed =</span> <span class="dv">2023</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb22-9"><a href="#cb22-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">serve_table</span>() <span class="sc">%&gt;%</span> <span class="fu">autoplot</span>(<span class="at">shape =</span> <span class="st">'circle'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="data-simulation_files/figure-html/unnamed-chunk-8-2.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
 </section>
 
 </main>
