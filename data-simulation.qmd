@@ -28,7 +28,12 @@ var.pair <- expand.grid(s,s) %>%
   mutate(percent = 100*Var1/Var2,
          mean_val = (Var1 + Var2) / 2) %>% 
   filter(percent <= 100) %>% 
+  mutate(percent = round(100*(Var1/Var2)^(.7)),
+         spl70 = 100*(Var1/Var2)^(.7)) %>% 
+  mutate(percent = Var2-Var1) %>% 
+  # filter((Var1 + Var2) == 100) %>% 
   mutate(in_percent = ifelse(percent %in% (10*(1:10)), 'Yes', 'No'))
+
 
 
 ggplot(var.pair, mapping = aes(x = Var1, y = Var2, 
