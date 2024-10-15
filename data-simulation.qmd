@@ -5,207 +5,233 @@ format: html
 ---
 
 ```{r}
+#| warning: false
+#| message: false
+
 library(tidyverse)
 set.seed(2026)
+theme_set(theme_bw())
 ```
 
-# Introduction
+# Research Objectives
 
-This document outlines the steps for data creation for the 3d heatmap study. 
-The original document is located in `design.qmd`, but has since had major revisions. 
+Our objectives are to determine the differences between digital projections of 3D heatmaps to physical 3D heatmaps. 
+To accomplish this, we are designing a study around accuracy judgements in a similar fashion to Cleveland and McGill's study (CM) that was published in 1984.
 
-Our currently proposed research questions consist of numerical estimation of value pairs, locate a coordinate with a similar value, and, in the case of correlated data, identify how many pairs of variables are highly correlated.
+# Stimuli creation
 
-# Value Pairs
+The main issue of designing a new set of stimuli that is different from CM is that we need to consider the ratio magnitude of two values.
+For example, two values of 5 and 10 have a ratio of 50%, but so does values of 50 and 100. 
+Below are a couple of possible solutions to this problem.
 
-The first step is to establish common value pairs to be used across all graphs. 
-In Cleveland and McGill, they chose pairs of values generated on a log scale. 
-The follow graph shows the combination pairs of values from 10 to 100 and if their ratios are perfectly within 10% increments from 10% to 100%. 
+## Replicate CM Method
+
+CM used $10\cdot 10^{(i-1)/12}$ with $i=1,\dots,10$, which gave a range of values from 10 to 56. 
+Adapting this to be $10\cdot 10^{(i-1)/9}$ gives a range of 10 to 100. 
+However, many values fall below 50, similiarly for ratios and differences
 
 ```{r}
-s = 10:100
-var.pair <- expand.grid(s,s) %>% 
-  mutate(percent = 100*Var1/Var2,
-         mean_val = (Var1 + Var2) / 2) %>% 
-  filter(percent <= 100) %>% 
-  mutate(percent = round(100*(Var1/Var2)^(.7)),
-         spl70 = 100*(Var1/Var2)^(.7)) %>% 
-  mutate(percent = Var2-Var1) %>% 
-  # filter((Var1 + Var2) == 100) %>% 
-  mutate(in_percent = ifelse(percent %in% (10*(1:10)), 'Yes', 'No'))
+i=1:10
+s = 10*10^((i-1)/9)
+stimuli.cm <- expand.grid(smaller = s, larger = s) %>% 
+  filter(smaller <= larger) %>% 
+  mutate(ratio = 100*smaller/larger,
+         difference = larger-smaller)
+sort(unique(stimuli.cm$ratio))
+sort(unique(stimuli.cm$difference))
+```
 
+## Constant Value
 
+NOTE: Text on graphs (title, etc.) may be incorrect
 
-ggplot(var.pair, mapping = aes(x = Var1, y = Var2, 
-                               fill = in_percent
-                               )) + 
-  geom_tile(color = NA) + 
-  scale_fill_manual(values = c("Yes" = 'grey10', "No" = 'grey90')) +
-  theme_bw() +
-  labs(title = 'Pairs of all integers (10 to 100)',
-       x = 'Smaller value',
-       y = 'Larger value') +
-  theme(aspect.ratio = 1) 
+Lastly, the approach we decided to take is to use a constant value in each comparison. 
+This process is well document in psychophysics experiments and allows for an easier control over ratios and differences.
+
+As an arbitrary process, assume that all values in the dataset will span a range of 0 to 100. CM had the lowest value set as 10, which I will keep here. If we let the constant value be 50, the symmetry puts the largest value at 90. 
+
+With a constant value at 50 and limits of 10 and 90, the next decision is to choose other values by segmenting differences or ratios. In the case of differences, we equally divide the range between the constant value and the bounds. Ratios are a little trickier, but this is done by calculating the ratios between the constant value and lower/upper bounds and equally segmenting the range of values. For example, the lower bound of 10 and constant of 50 creates a range of ratios between 0.2 and 1. Then, equally spaced ratios along 0.2 and 1 are chosen and used to get the stimuli values.
+
+```{r}
+#| layout-ncol: 2
+
+# Parameters
+constant = 50
+lower = 10
+upper = 90
+l = 5 # number-1 of values > or < constant
+
+# Get values by sequencing along lower bound and constant, similar with upper bound and constant
+diff_lower <- seq(lower, constant, l = l)
+diff_higher <- seq(constant, upper, l = l)
+
+# Arrange for plotting purposes
+s_d <- unique(c(diff_lower, diff_higher))
+value <- ifelse(s_d==constant, 'constant', 'varying')
+
+s_diff <- unique(c(constant-diff_lower, diff_higher-constant))
+
+# Plot values under difference condition
+ggplot(mapping = aes(x = 1:length(s_d), y = s_d, fill = value)) + 
+  geom_bar(stat = 'identity') + 
+  geom_text(aes(label = round(s_d,2), y = s_d + 3)) +
+  scale_y_continuous(breaks = c(0, s_d, upper+10), limits = c(0, upper+10)) + 
+  scale_fill_brewer(palette = 'Set1') +
+  labs(x = '', y = 'Value', title = 'Stimuli under differences condition',
+       subtitle = 'Values choses by segmenting differences between constant and bounds') + 
+  theme(axis.text.x = element_blank(),
+        axis.ticks.x = element_blank())
+
+# Plot values under difference condition
+ggplot(mapping = aes(x = 1:length(s_diff), y = sort(s_diff))) + 
+  geom_bar(stat = 'identity', fill = 'grey80') + 
+  geom_text(aes(label = sort(round(s_diff,2)), y = sort(s_diff) + 3)) +
+  scale_y_continuous(breaks = c(0, s_diff, upper+10), limits = c(0, max(s_diff)+10)) + 
+  scale_fill_brewer(palette = 'Set1') +
+  labs(x = '', y = 'Value', title = 'Range of differences',
+       subtitle = 'Values choses by segmenting differences between constant and bounds') + 
+  theme(axis.text.x = element_blank(),
+        axis.ticks.x = element_blank())
+```
+
+```{r}
+#| layout-ncol: 2
+
+# Segment values of ratios
+ratio_lower <- seq((lower/constant), 1, l = l)
+ratio_upper <- seq(1, (constant/upper), l = l)
+
+# Arrange ratios and calculate stimuli values
+s_ratio <- unique(c(ratio_lower, ratio_upper))
+value <- ifelse(s_ratio==1, 'constant', 'varying')
+s_r <- unique(c(ratio_lower*constant, constant/ratio_upper))
+
+# Plot values under ratio condition
+ggplot(mapping = aes(x = 1:length(s_r), y = s_r, fill = value)) + 
+  geom_bar(stat = 'identity') + 
+  geom_text(aes(label = round(s_r,2), y = s_r + 3)) +
+  scale_y_continuous(breaks = c(0, s_r, 100), limits = c(0, 100)) + 
+  scale_fill_brewer(palette = 'Set1') +
+  labs(x = '', y = 'Value', title = 'Stimuli under ratio condition',
+       subtitle = 'Values choses by segmenting ratios between constant and bounds') + 
+  theme(axis.text.x = element_blank(),
+        axis.ticks.x = element_blank())
   
+# Plot values under ratio condition
+ggplot(mapping = aes(x = 1:length(s_ratio), y = sort(s_ratio))) + 
+  geom_bar(stat = 'identity', fill = 'grey80') + 
+  geom_text(aes(label = sort(round(s_ratio,2)), y = sort(s_ratio -0.05))) +
+  scale_y_continuous(breaks = c(0, s_ratio, 1), limits = c(0, 1)) + 
+  scale_fill_brewer(palette = 'Set1') +
+  labs(x = '', y = 'Value', title = 'Range of ratios',
+       subtitle = 'Values choses by segmenting ratios between constant and bounds') + 
+  theme(axis.text.x = element_blank(),
+        axis.ticks.x = element_blank())
+
 ```
 
 
 
-One possible way to choose value pairs is to randomly sample from the pool of pairs where the ratio is exactly equal to the 10% increments.
-With this sampling method, we can control for excessively small values that could be influenced by either extreme differences in surround values or just noticeable differences. 
-By weighting the value pairs by their averages, we ensure that larger values are favored over smaller values. 
-The following plot shows 1,000 samples taken using the described method.
-What we see is that the average of value pairs tend to be between 50 and 70.
 
 
 ```{r}
-var.valid <- var.pair %>% 
-  group_by(percent) %>% 
-  filter((percent > 0) & (percent %in% (10*(0:10))))
-var.samples <- var.valid %>% 
-  slice_sample(n = 1000, weight_by = mean_val, replace = T)
-
-var.errbar <- var.samples %>% 
-  group_by(percent) %>% 
-  summarize(lower.p = quantile(mean_val, 0.35),
-            upper.p = quantile(mean_val, 0.65))
-
-var.samples %>% 
-  ggplot(mapping = aes(x = percent, y = mean_val)) + 
-  geom_jitter(width = 1/2, alpha = 1/100) + 
-  geom_smooth() + 
-  geom_errorbar(data = var.errbar, mapping = aes(x = percent, y = NULL, ymin = lower.p, ymax = upper.p), width = 3, color = 'red') + 
-  scale_y_continuous(breaks = seq(0, 100, 10)) +
-  labs(title = 'Average value pair from weighted sampling',
-       subtitle = 'Error bars represent 35th and 65th percentiles of average value',
-       x = 'Percent (Var1/Var2)', y = 'Average value',
-       caption = 'group n = 1000') + 
-  theme_classic()
-```
-
-```{r}
-#| eval: false
-#| echo: false
-
-# Statistics of sample
-var.samples %>% 
-  group_by(percent) %>% 
-  summarize(mean = mean(mean_val),
-            sd = sd(mean_val),
-            span = diff(range(mean_val)))
-```
-
-To finalize the selection of samples, we fit the same generalized additive model from `geom_smooth()` using `mgcv::gam()`. 
-From here, we can identify the value pairs that are closest to the predicted values from the GAM model.
-However, the value of 70 occurred frequently for the larger value of the pair, so we will consider average values that are within the 35th and 65th percentiles of their respective percent.
-Lastly, a randomized selection from the acceptable pairs is chosen.
-
-
-```{r}
-library(mgcv)
-mod <- gam(mean_val ~ s(percent, bs = 'cs'),
-    data = var.samples)
-
-var.final <- var.samples %>% 
+var1 <- 10:100
+stimuli <- expand.grid(var1 = var1, var2 = 50) %>% 
+  mutate(id = row_number()) %>% 
+  group_by(id) %>% 
+  mutate(smaller = min(var1, var2),
+         larger = max(var1, var2)) %>% 
+  mutate(ratio = smaller/larger, 
+         difference = larger-smaller) %>% 
   ungroup() %>% 
-  mutate(p = predict(mod)) %>% 
-  mutate(diff = abs(mean_val - p)) %>% 
-  group_by(percent) %>% 
-  # filter(diff <= min(diff) + 10) %>%
-  filter(mean_val <= quantile(mean_val, 0.65) & mean_val >= quantile(mean_val, 0.35)) %>%
-  slice_sample(n = 1)
-var.final
+  select(-c(var1,var2,id))
+
+library(ggrepel)
+stimuli %>% 
+  ggplot(aes(x = difference, y = ratio)) + 
+  geom_point() + 
+  geom_text_repel(aes(label = paste0(smaller,', ', larger)),
+                  min.segment.length = unit(0, 'lines'),
+                  size = 2, alpha = 1/2) 
 ```
 
-# Experimental Design
-
-With value pairs selected, we turn our attention to the design of the experiment. 
-My proposal consists of media, ratio, context, and variation.
-
-- Media: physical form of the graph (2d, 3d-digital, 3d-printed)
-- Ratio: ratio of value pairs (10%, 20%, ... , 100%)
-- Context: situational context (response surface, correlation)
-- Variation: different forms for data set to take on (5)
-
-There are 300 units available under a full factorial treatment design.
-It stands to reason that context is the whole plot factor, where each participant goes through two segments of each context. 
-From here, we would want a randomized order of media, ratio, and variation. 
-Figure @fig-FullDesign shows the full design without any blocking conditions.
-For simplicity, we currently assume that media is a split-plot. In practice, we will fully randomize the order, but this will allow for an easier experience in utilizing an incomplete block design for ratio and variation.
+The other option is to use symmetry with the upper ratios, shown below. The issue here is that ratios will only go between 0.55 and 1, missing the lower range of values. However, there are more values closer to 
 
 
 ```{r}
-#| label: fig-fullDesign
-#| fig-cap: "Full design"
+#| layout-ncol: 2
 
-library(edibble)
-library(deggust)
+# Segment values of ratios
+ratio_upper_s <- seq(1, (constant/upper), l = l)
 
-des <- design('Heat3d Units') %>% 
-  set_units(context = c('response', 'corr'),
-            fullmedia = nested_in(context,3),
-            order = nested_in(fullmedia, 50))
-serve_table(des) %>% autoplot()
-trt <- design('Heat3d Trts') %>% 
-  set_trts(ratio = 10,
-           vars = 5)
+# Arrange ratios and calculate stimuli values
+s_r_s <- unique(c(rev(ratio_upper_s)*constant, constant/ratio_upper_s))
+value_s <- ifelse(s_r_s == constant, 'constant', 'varying')
 
-(des + trt) %>% 
-  allot_trts(ratio:vars ~ order
-             ) %>% 
-  assign_trts(order = c("random"),
-              seed = 2023) %>% 
-  serve_table() %>% autoplot(shape = 'circle')
+
+
+# Plot values under ratio condition
+ggplot(mapping = aes(x = 1:length(s_r_s), y = s_r_s, fill = value)) + 
+  geom_bar(stat = 'identity') + 
+  geom_text(aes(label = round(s_r_s,2), y = s_r_s + 3)) +
+  scale_y_continuous(breaks = c(0, s_r_s, 100), limits = c(0, 100)) + 
+  scale_fill_brewer(palette = 'Set1') +
+  labs(x = '', y = 'Value', title = 'Stimuli under ratio condition',
+       subtitle = 'Values choses by segmenting ratios between constant and bounds') + 
+  theme(axis.text.x = element_blank(),
+        axis.ticks.x = element_blank())
+  
+# Plot values under ratio condition
+ggplot(mapping = aes(x = 1:length(ratio_upper_s), y = sort(ratio_upper_s))) + 
+  geom_bar(stat = 'identity', fill = 'grey80') + 
+  geom_text(aes(label = sort(round(ratio_upper_s,2)), y = sort(ratio_upper_s -0.05))) +
+  scale_y_continuous(breaks = c(0, ratio_upper_s, 1), limits = c(0, 1)) + 
+  scale_fill_brewer(palette = 'Set1') +
+  labs(x = '', y = 'Value', title = 'Range of ratios',
+       subtitle = 'Values choses by segmenting ratios between constant and bounds') + 
+  theme(axis.text.x = element_blank(),
+        axis.ticks.x = element_blank())
 
 ```
+
+Another option is to use symmetry on the values smaller than the constant using the differences with the larger values and the constant.
 
 ```{r}
-#| label: fig-fullDesignOneUnit
-#| fig-cap: "One unit of full design"
+#| layout-ncol: 2
 
-library(edibble)
-library(deggust)
+# Segment values of ratios
+ratio_upper_s <- seq(1, (constant/upper), l = l)
 
-des <- design('Heat3d Units') %>% 
-  set_units(order = 50)
-trt <- design('Heat3d Trts') %>% 
-  set_trts(ratio = 10,
-           vars = 5)
+# Arrange ratios and calculate stimuli values
+s_r_s <- unique(c(rev(constant - (constant/ratio_upper_s - constant)), constant/ratio_upper_s))
+value_s <- ifelse(s_r_s == constant, 'constant', 'varying')
 
-(des + trt) %>% 
-  allot_trts(ratio:vars ~ order
-             ) %>% 
-  assign_trts(order = c("random"),
-              seed = 2023) %>% 
-  serve_table() %>% autoplot(shape = 'circle')
+ratio_s <- ifelse(s_r_s <= constant, s_r_s/constant, constant/s_r_s)
 
-```
-
-With 300 trials per participant, we will want to use some sort of incomplete blocking structure.
-
-
-
-```{r}
-
-library(edibble)
-library(deggust)
-
-des <- design('Heat3d Units') %>% 
-  set_units(context = c('response', 'corr'),
-            fullmedia = nested_in(context,3),
-            order = nested_in(fullmedia, 10))
-serve_table(des) %>% autoplot()
-trt <- design('Heat3d Trts') %>% 
-  set_trts(ratio = 10)
-
-(des + trt) %>% 
-  allot_trts(ratio ~ order
-             ) %>% 
-  assign_trts(order = c("random"),
-              seed = 2023) %>% 
-  serve_table() %>% autoplot(shape = 'circle')
+# Plot values under ratio condition
+ggplot(mapping = aes(x = 1:length(s_r_s), y = s_r_s, fill = value_s)) + 
+  geom_bar(stat = 'identity') + 
+  geom_text(aes(label = round(s_r_s,2), y = s_r_s + 3)) +
+  scale_y_continuous(breaks = c(0, s_r_s, 100), limits = c(0, 100)) + 
+  scale_fill_brewer(palette = 'Set1') +
+  labs(x = '', y = 'Value', title = 'Stimuli under ratio condition',
+       subtitle = 'Values choses by segmenting ratios between constant and bounds') + 
+  theme(axis.text.x = element_blank(),
+        axis.ticks.x = element_blank())
+  
+# Plot values under ratio condition
+ggplot(mapping = aes(x = 1:length(ratio_s), y = sort(ratio_s))) + 
+  geom_bar(stat = 'identity', fill = 'grey80') + 
+  geom_text(aes(label = sort(round(ratio_s,2)), y = sort(ratio_s -0.05))) +
+  scale_y_continuous(breaks = c(0, ratio_s, 1), limits = c(0, 1)) + 
+  scale_fill_brewer(palette = 'Set1') +
+  labs(x = '', y = 'Value', title = 'Range of ratios',
+       subtitle = 'Values choses by segmenting ratios between constant and bounds') + 
+  theme(axis.text.x = element_blank(),
+        axis.ticks.x = element_blank())
 
 ```
 
 
+## Creating datasets
 
