@@ -1,0 +1,118 @@
+---
+title: "Data Simulation"
+author: "Tyler Wiederich"
+format: html
+---
+
+```{r}
+#| warning: false
+#| message: false
+
+library(tidyverse)
+set.seed(2026)
+theme_set(theme_bw())
+```
+
+# Stimuli Creation
+
+A well established design in psychophysics experiments involving comparisons is the the method of constant stimuli. This design has the benefit that one value remains constant and the value varies. In some studies, the constant value can vary.
+
+In this study, all values in the heatmap are between 0 and 100. The constant stimuli is set at 50 and the varying stimuli are created such that ratios are equally spaced between 50 and 90. The same ratios are used to create the stimuli smaller than 50 by using 50 as the denominator.
+
+```{r}
+#Parameters
+constant <- 50
+max_val <- 90
+l <- 5
+
+#Ratios
+ratios <- seq(constant/max_val, 1, l = l)
+ratios
+
+#Values
+lower <- constant*ratios
+upper <- rev(constant/ratios)
+values <- unique(c(lower, upper))
+values
+
+#Stimuli
+stimuli <- expand_grid(values, constant) %>% 
+  mutate(pair_id = row_number())
+
+```
+
+# Data sets
+
+The next step is to generate datasets for random noise.
+
+```{r}
+#Helper functions
+scale0to100 <- function(z){
+  100*(z-min(z))/(max(z)-min(z))
+}
+spherical <- function(x,y){
+  z2 <- 7^2 - (x-5.5)^2 - (y-5.5)^2 + rnorm(length(x), sd = 2)
+  z <- sqrt(map_dbl(z2, \(z)(max(z,0))))
+  return(z)
+}
+
+#Grids
+x <- y <- 1:10
+empty_grid <- expand_grid(x,y)
+grid1 <- empty_grid %>% 
+  mutate(z = scale0to100(map2_dbl(x,y, spherical)))
+ggplot(grid1, aes(x = x, y = y, fill = z)) + 
+  geom_tile() + 
+  scale_fill_gradient(low = 'white', high = 'darkblue') + 
+  theme(aspect.ratio = 1)
+```
+
+```{r}
+stimuli_long <- stimuli %>% 
+  pivot_longer(1:2, names_to = 'condition', values_to = 'z_star')
+z_star <- stimuli_long$z_star
+
+grid_closest <- grid1 %>% 
+  rowwise() %>% 
+  mutate(closest = z_star[which.min(abs(z-z_star))]) %>% 
+  mutate(diff = abs(z-closest)) %>% 
+  ungroup() %>% 
+  mutate(coord_id = row_number()) %>% 
+  filter(diff <= 5) %>% 
+  left_join(stimuli_long, by = c('closest' = 'z_star'),
+            relationship = 'many-to-many')
+grid_closest %>% 
+  full_join(grid_closest, by = c('dummy', 'pair_id')) %>% 
+  filter((x.x != x.y) & (y.x != y.y),
+         condition.x != condition.y) %>% 
+  mutate(m.dist = abs(x.x-x.y) + abs(y.x-y.y)) %>% 
+  filter(m.dist %in% c(3,4)) %>% 
+  ungroup() %>% 
+  mutate(match_id = row_number()) %>% 
+  group_by(pair_id) 
+  # group_by(pair_id.x) %>%
+  # slice_sample(n = 1) %>%
+  
+  pivot_longer(contains(c('.x', '.y')), values_transform = as.character) %>%
+  mutate(name = str_replace(name, '.x', ''),
+         name = str_replace(name, '.y', '')) %>%
+  pivot_wider(names_from = name) %>% 
+  unnest(cols = x:condition) %>% 
+  type_convert() %>% 
+  unique() %>% 
+  arrange(match_id, x, y)
+```
+
+```{r}
+grid_closest %>% 
+  ggplot(mapping = aes(x = x, y = y, fill = closest)) + 
+  geom_tile() + 
+  geom_text(aes(label = pair_id))
+
+
+
+
+grid_closest
+
+
+```
