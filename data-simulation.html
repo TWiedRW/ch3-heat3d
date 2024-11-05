@@ -137,248 +137,281 @@ window.Quarto = {
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">2026</span>)</span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="fu">theme_set</span>(<span class="fu">theme_bw</span>())</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<section id="research-objectives" class="level1">
-<h1>Research Objectives</h1>
-<p>Our objectives are to determine the differences between digital projections of 3D heatmaps to physical 3D heatmaps. To accomplish this, we are designing a study around accuracy judgements in a similar fashion to Cleveland and McGill’s study (CM) that was published in 1984.</p>
-</section>
 <section id="stimuli-creation" class="level1">
-<h1>Stimuli creation</h1>
-<p>The main issue of designing a new set of stimuli that is different from CM is that we need to consider the ratio magnitude of two values. For example, two values of 5 and 10 have a ratio of 50%, but so does values of 50 and 100. Below are a couple of possible solutions to this problem.</p>
-<section id="replicate-cm-method" class="level2">
-<h2 class="anchored" data-anchor-id="replicate-cm-method">Replicate CM Method</h2>
-<p>CM used <span class="math inline">\(10\cdot 10^{(i-1)/12}\)</span> with <span class="math inline">\(i=1,\dots,10\)</span>, which gave a range of values from 10 to 56. Adapting this to be <span class="math inline">\(10\cdot 10^{(i-1)/9}\)</span> gives a range of 10 to 100. However, many values fall below 50, similiarly for ratios and differences</p>
+<h1>Stimuli Creation</h1>
+<p>A well established design in psychophysics experiments involving comparisons is the the method of constant stimuli. This design has the benefit that one value remains constant and the value varies. In some studies, the constant value can vary.</p>
+<p>In this study, all values in the heatmap are between 0 and 100. The constant stimuli is set at 50 and the varying stimuli are created such that ratios are equally spaced between 50 and 90. The same ratios are used to create the stimuli smaller than 50 by using 50 as the denominator.</p>
+<p>The method of constant stimuli is a common experimental design in psychophysics. In this design, two values are compared by asking participants to make a judgement. Some studies create an additional factor by varying the magnitude of the constant stimuli.</p>
+<p>In our study, we restrict all values in the heatmap between 0 and 100. The constant stimuli is set at 50 and the varying stimuli is created such that</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>i<span class="ot">=</span><span class="dv">1</span><span class="sc">:</span><span class="dv">10</span></span>
-<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>s <span class="ot">=</span> <span class="dv">10</span><span class="sc">*</span><span class="dv">10</span><span class="sc">^</span>((i<span class="dv">-1</span>)<span class="sc">/</span><span class="dv">9</span>)</span>
-<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>stimuli.cm <span class="ot">&lt;-</span> <span class="fu">expand.grid</span>(<span class="at">smaller =</span> s, <span class="at">larger =</span> s) <span class="sc">%&gt;%</span> </span>
-<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(smaller <span class="sc">&lt;=</span> larger) <span class="sc">%&gt;%</span> </span>
-<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">ratio =</span> <span class="dv">100</span><span class="sc">*</span>smaller<span class="sc">/</span>larger,</span>
-<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>         <span class="at">difference =</span> larger<span class="sc">-</span>smaller)</span>
-<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a><span class="fu">sort</span>(<span class="fu">unique</span>(stimuli.cm<span class="sc">$</span>ratio))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-stdout">
-<pre><code> [1]  10.00000  12.91550  12.91550  16.68101  16.68101  21.54435  21.54435
- [8]  21.54435  27.82559  27.82559  35.93814  35.93814  46.41589  46.41589
-[15]  46.41589  59.94843  59.94843  59.94843  77.42637  77.42637 100.00000
-[22] 100.00000 100.00000</code></pre>
-</div>
-<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="fu">sort</span>(<span class="fu">unique</span>(stimuli.cm<span class="sc">$</span>difference))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-stdout">
-<pre><code> [1]  0.000000  2.915497  3.765509  4.863342  6.281247  6.681005  8.112543
- [8]  8.628850 10.477752 11.144589 11.544347 13.532537 14.393790 14.910097
-[15] 17.477943 17.825594 18.590294 19.257131 22.573632 23.022640 24.010288
-[22] 24.871541 25.938137 29.734883 31.010480 32.122831 33.500392 36.415888
-[29] 38.404078 40.051575 41.488232 43.267420 47.032928 49.600774 49.948425
-[36] 53.584112 55.882021 60.745363 64.061863 64.510872 67.426368 72.174406
-[43] 78.455653 83.318995 87.084503 90.000000</code></pre>
-</div>
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="co">#Parameters</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>constant <span class="ot">&lt;-</span> <span class="dv">50</span></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>max_val <span class="ot">&lt;-</span> <span class="dv">90</span></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>l <span class="ot">&lt;-</span> <span class="dv">5</span></span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a><span class="co">#Ratios</span></span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>ratios <span class="ot">&lt;-</span> <span class="fu">seq</span>(constant<span class="sc">/</span>max_val, <span class="dv">1</span>, <span class="at">l =</span> l)</span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a><span class="co">#Values</span></span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a>lower <span class="ot">&lt;-</span> constant<span class="sc">*</span>ratios</span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a>upper <span class="ot">&lt;-</span> <span class="fu">rev</span>(constant<span class="sc">/</span>ratios)</span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a>values <span class="ot">&lt;-</span> <span class="fu">unique</span>(<span class="fu">c</span>(lower, upper))</span>
+<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a><span class="co">#Stimuli</span></span>
+<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a>stimuli <span class="ot">&lt;-</span> <span class="fu">expand_grid</span>(values, constant) <span class="sc">%&gt;%</span> </span>
+<span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">pair_id =</span> <span class="fu">row_number</span>())</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section>
-<section id="constant-value" class="level2">
-<h2 class="anchored" data-anchor-id="constant-value">Constant Value</h2>
-<p>NOTE: Text on graphs (title, etc.) may be incorrect</p>
-<p>Lastly, the approach we decided to take is to use a constant value in each comparison. This process is well document in psychophysics experiments and allows for an easier control over ratios and differences.</p>
-<p>As an arbitrary process, assume that all values in the dataset will span a range of 0 to 100. CM had the lowest value set as 10, which I will keep here. If we let the constant value be 50, the symmetry puts the largest value at 90.</p>
-<p>With a constant value at 50 and limits of 10 and 90, the next decision is to choose other values by segmenting differences or ratios. In the case of differences, we equally divide the range between the constant value and the bounds. Ratios are a little trickier, but this is done by calculating the ratios between the constant value and lower/upper bounds and equally segmenting the range of values. For example, the lower bound of 10 and constant of 50 creates a range of ratios between 0.2 and 1. Then, equally spaced ratios along 0.2 and 1 are chosen and used to get the stimuli values.</p>
-<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Parameters</span></span>
-<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>constant <span class="ot">=</span> <span class="dv">50</span></span>
-<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>lower <span class="ot">=</span> <span class="dv">10</span></span>
-<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>upper <span class="ot">=</span> <span class="dv">90</span></span>
-<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>l <span class="ot">=</span> <span class="dv">5</span> <span class="co"># number-1 of values &gt; or &lt; constant</span></span>
-<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a><span class="co"># Get values by sequencing along lower bound and constant, similar with upper bound and constant</span></span>
-<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a>diff_lower <span class="ot">&lt;-</span> <span class="fu">seq</span>(lower, constant, <span class="at">l =</span> l)</span>
-<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a>diff_higher <span class="ot">&lt;-</span> <span class="fu">seq</span>(constant, upper, <span class="at">l =</span> l)</span>
-<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a><span class="co"># Arrange for plotting purposes</span></span>
-<span id="cb6-12"><a href="#cb6-12" aria-hidden="true" tabindex="-1"></a>s_d <span class="ot">&lt;-</span> <span class="fu">unique</span>(<span class="fu">c</span>(diff_lower, diff_higher))</span>
-<span id="cb6-13"><a href="#cb6-13" aria-hidden="true" tabindex="-1"></a>value <span class="ot">&lt;-</span> <span class="fu">ifelse</span>(s_d<span class="sc">==</span>constant, <span class="st">'constant'</span>, <span class="st">'varying'</span>)</span>
-<span id="cb6-14"><a href="#cb6-14" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-15"><a href="#cb6-15" aria-hidden="true" tabindex="-1"></a>s_diff <span class="ot">&lt;-</span> <span class="fu">unique</span>(<span class="fu">c</span>(constant<span class="sc">-</span>diff_lower, diff_higher<span class="sc">-</span>constant))</span>
-<span id="cb6-16"><a href="#cb6-16" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-17"><a href="#cb6-17" aria-hidden="true" tabindex="-1"></a><span class="co"># Plot values under difference condition</span></span>
-<span id="cb6-18"><a href="#cb6-18" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(<span class="at">mapping =</span> <span class="fu">aes</span>(<span class="at">x =</span> <span class="dv">1</span><span class="sc">:</span><span class="fu">length</span>(s_d), <span class="at">y =</span> s_d, <span class="at">fill =</span> value)) <span class="sc">+</span> </span>
-<span id="cb6-19"><a href="#cb6-19" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_bar</span>(<span class="at">stat =</span> <span class="st">'identity'</span>) <span class="sc">+</span> </span>
-<span id="cb6-20"><a href="#cb6-20" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_text</span>(<span class="fu">aes</span>(<span class="at">label =</span> <span class="fu">round</span>(s_d,<span class="dv">2</span>), <span class="at">y =</span> s_d <span class="sc">+</span> <span class="dv">3</span>)) <span class="sc">+</span></span>
-<span id="cb6-21"><a href="#cb6-21" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_y_continuous</span>(<span class="at">breaks =</span> <span class="fu">c</span>(<span class="dv">0</span>, s_d, upper<span class="sc">+</span><span class="dv">10</span>), <span class="at">limits =</span> <span class="fu">c</span>(<span class="dv">0</span>, upper<span class="sc">+</span><span class="dv">10</span>)) <span class="sc">+</span> </span>
-<span id="cb6-22"><a href="#cb6-22" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_fill_brewer</span>(<span class="at">palette =</span> <span class="st">'Set1'</span>) <span class="sc">+</span></span>
-<span id="cb6-23"><a href="#cb6-23" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="st">''</span>, <span class="at">y =</span> <span class="st">'Value'</span>, <span class="at">title =</span> <span class="st">'Stimuli under differences condition'</span>,</span>
-<span id="cb6-24"><a href="#cb6-24" aria-hidden="true" tabindex="-1"></a>       <span class="at">subtitle =</span> <span class="st">'Values choses by segmenting differences between constant and bounds'</span>) <span class="sc">+</span> </span>
-<span id="cb6-25"><a href="#cb6-25" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">axis.text.x =</span> <span class="fu">element_blank</span>(),</span>
-<span id="cb6-26"><a href="#cb6-26" aria-hidden="true" tabindex="-1"></a>        <span class="at">axis.ticks.x =</span> <span class="fu">element_blank</span>())</span>
-<span id="cb6-27"><a href="#cb6-27" aria-hidden="true" tabindex="-1"></a><span class="co"># Plot values under difference condition</span></span>
-<span id="cb6-28"><a href="#cb6-28" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(<span class="at">mapping =</span> <span class="fu">aes</span>(<span class="at">x =</span> <span class="dv">1</span><span class="sc">:</span><span class="fu">length</span>(s_diff), <span class="at">y =</span> <span class="fu">sort</span>(s_diff))) <span class="sc">+</span> </span>
-<span id="cb6-29"><a href="#cb6-29" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_bar</span>(<span class="at">stat =</span> <span class="st">'identity'</span>, <span class="at">fill =</span> <span class="st">'grey80'</span>) <span class="sc">+</span> </span>
-<span id="cb6-30"><a href="#cb6-30" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_text</span>(<span class="fu">aes</span>(<span class="at">label =</span> <span class="fu">sort</span>(<span class="fu">round</span>(s_diff,<span class="dv">2</span>)), <span class="at">y =</span> <span class="fu">sort</span>(s_diff) <span class="sc">+</span> <span class="dv">3</span>)) <span class="sc">+</span></span>
-<span id="cb6-31"><a href="#cb6-31" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_y_continuous</span>(<span class="at">breaks =</span> <span class="fu">c</span>(<span class="dv">0</span>, s_diff, upper<span class="sc">+</span><span class="dv">10</span>), <span class="at">limits =</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="fu">max</span>(s_diff)<span class="sc">+</span><span class="dv">10</span>)) <span class="sc">+</span> </span>
-<span id="cb6-32"><a href="#cb6-32" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_fill_brewer</span>(<span class="at">palette =</span> <span class="st">'Set1'</span>) <span class="sc">+</span></span>
-<span id="cb6-33"><a href="#cb6-33" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="st">''</span>, <span class="at">y =</span> <span class="st">'Value'</span>, <span class="at">title =</span> <span class="st">'Range of differences'</span>,</span>
-<span id="cb6-34"><a href="#cb6-34" aria-hidden="true" tabindex="-1"></a>       <span class="at">subtitle =</span> <span class="st">'Values choses by segmenting differences between constant and bounds'</span>) <span class="sc">+</span> </span>
-<span id="cb6-35"><a href="#cb6-35" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">axis.text.x =</span> <span class="fu">element_blank</span>(),</span>
-<span id="cb6-36"><a href="#cb6-36" aria-hidden="true" tabindex="-1"></a>        <span class="at">axis.ticks.x =</span> <span class="fu">element_blank</span>())</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell quarto-layout-panel" data-layout-ncol="2">
-<div class="quarto-layout-row">
-<div class="quarto-layout-cell" style="flex-basis: 50.0%;justify-content: center;">
-<p><img src="data-simulation_files/figure-html/unnamed-chunk-3-1.png" class="img-fluid" width="672"></p>
-</div>
-<div class="quarto-layout-cell" style="flex-basis: 50.0%;justify-content: center;">
-<p><img src="data-simulation_files/figure-html/unnamed-chunk-3-2.png" class="img-fluid" width="672"></p>
-</div>
-</div>
-</div>
-<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Segment values of ratios</span></span>
-<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>ratio_lower <span class="ot">&lt;-</span> <span class="fu">seq</span>((lower<span class="sc">/</span>constant), <span class="dv">1</span>, <span class="at">l =</span> l)</span>
-<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>ratio_upper <span class="ot">&lt;-</span> <span class="fu">seq</span>(<span class="dv">1</span>, (constant<span class="sc">/</span>upper), <span class="at">l =</span> l)</span>
-<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a><span class="co"># Arrange ratios and calculate stimuli values</span></span>
-<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>s_ratio <span class="ot">&lt;-</span> <span class="fu">unique</span>(<span class="fu">c</span>(ratio_lower, ratio_upper))</span>
-<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a>value <span class="ot">&lt;-</span> <span class="fu">ifelse</span>(s_ratio<span class="sc">==</span><span class="dv">1</span>, <span class="st">'constant'</span>, <span class="st">'varying'</span>)</span>
-<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a>s_r <span class="ot">&lt;-</span> <span class="fu">unique</span>(<span class="fu">c</span>(ratio_lower<span class="sc">*</span>constant, constant<span class="sc">/</span>ratio_upper))</span>
-<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a><span class="co"># Plot values under ratio condition</span></span>
-<span id="cb7-11"><a href="#cb7-11" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(<span class="at">mapping =</span> <span class="fu">aes</span>(<span class="at">x =</span> <span class="dv">1</span><span class="sc">:</span><span class="fu">length</span>(s_r), <span class="at">y =</span> s_r, <span class="at">fill =</span> value)) <span class="sc">+</span> </span>
-<span id="cb7-12"><a href="#cb7-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_bar</span>(<span class="at">stat =</span> <span class="st">'identity'</span>) <span class="sc">+</span> </span>
-<span id="cb7-13"><a href="#cb7-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_text</span>(<span class="fu">aes</span>(<span class="at">label =</span> <span class="fu">round</span>(s_r,<span class="dv">2</span>), <span class="at">y =</span> s_r <span class="sc">+</span> <span class="dv">3</span>)) <span class="sc">+</span></span>
-<span id="cb7-14"><a href="#cb7-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_y_continuous</span>(<span class="at">breaks =</span> <span class="fu">c</span>(<span class="dv">0</span>, s_r, <span class="dv">100</span>), <span class="at">limits =</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">100</span>)) <span class="sc">+</span> </span>
-<span id="cb7-15"><a href="#cb7-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_fill_brewer</span>(<span class="at">palette =</span> <span class="st">'Set1'</span>) <span class="sc">+</span></span>
-<span id="cb7-16"><a href="#cb7-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="st">''</span>, <span class="at">y =</span> <span class="st">'Value'</span>, <span class="at">title =</span> <span class="st">'Stimuli under ratio condition'</span>,</span>
-<span id="cb7-17"><a href="#cb7-17" aria-hidden="true" tabindex="-1"></a>       <span class="at">subtitle =</span> <span class="st">'Values choses by segmenting ratios between constant and bounds'</span>) <span class="sc">+</span> </span>
-<span id="cb7-18"><a href="#cb7-18" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">axis.text.x =</span> <span class="fu">element_blank</span>(),</span>
-<span id="cb7-19"><a href="#cb7-19" aria-hidden="true" tabindex="-1"></a>        <span class="at">axis.ticks.x =</span> <span class="fu">element_blank</span>())</span>
-<span id="cb7-20"><a href="#cb7-20" aria-hidden="true" tabindex="-1"></a><span class="co"># Plot values under ratio condition</span></span>
-<span id="cb7-21"><a href="#cb7-21" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(<span class="at">mapping =</span> <span class="fu">aes</span>(<span class="at">x =</span> <span class="dv">1</span><span class="sc">:</span><span class="fu">length</span>(s_ratio), <span class="at">y =</span> <span class="fu">sort</span>(s_ratio))) <span class="sc">+</span> </span>
-<span id="cb7-22"><a href="#cb7-22" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_bar</span>(<span class="at">stat =</span> <span class="st">'identity'</span>, <span class="at">fill =</span> <span class="st">'grey80'</span>) <span class="sc">+</span> </span>
-<span id="cb7-23"><a href="#cb7-23" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_text</span>(<span class="fu">aes</span>(<span class="at">label =</span> <span class="fu">sort</span>(<span class="fu">round</span>(s_ratio,<span class="dv">2</span>)), <span class="at">y =</span> <span class="fu">sort</span>(s_ratio <span class="sc">-</span><span class="fl">0.05</span>))) <span class="sc">+</span></span>
-<span id="cb7-24"><a href="#cb7-24" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_y_continuous</span>(<span class="at">breaks =</span> <span class="fu">c</span>(<span class="dv">0</span>, s_ratio, <span class="dv">1</span>), <span class="at">limits =</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">1</span>)) <span class="sc">+</span> </span>
-<span id="cb7-25"><a href="#cb7-25" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_fill_brewer</span>(<span class="at">palette =</span> <span class="st">'Set1'</span>) <span class="sc">+</span></span>
-<span id="cb7-26"><a href="#cb7-26" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="st">''</span>, <span class="at">y =</span> <span class="st">'Value'</span>, <span class="at">title =</span> <span class="st">'Range of ratios'</span>,</span>
-<span id="cb7-27"><a href="#cb7-27" aria-hidden="true" tabindex="-1"></a>       <span class="at">subtitle =</span> <span class="st">'Values choses by segmenting ratios between constant and bounds'</span>) <span class="sc">+</span> </span>
-<span id="cb7-28"><a href="#cb7-28" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">axis.text.x =</span> <span class="fu">element_blank</span>(),</span>
-<span id="cb7-29"><a href="#cb7-29" aria-hidden="true" tabindex="-1"></a>        <span class="at">axis.ticks.x =</span> <span class="fu">element_blank</span>())</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell quarto-layout-panel" data-layout-ncol="2">
-<div class="quarto-layout-row">
-<div class="quarto-layout-cell" style="flex-basis: 50.0%;justify-content: center;">
-<p><img src="data-simulation_files/figure-html/unnamed-chunk-4-1.png" class="img-fluid" width="672"></p>
-</div>
-<div class="quarto-layout-cell" style="flex-basis: 50.0%;justify-content: center;">
-<p><img src="data-simulation_files/figure-html/unnamed-chunk-4-2.png" class="img-fluid" width="672"></p>
-</div>
-</div>
-</div>
+<section id="idea" class="level1">
+<h1>Idea</h1>
+<ol type="1">
+<li>generate response surface as a mixture distribution of desired shape and uniform</li>
+<li>input one of the known values to a spot that is similar to its value</li>
+<li>look at all coordinates around the location and input the other value</li>
+<li>remove both coordinates from mixture distribution</li>
+<li>repeat until all values are used</li>
+<li>check that chosen coordinates are are not concentrated across x and y via two chi square tests
+<ul>
+<li>if either are significant, re-simulate values</li>
+</ul></li>
+</ol>
+</section>
+<section id="data-generation" class="level1">
+<h1>Data Generation</h1>
+<p>Values for the heatmap are created with a mixture distribution / weighted average. With mixing parameter <span class="math inline">\(c\)</span>, random variable <span class="math inline">\(U\)</span>, and a function between 0 and 100 <span class="math inline">\(g(X,Y)\)</span>, values are created as follows:</p>
+<p><span class="math display">\[
+f(X,Y)=c\cdot U_{[0,100]}+(1-c)\cdot g(X,Y)\qquad 0\leq c\leq 1;X,Y=1,\dots,10
+\]</span></p>
+<ol type="1">
+<li><p>INPUT x, y coordinates, mixing parameter, bivariate function, stimuli data frame, and iterations of datasets to simulate</p></li>
+<li><p>CREATE list to save each iteration</p></li>
+<li><p>FOR each iteration</p>
+<ol type="1">
+<li><p>CREATE grid <span class="math inline">\(M\)</span> with <span class="math inline">\((X,Y)\)</span></p></li>
+<li><p>INSERT <span class="math inline">\(\{U,g(X,Y),f(X,Y)\}\)</span> into <span class="math inline">\(M\)</span></p></li>
+<li><p>CREATE empty dataset <span class="math inline">\(D\)</span></p></li>
+<li><p>FOR each row of stimuli dataset with pairs <span class="math inline">\((S_1,S_2)\)</span></p>
+<ol type="1">
+<li><p>CREATE dataset <span class="math inline">\(D_1\)</span> with differences between <span class="math inline">\(f(X,Y)\)</span> and <span class="math inline">\((S_1)\)</span></p>
+<ol type="1">
+<li><p>FILTER <span class="math inline">\(D_1\)</span> with smallest differences</p></li>
+<li><p>SAMPLE remaining rows to account for ties</p></li>
+</ol></li>
+<li><p>CREATE dataset <span class="math inline">\(D_2\)</span> with differences between <span class="math inline">\(f(X,Y)\)</span> and <span class="math inline">\(S_2\)</span></p>
+<ol type="1">
+<li><p>FILTER <span class="math inline">\(D_2\)</span> for <span class="math inline">\((X,Y)\)</span> with Manhattan distances of 3 or 4 from <span class="math inline">\((X,Y)\)</span> of <span class="math inline">\(D_1\)</span></p></li>
+<li><p>FILTER <span class="math inline">\(D_2\)</span> with smallest differences</p></li>
+<li><p>SAMPLE remaining rows to account for ties</p></li>
+</ol></li>
+<li><p>SAVE <span class="math inline">\(D_1\)</span> and <span class="math inline">\(D_2\)</span> into <span class="math inline">\(D\)</span></p></li>
+<li><p>REMOVE <span class="math inline">\(D\)</span> from <span class="math inline">\(M\)</span></p></li>
+</ol></li>
+<li><p>CREATE <span class="math inline">\(M'\)</span> by joining <span class="math inline">\(D\)</span> and <span class="math inline">\(M\)</span></p></li>
+<li><p>CHECK that <span class="math inline">\((S_1,S_2)\)</span> are approximately evenly spaced across <span class="math inline">\(M'\)</span></p>
+<ol type="1">
+<li><p>CALCULATE marginal counts of <span class="math inline">\((S_1,S_2)\)</span> across <span class="math inline">\((X,Y)\)</span></p></li>
+<li><p>CALCULATE <span class="math inline">\(\chi^2\)</span> from a Chi-squared test across marginal counts of <span class="math inline">\(X\)</span> and <span class="math inline">\(Y\)</span></p></li>
+<li><p>AVERAGE both <span class="math inline">\(\chi^2\)</span> statistics</p>
+<ol type="1">
+<li><em>Remark</em>: the purpose of the Chi-squared tests is to make sure that the stimuli coordinates are not concentrated onto any particular part of the heatmap. The smaller the test statistic, the smaller the difference between marginal count of stimuli across <span class="math inline">\(X\)</span> or <span class="math inline">\(Y\)</span> and the expected counts. With 18 stimuli values, the expected count 1.8 per row/column</li>
+</ol></li>
+</ol></li>
+</ol></li>
+<li><p>EXTRACT dataset with smallest average chi-square statistic</p></li>
+<li><p>OUTPUT dataset</p></li>
+</ol>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>var1 <span class="ot">&lt;-</span> <span class="dv">10</span><span class="sc">:</span><span class="dv">100</span></span>
-<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>stimuli <span class="ot">&lt;-</span> <span class="fu">expand.grid</span>(<span class="at">var1 =</span> var1, <span class="at">var2 =</span> <span class="dv">50</span>) <span class="sc">%&gt;%</span> </span>
-<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">id =</span> <span class="fu">row_number</span>()) <span class="sc">%&gt;%</span> </span>
-<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(id) <span class="sc">%&gt;%</span> </span>
-<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">smaller =</span> <span class="fu">min</span>(var1, var2),</span>
-<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a>         <span class="at">larger =</span> <span class="fu">max</span>(var1, var2)) <span class="sc">%&gt;%</span> </span>
-<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">ratio =</span> smaller<span class="sc">/</span>larger, </span>
-<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a>         <span class="at">difference =</span> larger<span class="sc">-</span>smaller) <span class="sc">%&gt;%</span> </span>
-<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ungroup</span>() <span class="sc">%&gt;%</span> </span>
-<span id="cb8-10"><a href="#cb8-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="sc">-</span><span class="fu">c</span>(var1,var2,id))</span>
-<span id="cb8-11"><a href="#cb8-11" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-12"><a href="#cb8-12" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(ggrepel)</span>
-<span id="cb8-13"><a href="#cb8-13" aria-hidden="true" tabindex="-1"></a>stimuli <span class="sc">%&gt;%</span> </span>
-<span id="cb8-14"><a href="#cb8-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> difference, <span class="at">y =</span> ratio)) <span class="sc">+</span> </span>
-<span id="cb8-15"><a href="#cb8-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>() <span class="sc">+</span> </span>
-<span id="cb8-16"><a href="#cb8-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_text_repel</span>(<span class="fu">aes</span>(<span class="at">label =</span> <span class="fu">paste0</span>(smaller,<span class="st">', '</span>, larger)),</span>
-<span id="cb8-17"><a href="#cb8-17" aria-hidden="true" tabindex="-1"></a>                  <span class="at">min.segment.length =</span> <span class="fu">unit</span>(<span class="dv">0</span>, <span class="st">'lines'</span>),</span>
-<span id="cb8-18"><a href="#cb8-18" aria-hidden="true" tabindex="-1"></a>                  <span class="at">size =</span> <span class="dv">2</span>, <span class="at">alpha =</span> <span class="dv">1</span><span class="sc">/</span><span class="dv">2</span>) </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>generate_heatmap_data <span class="ot">&lt;-</span> <span class="cf">function</span>(<span class="at">x=</span><span class="dv">1</span><span class="sc">:</span><span class="dv">10</span>, <span class="at">y=</span><span class="dv">1</span><span class="sc">:</span><span class="dv">10</span>, <span class="at">c=</span><span class="fl">0.3</span>, f, stimuli, <span class="at">num_iters =</span> <span class="dv">20</span>, ...){</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>  <span class="co"># x, y:     grid coordinates</span></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>  <span class="co"># c:        mixing parameter of true function and random noise</span></span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>  <span class="co"># f:        function with arguments (x,y) to be used as the true surface </span></span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>  <span class="co">#             across the grid (need not be scaled)</span></span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>  <span class="co"># stimuli:  data frame with three columns, where columns 1 and 2 are </span></span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>  <span class="co">#             values to compare and column 3 is the pair identifier</span></span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>  <span class="co"># num_iters: number of iterations    </span></span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a>  <span class="co"># ...:      additional values to pass to f</span></span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a>  <span class="co">#Helper functions</span></span>
+<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a>  scale0to100 <span class="ot">&lt;-</span> <span class="cf">function</span>(z){</span>
+<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a>  <span class="dv">100</span><span class="sc">*</span>(z<span class="sc">-</span><span class="fu">min</span>(z))<span class="sc">/</span>(<span class="fu">max</span>(z)<span class="sc">-</span><span class="fu">min</span>(z))</span>
+<span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb3-15"><a href="#cb3-15" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb3-16"><a href="#cb3-16" aria-hidden="true" tabindex="-1"></a>  save_iters <span class="ot">&lt;-</span> <span class="fu">list</span>()</span>
+<span id="cb3-17"><a href="#cb3-17" aria-hidden="true" tabindex="-1"></a>  <span class="cf">for</span>(i <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span>num_iters){</span>
+<span id="cb3-18"><a href="#cb3-18" aria-hidden="true" tabindex="-1"></a>    <span class="co">#Create grid and calculate mixture distribution</span></span>
+<span id="cb3-19"><a href="#cb3-19" aria-hidden="true" tabindex="-1"></a>    mixed_grid <span class="ot">&lt;-</span> <span class="fu">expand_grid</span>(x,y) <span class="sc">%&gt;%</span> </span>
+<span id="cb3-20"><a href="#cb3-20" aria-hidden="true" tabindex="-1"></a>    <span class="fu">mutate</span>(<span class="at">unif =</span> <span class="fu">runif</span>(<span class="fu">nrow</span>(.), <span class="dv">0</span>, <span class="dv">100</span>),</span>
+<span id="cb3-21"><a href="#cb3-21" aria-hidden="true" tabindex="-1"></a>           <span class="at">dtn =</span> <span class="fu">scale0to100</span>(<span class="fu">f</span>(x,y)),</span>
+<span id="cb3-22"><a href="#cb3-22" aria-hidden="true" tabindex="-1"></a>           <span class="at">f =</span> c<span class="sc">*</span>unif <span class="sc">+</span> (<span class="dv">1</span><span class="sc">-</span>c)<span class="sc">*</span>dtn)</span>
+<span id="cb3-23"><a href="#cb3-23" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb3-24"><a href="#cb3-24" aria-hidden="true" tabindex="-1"></a>    <span class="co">#Empty data frame to save results</span></span>
+<span id="cb3-25"><a href="#cb3-25" aria-hidden="true" tabindex="-1"></a>    save_grid <span class="ot">&lt;-</span> <span class="fu">data.frame</span>()</span>
+<span id="cb3-26"><a href="#cb3-26" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb3-27"><a href="#cb3-27" aria-hidden="true" tabindex="-1"></a>    <span class="co">#For each stimuli pair, place values into grid</span></span>
+<span id="cb3-28"><a href="#cb3-28" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span>(j <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span><span class="fu">nrow</span>(stimuli)){</span>
+<span id="cb3-29"><a href="#cb3-29" aria-hidden="true" tabindex="-1"></a>      val1 <span class="ot">&lt;-</span> stimuli[j,<span class="dv">1</span>][[<span class="dv">1</span>]]; val2 <span class="ot">&lt;-</span> stimuli[j,<span class="dv">2</span>][[<span class="dv">1</span>]]; pair_id <span class="ot">&lt;-</span> stimuli[j,<span class="dv">3</span>][[<span class="dv">1</span>]]</span>
+<span id="cb3-30"><a href="#cb3-30" aria-hidden="true" tabindex="-1"></a>      </span>
+<span id="cb3-31"><a href="#cb3-31" aria-hidden="true" tabindex="-1"></a>      <span class="co">#Sample location of one value</span></span>
+<span id="cb3-32"><a href="#cb3-32" aria-hidden="true" tabindex="-1"></a>      tmp1 <span class="ot">&lt;-</span> mixed_grid <span class="sc">%&gt;%</span> </span>
+<span id="cb3-33"><a href="#cb3-33" aria-hidden="true" tabindex="-1"></a>        <span class="fu">mutate</span>(<span class="at">z =</span> val1, <span class="at">diff =</span> <span class="fu">abs</span>(f<span class="sc">-</span>val1),</span>
+<span id="cb3-34"><a href="#cb3-34" aria-hidden="true" tabindex="-1"></a>               pair_id) <span class="sc">%&gt;%</span></span>
+<span id="cb3-35"><a href="#cb3-35" aria-hidden="true" tabindex="-1"></a>        <span class="co"># filter(diff &lt;= 15) %&gt;% </span></span>
+<span id="cb3-36"><a href="#cb3-36" aria-hidden="true" tabindex="-1"></a>        <span class="fu">filter</span>(diff <span class="sc">==</span> <span class="fu">min</span>(diff)) <span class="sc">%&gt;%</span></span>
+<span id="cb3-37"><a href="#cb3-37" aria-hidden="true" tabindex="-1"></a>        <span class="fu">slice_sample</span>(<span class="at">n =</span> <span class="dv">1</span>) <span class="co">#to account for ties</span></span>
+<span id="cb3-38"><a href="#cb3-38" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb3-39"><a href="#cb3-39" aria-hidden="true" tabindex="-1"></a>      <span class="co">#Sample location of second value based off acceptable distances to first value</span></span>
+<span id="cb3-40"><a href="#cb3-40" aria-hidden="true" tabindex="-1"></a>      tmp2 <span class="ot">&lt;-</span> mixed_grid <span class="sc">%&gt;%</span> </span>
+<span id="cb3-41"><a href="#cb3-41" aria-hidden="true" tabindex="-1"></a>        <span class="fu">filter</span>(((x <span class="sc">==</span> tmp1<span class="sc">$</span>x) <span class="sc">&amp;</span> (y <span class="sc">==</span> tmp1<span class="sc">$</span>y)) <span class="sc">|</span> (<span class="fu">abs</span>(x<span class="sc">-</span>tmp1<span class="sc">$</span>x) <span class="sc">+</span> <span class="fu">abs</span>(y<span class="sc">-</span>tmp1<span class="sc">$</span>y)) <span class="sc">%in%</span> <span class="fu">c</span>(<span class="dv">3</span>,<span class="dv">4</span>)) <span class="sc">%&gt;%</span> </span>
+<span id="cb3-42"><a href="#cb3-42" aria-hidden="true" tabindex="-1"></a>        <span class="fu">anti_join</span>(tmp1, <span class="at">by =</span> <span class="fu">c</span>(<span class="st">'x'</span>,<span class="st">'y'</span>)) <span class="sc">%&gt;%</span> </span>
+<span id="cb3-43"><a href="#cb3-43" aria-hidden="true" tabindex="-1"></a>        <span class="fu">mutate</span>(<span class="at">z =</span> val2, <span class="at">diff =</span> <span class="fu">abs</span>(f<span class="sc">-</span>val2),</span>
+<span id="cb3-44"><a href="#cb3-44" aria-hidden="true" tabindex="-1"></a>               pair_id) <span class="sc">%&gt;%</span> </span>
+<span id="cb3-45"><a href="#cb3-45" aria-hidden="true" tabindex="-1"></a>        <span class="fu">filter</span>(diff <span class="sc">==</span> <span class="fu">min</span>(diff)) <span class="sc">%&gt;%</span> </span>
+<span id="cb3-46"><a href="#cb3-46" aria-hidden="true" tabindex="-1"></a>        <span class="fu">slice_sample</span>(<span class="at">n =</span> <span class="dv">1</span>) <span class="co">#to account for ties</span></span>
+<span id="cb3-47"><a href="#cb3-47" aria-hidden="true" tabindex="-1"></a>      </span>
+<span id="cb3-48"><a href="#cb3-48" aria-hidden="true" tabindex="-1"></a>      <span class="co">#Save locations and values of stimuli pair, remove from available spots</span></span>
+<span id="cb3-49"><a href="#cb3-49" aria-hidden="true" tabindex="-1"></a>      save_grid <span class="ot">&lt;-</span> <span class="fu">bind_rows</span>(save_grid, tmp1, tmp2)</span>
+<span id="cb3-50"><a href="#cb3-50" aria-hidden="true" tabindex="-1"></a>      mixed_grid <span class="ot">&lt;-</span> mixed_grid <span class="sc">%&gt;%</span> </span>
+<span id="cb3-51"><a href="#cb3-51" aria-hidden="true" tabindex="-1"></a>        <span class="fu">anti_join</span>(save_grid, <span class="at">by =</span> <span class="fu">c</span>(<span class="st">'x'</span>, <span class="st">'y'</span>))</span>
+<span id="cb3-52"><a href="#cb3-52" aria-hidden="true" tabindex="-1"></a>      </span>
+<span id="cb3-53"><a href="#cb3-53" aria-hidden="true" tabindex="-1"></a>    }<span class="co">#end inner for loop</span></span>
+<span id="cb3-54"><a href="#cb3-54" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb3-55"><a href="#cb3-55" aria-hidden="true" tabindex="-1"></a>    <span class="co">#Join the used and unused coordinates, replacing </span></span>
+<span id="cb3-56"><a href="#cb3-56" aria-hidden="true" tabindex="-1"></a>    full_grid <span class="ot">&lt;-</span> mixed_grid <span class="sc">%&gt;%</span> </span>
+<span id="cb3-57"><a href="#cb3-57" aria-hidden="true" tabindex="-1"></a>      <span class="fu">full_join</span>(save_grid, <span class="at">by =</span> <span class="fu">c</span>(<span class="st">'x'</span>, <span class="st">'y'</span>, <span class="st">'unif'</span>, <span class="st">'dtn'</span>, <span class="st">'f'</span>)) <span class="sc">%&gt;%</span> </span>
+<span id="cb3-58"><a href="#cb3-58" aria-hidden="true" tabindex="-1"></a>      <span class="fu">mutate</span>(<span class="at">z =</span> <span class="fu">ifelse</span>(<span class="fu">is.na</span>(z), f, z))</span>
+<span id="cb3-59"><a href="#cb3-59" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb3-60"><a href="#cb3-60" aria-hidden="true" tabindex="-1"></a>    <span class="co">#Check that placed values are not congregated along x or y axis using chi square tests</span></span>
+<span id="cb3-61"><a href="#cb3-61" aria-hidden="true" tabindex="-1"></a>    x_coord_check <span class="ot">&lt;-</span> full_grid <span class="sc">%&gt;%</span> </span>
+<span id="cb3-62"><a href="#cb3-62" aria-hidden="true" tabindex="-1"></a>      <span class="fu">group_by</span>(x) <span class="sc">%&gt;%</span> </span>
+<span id="cb3-63"><a href="#cb3-63" aria-hidden="true" tabindex="-1"></a>      <span class="fu">summarize</span>(<span class="at">Count =</span> <span class="fu">sum</span>(<span class="sc">!</span><span class="fu">is.na</span>(pair_id)))</span>
+<span id="cb3-64"><a href="#cb3-64" aria-hidden="true" tabindex="-1"></a>    tmp_x <span class="ot">&lt;-</span> <span class="fu">chisq.test</span>(x_coord_check<span class="sc">$</span>Count, <span class="at">simulate.p.value =</span> T)</span>
+<span id="cb3-65"><a href="#cb3-65" aria-hidden="true" tabindex="-1"></a>    y_coord_check <span class="ot">&lt;-</span> full_grid <span class="sc">%&gt;%</span> </span>
+<span id="cb3-66"><a href="#cb3-66" aria-hidden="true" tabindex="-1"></a>      <span class="fu">group_by</span>(y) <span class="sc">%&gt;%</span> </span>
+<span id="cb3-67"><a href="#cb3-67" aria-hidden="true" tabindex="-1"></a>      <span class="fu">summarise</span>(<span class="at">Count =</span> <span class="fu">sum</span>(<span class="sc">!</span><span class="fu">is.na</span>(pair_id)))</span>
+<span id="cb3-68"><a href="#cb3-68" aria-hidden="true" tabindex="-1"></a>    tmp_y <span class="ot">&lt;-</span> <span class="fu">chisq.test</span>(y_coord_check<span class="sc">$</span>Count, <span class="at">simulate.p.value =</span> T)</span>
+<span id="cb3-69"><a href="#cb3-69" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb3-70"><a href="#cb3-70" aria-hidden="true" tabindex="-1"></a>    <span class="co">#Save iterations into list</span></span>
+<span id="cb3-71"><a href="#cb3-71" aria-hidden="true" tabindex="-1"></a>    save_iters[[i]] <span class="ot">&lt;-</span> <span class="fu">list</span>(<span class="at">data =</span> full_grid, <span class="at">chisq =</span> <span class="fu">mean</span>(<span class="fu">c</span>(tmp_x<span class="sc">$</span>statistic, tmp_y<span class="sc">$</span>statistic)))</span>
+<span id="cb3-72"><a href="#cb3-72" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-73"><a href="#cb3-73" aria-hidden="true" tabindex="-1"></a>  }<span class="co">#end outer for loop</span></span>
+<span id="cb3-74"><a href="#cb3-74" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb3-75"><a href="#cb3-75" aria-hidden="true" tabindex="-1"></a>  <span class="co">#Find iteration with smallest average chi square statistic</span></span>
+<span id="cb3-76"><a href="#cb3-76" aria-hidden="true" tabindex="-1"></a>  chisq <span class="ot">&lt;-</span> <span class="fu">numeric</span>(<span class="fu">length</span>(save_iters))</span>
+<span id="cb3-77"><a href="#cb3-77" aria-hidden="true" tabindex="-1"></a>  <span class="cf">for</span>(i <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span><span class="fu">length</span>(chisq)){</span>
+<span id="cb3-78"><a href="#cb3-78" aria-hidden="true" tabindex="-1"></a>    chisq[i] <span class="ot">&lt;-</span> save_iters[[i]][[<span class="st">'chisq'</span>]]</span>
+<span id="cb3-79"><a href="#cb3-79" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb3-80"><a href="#cb3-80" aria-hidden="true" tabindex="-1"></a>  best_fit <span class="ot">&lt;-</span> save_iters[[<span class="fu">which.min</span>(chisq)]][[<span class="st">'data'</span>]]</span>
+<span id="cb3-81"><a href="#cb3-81" aria-hidden="true" tabindex="-1"></a>  <span class="fu">return</span>(best_fit)</span>
+<span id="cb3-82"><a href="#cb3-82" aria-hidden="true" tabindex="-1"></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="examples" class="level1">
+<h1>Examples</h1>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>dat <span class="ot">=</span> <span class="fu">generate_heatmap_data</span>(<span class="at">f =</span> \(x,y)(<span class="dv">36</span><span class="sc">-</span>(x<span class="sc">-</span><span class="fu">mean</span>(x))<span class="sc">^</span><span class="dv">2</span><span class="sc">-</span>(y<span class="sc">-</span><span class="fu">mean</span>(y))<span class="sc">^</span><span class="dv">2</span>), <span class="at">stimuli =</span> stimuli, <span class="at">num_iters =</span> <span class="dv">10</span>, <span class="at">c =</span> <span class="fl">0.25</span>)</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>p <span class="ot">&lt;-</span> <span class="fu">ggplot</span>(dat, <span class="fu">aes</span>(x, y, <span class="at">fill =</span> z)) <span class="sc">+</span> </span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_tile</span>() <span class="sc">+</span> </span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_text</span>(<span class="fu">aes</span>(<span class="at">label =</span> pair_id)) <span class="sc">+</span> </span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_fill_gradient</span>(<span class="at">low =</span> <span class="st">'white'</span>, <span class="at">high =</span> <span class="st">'darkblue'</span>) <span class="sc">+</span></span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">aspect.ratio =</span> <span class="dv">1</span>)</span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>p</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stderr">
-<pre><code>Warning: ggrepel: 1 unlabeled data points (too many overlaps). Consider
-increasing max.overlaps</code></pre>
+<pre><code>Warning: Removed 82 rows containing missing values or values outside the scale range
+(`geom_text()`).</code></pre>
 </div>
 <div class="cell-output-display">
-<div>
+<div class="quarto-figure quarto-figure-center">
 <figure class="figure">
-<p><img src="data-simulation_files/figure-html/unnamed-chunk-5-1.png" class="img-fluid figure-img" width="672"></p>
+<p><img src="data-simulation_files/figure-html/unnamed-chunk-4-1.png" class="img-fluid figure-img" width="672"></p>
+<figcaption>Semisphere</figcaption>
 </figure>
 </div>
 </div>
 </div>
-<p>The other option is to use symmetry with the upper ratios, shown below. The issue here is that ratios will only go between 0.55 and 1, missing the lower range of values. However, there are more values closer to</p>
-<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Segment values of ratios</span></span>
-<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>ratio_upper_s <span class="ot">&lt;-</span> <span class="fu">seq</span>(<span class="dv">1</span>, (constant<span class="sc">/</span>upper), <span class="at">l =</span> l)</span>
-<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Arrange ratios and calculate stimuli values</span></span>
-<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a>s_r_s <span class="ot">&lt;-</span> <span class="fu">unique</span>(<span class="fu">c</span>(<span class="fu">rev</span>(ratio_upper_s)<span class="sc">*</span>constant, constant<span class="sc">/</span>ratio_upper_s))</span>
-<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a>value_s <span class="ot">&lt;-</span> <span class="fu">ifelse</span>(s_r_s <span class="sc">==</span> constant, <span class="st">'constant'</span>, <span class="st">'varying'</span>)</span>
-<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb10-8"><a href="#cb10-8" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb10-9"><a href="#cb10-9" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb10-10"><a href="#cb10-10" aria-hidden="true" tabindex="-1"></a><span class="co"># Plot values under ratio condition</span></span>
-<span id="cb10-11"><a href="#cb10-11" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(<span class="at">mapping =</span> <span class="fu">aes</span>(<span class="at">x =</span> <span class="dv">1</span><span class="sc">:</span><span class="fu">length</span>(s_r_s), <span class="at">y =</span> s_r_s, <span class="at">fill =</span> value)) <span class="sc">+</span> </span>
-<span id="cb10-12"><a href="#cb10-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_bar</span>(<span class="at">stat =</span> <span class="st">'identity'</span>) <span class="sc">+</span> </span>
-<span id="cb10-13"><a href="#cb10-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_text</span>(<span class="fu">aes</span>(<span class="at">label =</span> <span class="fu">round</span>(s_r_s,<span class="dv">2</span>), <span class="at">y =</span> s_r_s <span class="sc">+</span> <span class="dv">3</span>)) <span class="sc">+</span></span>
-<span id="cb10-14"><a href="#cb10-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_y_continuous</span>(<span class="at">breaks =</span> <span class="fu">c</span>(<span class="dv">0</span>, s_r_s, <span class="dv">100</span>), <span class="at">limits =</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">100</span>)) <span class="sc">+</span> </span>
-<span id="cb10-15"><a href="#cb10-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_fill_brewer</span>(<span class="at">palette =</span> <span class="st">'Set1'</span>) <span class="sc">+</span></span>
-<span id="cb10-16"><a href="#cb10-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="st">''</span>, <span class="at">y =</span> <span class="st">'Value'</span>, <span class="at">title =</span> <span class="st">'Stimuli under ratio condition'</span>,</span>
-<span id="cb10-17"><a href="#cb10-17" aria-hidden="true" tabindex="-1"></a>       <span class="at">subtitle =</span> <span class="st">'Values choses by segmenting ratios between constant and bounds'</span>) <span class="sc">+</span> </span>
-<span id="cb10-18"><a href="#cb10-18" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">axis.text.x =</span> <span class="fu">element_blank</span>(),</span>
-<span id="cb10-19"><a href="#cb10-19" aria-hidden="true" tabindex="-1"></a>        <span class="at">axis.ticks.x =</span> <span class="fu">element_blank</span>())</span>
-<span id="cb10-20"><a href="#cb10-20" aria-hidden="true" tabindex="-1"></a><span class="co"># Plot values under ratio condition</span></span>
-<span id="cb10-21"><a href="#cb10-21" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(<span class="at">mapping =</span> <span class="fu">aes</span>(<span class="at">x =</span> <span class="dv">1</span><span class="sc">:</span><span class="fu">length</span>(ratio_upper_s), <span class="at">y =</span> <span class="fu">sort</span>(ratio_upper_s))) <span class="sc">+</span> </span>
-<span id="cb10-22"><a href="#cb10-22" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_bar</span>(<span class="at">stat =</span> <span class="st">'identity'</span>, <span class="at">fill =</span> <span class="st">'grey80'</span>) <span class="sc">+</span> </span>
-<span id="cb10-23"><a href="#cb10-23" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_text</span>(<span class="fu">aes</span>(<span class="at">label =</span> <span class="fu">sort</span>(<span class="fu">round</span>(ratio_upper_s,<span class="dv">2</span>)), <span class="at">y =</span> <span class="fu">sort</span>(ratio_upper_s <span class="sc">-</span><span class="fl">0.05</span>))) <span class="sc">+</span></span>
-<span id="cb10-24"><a href="#cb10-24" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_y_continuous</span>(<span class="at">breaks =</span> <span class="fu">c</span>(<span class="dv">0</span>, ratio_upper_s, <span class="dv">1</span>), <span class="at">limits =</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">1</span>)) <span class="sc">+</span> </span>
-<span id="cb10-25"><a href="#cb10-25" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_fill_brewer</span>(<span class="at">palette =</span> <span class="st">'Set1'</span>) <span class="sc">+</span></span>
-<span id="cb10-26"><a href="#cb10-26" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="st">''</span>, <span class="at">y =</span> <span class="st">'Value'</span>, <span class="at">title =</span> <span class="st">'Range of ratios'</span>,</span>
-<span id="cb10-27"><a href="#cb10-27" aria-hidden="true" tabindex="-1"></a>       <span class="at">subtitle =</span> <span class="st">'Values choses by segmenting ratios between constant and bounds'</span>) <span class="sc">+</span> </span>
-<span id="cb10-28"><a href="#cb10-28" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">axis.text.x =</span> <span class="fu">element_blank</span>(),</span>
-<span id="cb10-29"><a href="#cb10-29" aria-hidden="true" tabindex="-1"></a>        <span class="at">axis.ticks.x =</span> <span class="fu">element_blank</span>())</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell quarto-layout-panel" data-layout-ncol="2">
-<div class="quarto-layout-row">
-<div class="quarto-layout-cell" style="flex-basis: 50.0%;justify-content: center;">
-<p><img src="data-simulation_files/figure-html/unnamed-chunk-6-1.png" class="img-fluid" width="672"></p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>dat <span class="ot">=</span> <span class="fu">generate_heatmap_data</span>(<span class="at">f =</span> \(x,y)(<span class="dv">36</span><span class="sc">-</span>(x<span class="sc">-</span><span class="fu">mean</span>(x))<span class="sc">^</span><span class="dv">2</span><span class="sc">+</span>(y<span class="sc">-</span><span class="fu">mean</span>(y))<span class="sc">^</span><span class="dv">2</span>), <span class="at">stimuli =</span> stimuli, <span class="at">num_iters =</span> <span class="dv">10</span>, <span class="at">c =</span> <span class="fl">0.25</span>)</span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>p <span class="ot">&lt;-</span> <span class="fu">ggplot</span>(dat, <span class="fu">aes</span>(x, y, <span class="at">fill =</span> z)) <span class="sc">+</span> </span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_tile</span>() <span class="sc">+</span> </span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_text</span>(<span class="fu">aes</span>(<span class="at">label =</span> pair_id)) <span class="sc">+</span> </span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_fill_gradient</span>(<span class="at">low =</span> <span class="st">'white'</span>, <span class="at">high =</span> <span class="st">'darkblue'</span>) <span class="sc">+</span></span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">aspect.ratio =</span> <span class="dv">1</span>)</span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a>p</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: Removed 82 rows containing missing values or values outside the scale range
+(`geom_text()`).</code></pre>
 </div>
-<div class="quarto-layout-cell" style="flex-basis: 50.0%;justify-content: center;">
-<p><img src="data-simulation_files/figure-html/unnamed-chunk-6-2.png" class="img-fluid" width="672"></p>
+<div class="cell-output-display">
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="data-simulation_files/figure-html/unnamed-chunk-5-1.png" class="img-fluid figure-img" width="672"></p>
+<figcaption>Saddle-point</figcaption>
+</figure>
 </div>
 </div>
 </div>
-<p>Another option is to use symmetry on the values smaller than the constant using the differences with the larger values and the constant.</p>
-<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Segment values of ratios</span></span>
-<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>ratio_upper_s <span class="ot">&lt;-</span> <span class="fu">seq</span>(<span class="dv">1</span>, (constant<span class="sc">/</span>upper), <span class="at">l =</span> l)</span>
-<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Arrange ratios and calculate stimuli values</span></span>
-<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a>s_r_s <span class="ot">&lt;-</span> <span class="fu">unique</span>(<span class="fu">c</span>(<span class="fu">rev</span>(constant <span class="sc">-</span> (constant<span class="sc">/</span>ratio_upper_s <span class="sc">-</span> constant)), constant<span class="sc">/</span>ratio_upper_s))</span>
-<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a>value_s <span class="ot">&lt;-</span> <span class="fu">ifelse</span>(s_r_s <span class="sc">==</span> constant, <span class="st">'constant'</span>, <span class="st">'varying'</span>)</span>
-<span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb11-8"><a href="#cb11-8" aria-hidden="true" tabindex="-1"></a>ratio_s <span class="ot">&lt;-</span> <span class="fu">ifelse</span>(s_r_s <span class="sc">&lt;=</span> constant, s_r_s<span class="sc">/</span>constant, constant<span class="sc">/</span>s_r_s)</span>
-<span id="cb11-9"><a href="#cb11-9" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb11-10"><a href="#cb11-10" aria-hidden="true" tabindex="-1"></a><span class="co"># Plot values under ratio condition</span></span>
-<span id="cb11-11"><a href="#cb11-11" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(<span class="at">mapping =</span> <span class="fu">aes</span>(<span class="at">x =</span> <span class="dv">1</span><span class="sc">:</span><span class="fu">length</span>(s_r_s), <span class="at">y =</span> s_r_s, <span class="at">fill =</span> value_s)) <span class="sc">+</span> </span>
-<span id="cb11-12"><a href="#cb11-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_bar</span>(<span class="at">stat =</span> <span class="st">'identity'</span>) <span class="sc">+</span> </span>
-<span id="cb11-13"><a href="#cb11-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_text</span>(<span class="fu">aes</span>(<span class="at">label =</span> <span class="fu">round</span>(s_r_s,<span class="dv">2</span>), <span class="at">y =</span> s_r_s <span class="sc">+</span> <span class="dv">3</span>)) <span class="sc">+</span></span>
-<span id="cb11-14"><a href="#cb11-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_y_continuous</span>(<span class="at">breaks =</span> <span class="fu">c</span>(<span class="dv">0</span>, s_r_s, <span class="dv">100</span>), <span class="at">limits =</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">100</span>)) <span class="sc">+</span> </span>
-<span id="cb11-15"><a href="#cb11-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_fill_brewer</span>(<span class="at">palette =</span> <span class="st">'Set1'</span>) <span class="sc">+</span></span>
-<span id="cb11-16"><a href="#cb11-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="st">''</span>, <span class="at">y =</span> <span class="st">'Value'</span>, <span class="at">title =</span> <span class="st">'Stimuli under ratio condition'</span>,</span>
-<span id="cb11-17"><a href="#cb11-17" aria-hidden="true" tabindex="-1"></a>       <span class="at">subtitle =</span> <span class="st">'Values choses by segmenting ratios between constant and bounds'</span>) <span class="sc">+</span> </span>
-<span id="cb11-18"><a href="#cb11-18" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">axis.text.x =</span> <span class="fu">element_blank</span>(),</span>
-<span id="cb11-19"><a href="#cb11-19" aria-hidden="true" tabindex="-1"></a>        <span class="at">axis.ticks.x =</span> <span class="fu">element_blank</span>())</span>
-<span id="cb11-20"><a href="#cb11-20" aria-hidden="true" tabindex="-1"></a><span class="co"># Plot values under ratio condition</span></span>
-<span id="cb11-21"><a href="#cb11-21" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(<span class="at">mapping =</span> <span class="fu">aes</span>(<span class="at">x =</span> <span class="dv">1</span><span class="sc">:</span><span class="fu">length</span>(ratio_s), <span class="at">y =</span> <span class="fu">sort</span>(ratio_s))) <span class="sc">+</span> </span>
-<span id="cb11-22"><a href="#cb11-22" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_bar</span>(<span class="at">stat =</span> <span class="st">'identity'</span>, <span class="at">fill =</span> <span class="st">'grey80'</span>) <span class="sc">+</span> </span>
-<span id="cb11-23"><a href="#cb11-23" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_text</span>(<span class="fu">aes</span>(<span class="at">label =</span> <span class="fu">sort</span>(<span class="fu">round</span>(ratio_s,<span class="dv">2</span>)), <span class="at">y =</span> <span class="fu">sort</span>(ratio_s <span class="sc">-</span><span class="fl">0.05</span>))) <span class="sc">+</span></span>
-<span id="cb11-24"><a href="#cb11-24" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_y_continuous</span>(<span class="at">breaks =</span> <span class="fu">c</span>(<span class="dv">0</span>, ratio_s, <span class="dv">1</span>), <span class="at">limits =</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">1</span>)) <span class="sc">+</span> </span>
-<span id="cb11-25"><a href="#cb11-25" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_fill_brewer</span>(<span class="at">palette =</span> <span class="st">'Set1'</span>) <span class="sc">+</span></span>
-<span id="cb11-26"><a href="#cb11-26" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="st">''</span>, <span class="at">y =</span> <span class="st">'Value'</span>, <span class="at">title =</span> <span class="st">'Range of ratios'</span>,</span>
-<span id="cb11-27"><a href="#cb11-27" aria-hidden="true" tabindex="-1"></a>       <span class="at">subtitle =</span> <span class="st">'Values choses by segmenting ratios between constant and bounds'</span>) <span class="sc">+</span> </span>
-<span id="cb11-28"><a href="#cb11-28" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">axis.text.x =</span> <span class="fu">element_blank</span>(),</span>
-<span id="cb11-29"><a href="#cb11-29" aria-hidden="true" tabindex="-1"></a>        <span class="at">axis.ticks.x =</span> <span class="fu">element_blank</span>())</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell quarto-layout-panel" data-layout-ncol="2">
-<div class="quarto-layout-row">
-<div class="quarto-layout-cell" style="flex-basis: 50.0%;justify-content: center;">
-<p><img src="data-simulation_files/figure-html/unnamed-chunk-7-1.png" class="img-fluid" width="672"></p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>dat <span class="ot">=</span> <span class="fu">generate_heatmap_data</span>(<span class="at">f =</span> \(x,y)(x), <span class="at">stimuli =</span> stimuli, <span class="at">num_iters =</span> <span class="dv">20</span>, <span class="at">c =</span> <span class="fl">0.25</span>)</span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>p <span class="ot">&lt;-</span> <span class="fu">ggplot</span>(dat, <span class="fu">aes</span>(x, y, <span class="at">fill =</span> z)) <span class="sc">+</span> </span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_tile</span>() <span class="sc">+</span> </span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_text</span>(<span class="fu">aes</span>(<span class="at">label =</span> pair_id)) <span class="sc">+</span> </span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_fill_gradient</span>(<span class="at">low =</span> <span class="st">'white'</span>, <span class="at">high =</span> <span class="st">'darkblue'</span>) <span class="sc">+</span></span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">aspect.ratio =</span> <span class="dv">1</span>)</span>
+<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a>p</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: Removed 82 rows containing missing values or values outside the scale range
+(`geom_text()`).</code></pre>
 </div>
-<div class="quarto-layout-cell" style="flex-basis: 50.0%;justify-content: center;">
-<p><img src="data-simulation_files/figure-html/unnamed-chunk-7-2.png" class="img-fluid" width="672"></p>
+<div class="cell-output-display">
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="data-simulation_files/figure-html/unnamed-chunk-6-1.png" class="img-fluid figure-img" width="672"></p>
+<figcaption>Increase in X</figcaption>
+</figure>
 </div>
 </div>
 </div>
-</section>
-<section id="creating-datasets" class="level2">
-<h2 class="anchored" data-anchor-id="creating-datasets">Creating datasets</h2>
-</section>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>dat <span class="ot">=</span> <span class="fu">generate_heatmap_data</span>(<span class="at">f =</span> \(x,y)(x<span class="sc">+</span>y), <span class="at">stimuli =</span> stimuli, <span class="at">num_iters =</span> <span class="dv">20</span>, <span class="at">c =</span> <span class="fl">0.25</span>)</span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>p <span class="ot">&lt;-</span> <span class="fu">ggplot</span>(dat, <span class="fu">aes</span>(x, y, <span class="at">fill =</span> z)) <span class="sc">+</span> </span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_tile</span>() <span class="sc">+</span> </span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_text</span>(<span class="fu">aes</span>(<span class="at">label =</span> pair_id)) <span class="sc">+</span> </span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_fill_gradient</span>(<span class="at">low =</span> <span class="st">'white'</span>, <span class="at">high =</span> <span class="st">'darkblue'</span>) <span class="sc">+</span></span>
+<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">aspect.ratio =</span> <span class="dv">1</span>)</span>
+<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a>p</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: Removed 82 rows containing missing values or values outside the scale range
+(`geom_text()`).</code></pre>
+</div>
+<div class="cell-output-display">
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="data-simulation_files/figure-html/unnamed-chunk-7-1.png" class="img-fluid figure-img" width="672"></p>
+<figcaption>Increase in X and Y</figcaption>
+</figure>
+</div>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="co"># weather2023 &lt;- read.csv('https://www.ncei.noaa.gov/orders/cdo/3832990.csv')</span></span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a><span class="co"># write.csv(weather2023, 'weather2023.csv')</span></span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a>weather2023 <span class="ot">&lt;-</span> <span class="fu">read.csv</span>(<span class="st">'weather2023.csv'</span>)</span>
+<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-6"><a href="#cb12-6" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(weather2023, <span class="fu">aes</span>(<span class="at">x =</span> TMIN, <span class="at">y =</span> TMAX)) <span class="sc">+</span> </span>
+<span id="cb12-7"><a href="#cb12-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_density_2d</span>() <span class="sc">+</span> </span>
+<span id="cb12-8"><a href="#cb12-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">aspect.ratio =</span> <span class="dv">1</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: Removed 10258 rows containing non-finite outside the scale range
+(`stat_density2d()`).</code></pre>
+</div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="data-simulation_files/figure-html/unnamed-chunk-8-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
 </section>
 
 </main>

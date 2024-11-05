@@ -19,6 +19,10 @@ A well established design in psychophysics experiments involving comparisons is 
 
 In this study, all values in the heatmap are between 0 and 100. The constant stimuli is set at 50 and the varying stimuli are created such that ratios are equally spaced between 50 and 90. The same ratios are used to create the stimuli smaller than 50 by using 50 as the denominator.
 
+The method of constant stimuli is a common experimental design in psychophysics. In this design, two values are compared by asking participants to make a judgement. Some studies create an additional factor by varying the magnitude of the constant stimuli.
+
+In our study, we restrict all values in the heatmap between 0 and 100. The constant stimuli is set at 50 and the varying stimuli is created such that
+
 ```{r}
 #Parameters
 constant <- 50
@@ -27,408 +31,82 @@ l <- 5
 
 #Ratios
 ratios <- seq(constant/max_val, 1, l = l)
-ratios
 
 #Values
 lower <- constant*ratios
 upper <- rev(constant/ratios)
 values <- unique(c(lower, upper))
-values
 
 #Stimuli
 stimuli <- expand_grid(values, constant) %>% 
   mutate(pair_id = row_number())
-
-ggplot(stimuli, mapping = aes(x = values)) + 
-  geom_col()
-
-plot(stimuli$values)
-```
-
-# Data sets
-
-The next step is to generate datasets for random noise.
-
-```{r}
-#Helper functions
-scale0to100 <- function(z){
-  100*(z-min(z))/(max(z)-min(z))
-}
-spherical <- function(x,y){
-  z2 <- 7^2 - (x-5.5)^2 - (y-5.5)^2 + rnorm(length(x), sd = 2)
-  z <- sqrt(map_dbl(z2, \(z)(max(z,0))))
-  return(z)
-}
-
-#Grids
-x <- y <- 1:10
-empty_grid <- expand_grid(x,y)
-grid1 <- empty_grid %>% 
-  mutate(z = scale0to100(map2_dbl(x,y, spherical)))
-ggplot(grid1, aes(x = x, y = y, fill = z)) + 
-  geom_tile() + 
-  scale_fill_gradient(low = 'white', high = 'darkblue') + 
-  theme(aspect.ratio = 1)
-```
-
-Pseudo-code for getting chosen values into response surface
-
--   Simulate response surface
-
--   Determine which coordinates are closest to chosen values
-
--   For each pair_id:
-
-    -   Get all available coordinates from response surface
-
-    -   Create all pairs of these coordinates
-
-    -   Filter coordinates pairs by Manhattan distance equal to 3 or 4
-
-    -   Randomly sample one pair of coordinates
-
-    -   Save coordinates to temporary grid
-
-    -   Update response surface grid to remove sampled coordinates
-
--   If suitable coordinates not found, resimulate response surface
-
-```{r}
-stimuli_long <- stimuli %>% 
-  pivot_longer(1:2, names_to = 'condition', values_to = 'z_star')
-z_star <- stimuli_long$z_star
-
-grid_closest <- grid1 %>% 
-  rowwise() %>% 
-  mutate(closest = z_star[which.min(abs(z-z_star))]) %>% 
-  mutate(diff = abs(z-closest)) %>% 
-  ungroup() %>% 
-  mutate(coord_id = row_number()) %>% 
-  filter(diff <= 5) %>% 
-  left_join(stimuli_long, by = c('closest' = 'z_star'),
-            relationship = 'many-to-many')
-
-grid_closest
-
-gridt <- grid1
-save_grid <- data.frame()
-
-for(i in 1:length(unique(stimuli_long$pair_id))){
-  
-    coord_sample <- filter(grid_closest, pair_id == i) %>% 
-    select(x, y, closest, condition) %>% 
-    expand_grid(., ., .name_repair = 'minimal') %>% 
-    janitor::clean_names() %>% 
-    filter(x != x_2 & y != y_2, closest != closest_2, condition != condition_2) %>% 
-    mutate(m_dist = abs(x-x_2) + abs(y-y_2)) %>% 
-    filter(m_dist %in% c(3,4)) %>% 
-    slice_sample(n = 1)
-    if(nrow(coord_sample) <1) print('Loop stopped because of errors')
-
-    tmp_grid <- tibble(
-      x = c(coord_sample$x, coord_sample$x_2),
-      y = c(coord_sample$y, coord_sample$y_2),
-      z = c(coord_sample$closest, coord_sample$closest_2)
-    )
-    save_grid <- bind_rows(save_grid, tmp_grid)
-    gridt <- gridt %>% 
-      anti_join(tmp_grid, by = c('x', 'y'))
-      
-
-}
-
-
-
-
-
-```
-
-```{r}
-generate_response_surface <- function(x = 1:10, y = 1:10, f = 'semisphere'){
-  if(length(x) != length(y))(errorCondition('x and y are not the same length'))
-  scale0to100 <- function(z){
-  100*(z-min(z))/(max(z)-min(z))
-  }
-  
-  
-  
-  if(f=='semisphere'){
-    z <- outer(x, y, \(x,y)(scale0to100(rnorm(length(x), 0, 0) + 
-                                          sqrt(7^2-(x-mean(x))^2-(y-mean(y))^2))))
-    z <- z %>% 
-      as_tibble() %>% 
-      mutate(rownum = 1:n()) %>% 
-      pivot_longer(cols = 1:(ncol(.)-1)) %>% 
-      mutate(x = rownum,
-             y = as.numeric(gsub('V', '', name)),
-             z = value, .keep = 'unused')
-  }
-  
-  
-  return(z)
-}
-
-
-```
-
-```{r}
-iterations <- list()
-num_iter <- 1
-while(T){
-  
-  candidate_surface <- generate_response_surface()
-  num_iter <- num_iter + 1
-  save_grid <- data.frame()
-  if(num_iter > 1000){
-    print('Maximum number of allowed iterations were used.')
-    break
-  } else {
-    #Generate x and y coordinates for values closest to stimuli
-    grid_closest <- candidate_surface %>% 
-      rowwise() %>% 
-      mutate(closest = z_star[which.min(abs(z-z_star))]) %>% 
-      mutate(diff = abs(z-closest)) %>% 
-      ungroup() %>% 
-      mutate(coord_id = row_number()) %>% 
-      filter(diff <= 5) %>% 
-      left_join(stimuli_long, by = c('closest' = 'z_star'),
-                relationship = 'many-to-many')
-    
-    
-    #For each stimuli pair
-    for(i in 1:length(unique(stimuli_long$pair_id))){
-    
-    coord_sample <- filter(grid_closest, pair_id == i) %>% 
-    select(x, y, closest, condition) %>% 
-    expand_grid(., ., .name_repair = 'minimal') %>% 
-    janitor::clean_names() %>% 
-    filter(x != x_2 & y != y_2, closest != closest_2, condition != condition_2) %>% 
-    mutate(m_dist = abs(x-x_2) + abs(y-y_2)) %>% 
-    filter(m_dist %in% c(3,4)) %>%
-    slice_sample(n = 1)
-
-    if(nrow(coord_sample) < 1){
-      break
-    } else {
-      tmp_grid <- tibble(
-      x = c(coord_sample$x, coord_sample$x_2),
-      y = c(coord_sample$y, coord_sample$y_2),
-      z = c(coord_sample$closest, coord_sample$closest_2))
-      
-      save_grid <- bind_rows(save_grid, tmp_grid)
-      
-      candidate_surface <- candidate_surface %>% 
-        anti_join(tmp_grid, by = c('x', 'y'))
-    }
-    
-    } #end for loop
-  } #end else
-} #end while loop
-
-save_grid
-```
-
-
-
-```{r}
-stimuli_long
-
-sphere <- function(x, y, r=7){
-  z = scale0to100(sqrt(r^2-(x-mean(x))^2-(y-mean(y))^2))
-  return(z)
-}
-
-x <- 1:10; y<- 1:10
-surface <- outer(x,y,sphere) %>% 
-  as_tibble() %>% 
-  mutate(rownum = row_number()) %>% 
-  pivot_longer(cols = 1:(ncol(.)-1)) %>% 
-  mutate(x = rownum, y = gsub('V', '', name),
-         z = value, .keep = 'unused') %>% 
-  type_convert() %>% 
-  rowwise() %>% 
-  mutate(closest = z_star[which.min(abs(z-z_star))]) %>% 
-  mutate(diff = abs(z-closest)) 
-
-stimuli_matches <- surface %>% 
-  # filter(diff <= 20) %>% 
-  select(-c(z)) %>% 
-  left_join(stimuli_long, by = c('closest' = 'z_star'),
-            relationship = 'many-to-many') %>% 
-  expand_grid(.,., .name_repair = 'minimal') %>% 
-  janitor::clean_names() %>% 
-  mutate(m_dist = abs(x-x_2) + abs(y-y_2)) %>% 
-  filter((x != x_2) | (y != y_2), condition != condition_2, 
-         pair_id == pair_id_2, m_dist %in% c(3,4)) 
-stimuli_matches %>% 
-  ungroup() %>% 
-  group_by(pair_id) %>% 
-  slice_sample(n = 1, weight_by = 1/diff)
-
-
-# library(lattice)
-# lattice::contourplot(outer(x,y, sphere, r=7), cuts = 100)
-
-```
-
-
-
-```{r}
-tmp <- empty_grid %>% 
-  mutate(z = runif(nrow(.), 0, 100))
-
-mod = loess(z ~ x * y, data = tmp)
-tmp$z_star <- predict(mod)
-
-tmp %>% 
-  ggplot(mapping = aes(x = x, y = y, fill = z_star)) + 
-  geom_tile()
-
 ```
 
 # Idea
 
-- Use weighted average of uniform (where values are inputted) and desired distribution
+1)  generate response surface as a mixture distribution of desired shape and uniform
+2)  input one of the known values to a spot that is similar to its value
+3)  look at all coordinates around the location and input the other value
+4)  remove both coordinates from mixture distribution
+5)  repeat until all values are used
+6)  check that chosen coordinates are are not concentrated across x and y via two chi square tests
+    -   if either are significant, re-simulate values
 
-```{r}
-x = y = 1:10
-c = 0.2
-mixed_grid <- expand_grid(x,y) %>% 
-  mutate(unif = runif(nrow(.), 0, 100),
-         dtn = scale0to100(sqrt(7^2-(x-mean(x))^2-(y-mean(y))^2)))
+# Data Generation
 
-matched_stimuli_grid <- mixed_grid %>% 
-  rowwise() %>% 
-  mutate(dtn_closest = z_star[which.min(abs(dtn-z_star))],
-         dummy = 1) %>% 
-  # filter(abs(dtn-dtn_closest) <= 100) %>% 
-  left_join(stimuli_long, by = c('dtn_closest' = 'z_star'),
-            relationship = 'many-to-many') %>% 
-  dplyr::select(x,y,dtn_closest,pair_id,condition,dummy) %>% 
-  full_join(., ., by = c('pair_id'), 
-            suffix = c('', '_2'), relationship = 'many-to-many') %>% 
-  filter(condition != condition_2) %>% 
-  mutate(m_dist = abs(x-x_2) + abs(y-y_2))
-  
+Values for the heatmap are created with a mixture distribution / weighted average. With mixing parameter $c$, random variable $U$, and a function between 0 and 100 $g(X,Y)$, values are created as follows:
 
-matched_stimuli_grid %>% 
-  mutate(m_dist = abs(x-x_2) + abs(y-y_2)) %>% 
-  ggplot(mapping = aes(x = factor(pair_id), y = m_dist)) + 
-  geom_jitter() +
-  theme_bw()
-  
+$$
+f(X,Y)=c\cdot U_{[0,100]}+(1-c)\cdot g(X,Y)\qquad 0\leq c\leq 1;X,Y=1,\dots,10
+$$
 
+1.  INPUT x, y coordinates, mixing parameter, bivariate function, stimuli data frame, and iterations of datasets to simulate
 
-ggplot(mixed_grid, mapping = aes(x,y, fill = dtn)) +
-  geom_tile() +
-  scale_fill_gradient(low = 'white', high = 'darkblue')
-```
+2.  CREATE list to save each iteration
 
+3.  FOR each iteration
 
+    1.  CREATE grid $M$ with $(X,Y)$
 
-```{r}
-Sigma <- matrix(2*c(
-  1, 0.8,
-  0.8, 1), nrow = 2)
+    2.  INSERT $\{U,g(X,Y),f(X,Y)\}$ into $M$
 
-dat = mvrnorm(1000, mu = c(5.5, 5.5), Sigma = Sigma)
-ggplot(data.frame(dat), aes(x = X1, y = X2)) + 
-  geom_point() + 
-  geom_density2d()
-```
+    3.  CREATE empty dataset $D$
 
+    4.  FOR each row of stimuli dataset with pairs $(S_1,S_2)$
 
+        1.  CREATE dataset $D_1$ with differences between $f(X,Y)$ and $(S_1)$
 
+            1.  FILTER $D_1$ with smallest differences
 
+            2.  SAMPLE remaining rows to account for ties
 
+        2.  CREATE dataset $D_2$ with differences between $f(X,Y)$ and $S_2$
 
-# Idea
+            1.  FILTER $D_2$ for $(X,Y)$ with Manhattan distances of 3 or 4 from $(X,Y)$ of $D_1$
 
+            2.  FILTER $D_2$ with smallest differences
 
-```{r}
-x = y = 1:10
-c = 0.2
-mixed_grid <- expand_grid(x,y) %>% 
-  mutate(unif = runif(nrow(.), 0, 100),
-         dtn = scale0to100(sqrt(7^2-(x-mean(x))^2-(y-mean(y))^2)))
+            3.  SAMPLE remaining rows to account for ties
 
-matched_stimuli_grid <- mixed_grid %>% 
-  rowwise() %>% 
-  mutate(dtn_closest = z_star[which.min(abs(dtn-z_star))])
+        3.  SAVE $D_1$ and $D_2$ into $D$
 
+        4.  REMOVE $D$ from $M$
 
-```
+    5.  CREATE $M'$ by joining $D$ and $M$
 
+    6.  CHECK that $(S_1,S_2)$ are approximately evenly spaced across $M'$
 
+        1.  CALCULATE marginal counts of $(S_1,S_2)$ across $(X,Y)$
 
+        2.  CALCULATE $\chi^2$ from a Chi-squared test across marginal counts of $X$ and $Y$
 
-# Idea
+        3.  AVERAGE both $\chi^2$ statistics
 
-1) generate response surface as a mixture distribution of desired shape and uniform
-2) input one of the known values to a spot that is similar to its value
-3) look at all coordinates around the location and input the other value
-4) remove both coordinates from mixture distribution
-5) repeat until all values are used
-6) check that chosen coordinates are are not concentrated across x and y via two chi square tests
-    - if either are significant, re-simulate values
+            1.  *Remark*: the purpose of the Chi-squared tests is to make sure that the stimuli coordinates are not concentrated onto any particular part of the heatmap. The smaller the test statistic, the smaller the difference between marginal count of stimuli across $X$ or $Y$ and the expected counts. With 18 stimuli values, the expected count 1.8 per row/column
 
+4.  EXTRACT dataset with smallest average chi-square statistic
 
-```{r}
-# stimuli
-
-x <- y <- 1:10
-c = 0.3
-mixed_grid <- expand_grid(x,y) %>% 
-  mutate(unif = runif(nrow(.), 0, 100),
-         dtn = scale0to100(sqrt(7^2+(x-mean(x))^2-(y-mean(y))^2)),
-         f = c*unif + (1-c)*dtn)
-# mixed_grid
-
-save_grid <- data.frame()
-for(i in 1:nrow(stimuli)){
-  val1 <- stimuli[i,1][[1]]; val2 <- stimuli[i,2][[1]]; pair_id <- stimuli[i,3][[1]]
-  
-  #Sample location of one value
-  tmp1 <- mixed_grid %>% 
-    mutate(z = val1, diff = abs(f-val1),
-           pair_id) %>%
-    filter(diff <= 15) %>% 
-    # filter(diff == min(diff)) %>% 
-    slice_sample(n = 1, weight_by = 1/diff)
-
-  #Sample location of second value based off acceptable distances to first value
-  tmp2 <- mixed_grid %>% 
-    filter(((x == tmp1$x) & (y == tmp1$y)) | (abs(x-tmp1$x) + abs(y-tmp1$y)) %in% c(3,4)) %>% 
-    anti_join(tmp1, by = c('x','y')) %>% 
-    mutate(z = val2, diff = abs(f-val2),
-           pair_id) %>% 
-    filter(diff == min(diff)) %>% 
-    slice_sample(n = 1, weight_by = 1/diff)
-  
-  #Save both
-  save_grid <- bind_rows(save_grid, tmp1, tmp2)
-  mixed_grid <- mixed_grid %>% 
-    anti_join(save_grid, by = c('x', 'y'))
-  
-}
-
-#Join saved values back to full data set
-full_grid <- mixed_grid %>% 
-  full_join(save_grid, by = c('x', 'y', 'unif', 'dtn', 'f')) %>% 
-  mutate(z = ifelse(is.na(z), f, z))
-
-p <- mixed_grid %>% 
-  full_join(save_grid, by = c('x', 'y', 'unif', 'dtn', 'f')) %>% 
-  mutate(z = ifelse(is.na(z), f, z)) %>% 
-  ggplot(mapping = aes(x = x, y = y, fill = z)) + 
-  geom_tile() + 
-  geom_label(aes(label = pair_id)) + 
-  theme(aspect.ratio = 1)
-# p
-plot_gg(p, raytrace = F)
-
-
-```
+5.  OUTPUT dataset
 
 ```{r}
 generate_heatmap_data <- function(x=1:10, y=1:10, c=0.3, f, stimuli, num_iters = 20, ...){
@@ -465,7 +143,7 @@ generate_heatmap_data <- function(x=1:10, y=1:10, c=0.3, f, stimuli, num_iters =
       tmp1 <- mixed_grid %>% 
         mutate(z = val1, diff = abs(f-val1),
                pair_id) %>%
-        filter(diff <= 15) %>% 
+        # filter(diff <= 15) %>% 
         filter(diff == min(diff)) %>%
         slice_sample(n = 1) #to account for ties
     
@@ -515,10 +193,35 @@ generate_heatmap_data <- function(x=1:10, y=1:10, c=0.3, f, stimuli, num_iters =
 }
 ```
 
+# Examples
+
+```{r}
+#| fig-cap: "Semisphere"
+dat = generate_heatmap_data(f = \(x,y)(36-(x-mean(x))^2-(y-mean(y))^2), stimuli = stimuli, num_iters = 10, c = 0.25)
+p <- ggplot(dat, aes(x, y, fill = z)) + 
+  geom_tile() + 
+  geom_text(aes(label = pair_id)) + 
+  scale_fill_gradient(low = 'white', high = 'darkblue') +
+  theme(aspect.ratio = 1)
+p
+```
 
 
 ```{r}
-dat = generate_heatmap_data(f = \(x,y)(36+(x-mean(x))^2-(y-mean(y))^2), stimuli = stimuli, num_iters = 10, c = 0.25)
+#| fig-cap: "Saddle-point"
+dat = generate_heatmap_data(f = \(x,y)(36-(x-mean(x))^2+(y-mean(y))^2), stimuli = stimuli, num_iters = 10, c = 0.25)
+p <- ggplot(dat, aes(x, y, fill = z)) + 
+  geom_tile() + 
+  geom_text(aes(label = pair_id)) + 
+  scale_fill_gradient(low = 'white', high = 'darkblue') +
+  theme(aspect.ratio = 1)
+p
+```
+
+
+```{r}
+#| fig-cap: "Increase in X"
+dat = generate_heatmap_data(f = \(x,y)(x), stimuli = stimuli, num_iters = 20, c = 0.25)
 p <- ggplot(dat, aes(x, y, fill = z)) + 
   geom_tile() + 
   geom_text(aes(label = pair_id)) + 
@@ -528,6 +231,27 @@ p
 ```
 
 ```{r}
-dat
+#| fig-cap: "Increase in X and Y"
+dat = generate_heatmap_data(f = \(x,y)(x+y), stimuli = stimuli, num_iters = 20, c = 0.25)
+p <- ggplot(dat, aes(x, y, fill = z)) + 
+  geom_tile() + 
+  geom_text(aes(label = pair_id)) + 
+  scale_fill_gradient(low = 'white', high = 'darkblue') +
+  theme(aspect.ratio = 1)
+p
+```
+
+
+```{r}
+
+# weather2023 <- read.csv('https://www.ncei.noaa.gov/orders/cdo/3832990.csv')
+# write.csv(weather2023, 'weather2023.csv')
+
+weather2023 <- read.csv('weather2023.csv')
+
+ggplot(weather2023, aes(x = TMIN, y = TMAX)) + 
+  geom_density_2d() + 
+  theme(aspect.ratio = 1)
+
 ```
 
