@@ -197,15 +197,19 @@ generate_heatmap_data <- function(x=1:10, y=1:10, c=0.3, f, stimuli, num_iters =
 
 ```{r}
 #| fig-cap: "Semisphere"
-dat = generate_heatmap_data(f = \(x,y)(36-(x-mean(x))^2-(y-mean(y))^2), stimuli = stimuli, num_iters = 10, c = 0.25)
-p <- ggplot(dat, aes(x, y, fill = z)) + 
-  geom_tile() + 
-  geom_text(aes(label = pair_id)) + 
-  scale_fill_gradient(low = 'white', high = 'darkblue') +
-  theme(aspect.ratio = 1)
-p
-```
+dat = generate_heatmap_data(f = \(x,y)(36-(x-mean(x))^2-(y-mean(y))^2), stimuli = stimuli, num_iters = 10, c = 0.25, x = 1:10, y = 1:10)
 
+# p <- ggplot(dat, aes(x, y, fill = z)) + 
+#   geom_tile() + 
+#   geom_text(aes(label = pair_id)) + 
+#   # scale_fill_gradient(low = 'white', high = 'darkblue') +
+#   scale_fill_viridis_c(limits = c(0, 100)) +
+#   theme(aspect.ratio = 1)
+# p
+
+
+
+```
 
 ```{r}
 #| fig-cap: "Saddle-point"
@@ -213,11 +217,11 @@ dat = generate_heatmap_data(f = \(x,y)(36-(x-mean(x))^2+(y-mean(y))^2), stimuli 
 p <- ggplot(dat, aes(x, y, fill = z)) + 
   geom_tile() + 
   geom_text(aes(label = pair_id)) + 
-  scale_fill_gradient(low = 'white', high = 'darkblue') +
+  # scale_fill_gradient(low = 'white', high = 'darkblue') +
+  scale_fill_viridis_c(limits = c(0, 100)) +
   theme(aspect.ratio = 1)
 p
 ```
-
 
 ```{r}
 #| fig-cap: "Increase in X"
@@ -241,17 +245,41 @@ p <- ggplot(dat, aes(x, y, fill = z)) +
 p
 ```
 
+```{r}
+#| fig-cap: "Other Example"
+dat = generate_heatmap_data(f = \(x,y)(sin(x^2+y^2)), stimuli = stimuli, 
+                            num_iters = 10, c = 0.25, x = 1:100, y = 1:100)
+p <- ggplot(dat, aes(x, y, fill = z)) + 
+  geom_tile() + 
+  geom_text(aes(label = pair_id)) + 
+  scale_fill_gradient(low = 'white', high = 'darkblue') +
+  theme(aspect.ratio = 1)
+p
+```
 
 ```{r}
-
-# weather2023 <- read.csv('https://www.ncei.noaa.gov/orders/cdo/3832990.csv')
-# write.csv(weather2023, 'weather2023.csv')
-
-weather2023 <- read.csv('weather2023.csv')
-
-ggplot(weather2023, aes(x = TMIN, y = TMAX)) + 
-  geom_density_2d() + 
+#| fig-cap: "Other Example"
+dat = generate_heatmap_data(f = \(x,y)(sin(x+y^2)), stimuli = stimuli, 
+                            num_iters = 10, c = 0.25, x = 1:100, y = 1:100)
+p <- ggplot(dat, aes(x, y, fill = z)) + 
+  geom_tile() + 
+  geom_text(aes(label = pair_id)) + 
+  scale_fill_gradient(low = 'white', high = 'darkblue') +
   theme(aspect.ratio = 1)
-
+p
 ```
+
+```{r}
+#| fig-cap: "Other Example"
+dat = generate_heatmap_data(f = \(x,y)(sin(5*x)*cos(5*y)), stimuli = stimuli, 
+                            num_iters = 10, c = 0.25, x = seq(1, 10, l = 100), y = seq(1, 10, l = 100))
+p <- ggplot(dat, aes(x, y, fill = z)) + 
+  geom_tile() + 
+  geom_text(aes(label = pair_id)) + 
+  scale_fill_gradient(low = 'white', high = 'darkblue') +
+  theme(aspect.ratio = 1)
+p
+```
+
+
 
