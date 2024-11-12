@@ -112,10 +112,10 @@ server <- function(input, output) {
            'Grid' = ggrid,
            'Tile' = gtile)
     switch(input$palette,
-           'Blues' = p + scale_fill_distiller(palette = 'Blues', limits = c(0,100), direction = 1),
-           'Spectral' = p + scale_fill_distiller(palette = 'Spectral', limits = c(0,100), direction = 1),
-           'YlOrBr' = p + scale_fill_distiller(palette = 'YlOrBr', limits = c(0,100), direction = 1),
-           'Viridis' = p + scale_fill_viridis_c(limits = c(0,100)))
+           'Blues' = p + scale_fill_distiller(palette = 'Blues', limits = c(0,100), direction = 1, na.value = 'white'),
+           'Spectral' = p + scale_fill_distiller(palette = 'Spectral', limits = c(0,100), direction = 1, na.value = 'white'),
+           'YlOrBr' = p + scale_fill_distiller(palette = 'YlOrBr', limits = c(0,100), direction = 1, na.value = 'white'),
+           'Viridis' = p + scale_fill_viridis_c(limits = c(0,100), na.value = 'white'))
 
   })
 

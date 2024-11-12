@@ -95,6 +95,8 @@ generate_heatmap_data <- function(x=1:10, y=1:10, c=0.3, f, stimuli, num_iters =
     chisq[i] <- save_iters[[i]][['chisq']]
   }
   best_fit <- save_iters[[which.min(chisq)]][['data']] %>%
-    dplyr::select(x,y,z,pair_id)
+    dplyr::select(x,y,z,pair_id) %>%
+    group_by(pair_id) %>%
+    mutate(within_pair = ifelse(!is.na(pair_id), sample(c('p1', 'p2')), NA))
   return(best_fit)
 }

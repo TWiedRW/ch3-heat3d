@@ -1,4 +1,4 @@
-
+#Set to T to simulate new data
 if(F){
   set.seed(2026)
 
