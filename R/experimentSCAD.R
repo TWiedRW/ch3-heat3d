@@ -7,9 +7,12 @@ data("stimuli_labels")
 #Read data with CMD-Shift-L
 
 #Function that writes an SCAD file based on data and template above
-write_scad <- function(data, template){
+write_scad <- function(data, template, bottom_text){
   require(tidyverse)
   data_name = deparse(substitute(data))
+
+  #Text on bottom of graph
+  template[2] <- glue::glue('code = "{bottom_text}";')
 
   #Combine data with letter pairs
   data2 <- data %>%
@@ -49,11 +52,11 @@ write_scad <- function(data, template){
 
 
 #Read and write .scad files from data
-# utils::data(data1)
-# utils::data(data2)
+utils::data(data1)
+utils::data(data2)
 # utils::data(data3)
 # utils::data(data4)
-# write_scad(data1, scad_template)
-# write_scad(data2, scad_template)
+write_scad(data1, scad_template, 'Set 1')
+write_scad(data2, scad_template, 'Set 2')
 # write_scad(data3, scad_template)
 # write_scad(data4, scad_template)
