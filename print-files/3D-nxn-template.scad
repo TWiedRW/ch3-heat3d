@@ -29,8 +29,8 @@ letter_array = [
 ["", "", "", "", "", "", "", "", "J", ""]
 ];
 
-x_axis_label = "X axis label";
-y_axis_label = "Y axis label";
+x_axis_label = "Factor 1";
+y_axis_label = "Factor 2";
 
 bar_dims_xy=[10,10]; // in mm
 n_bars_xy=[10,10];
