@@ -1,7 +1,7 @@
 set.seed(2026)
 
 #Read template
-scad_template <- readLines('3D-nxn-template.scad')
+scad_template <- readLines('print-files/3D-nxn-template.scad')
 scad_template
 data("stimuli_labels")
 #Read data with CMD-Shift-L
@@ -16,7 +16,7 @@ write_scad <- function(data, template, bottom_text){
 
   #Combine data with letter pairs
   data2 <- data %>%
-    left_join(stimuli_labels, by = c('pair_id', 'within_pair', 'z')) %>%
+    left_join(stimuli_labels, by = c('pair_id', 'within_pair')) %>%
     distinct() %>%
     ungroup()
 
@@ -47,16 +47,16 @@ write_scad <- function(data, template, bottom_text){
            scad_txt = str_replace_all(scad_txt, 'NA', '\"\"'))
   template[20:29] <- tmp_letters$scad_txt
 
-  writeLines(template, paste0(data_name, '.scad'))
+  writeLines(template, paste0('print-files/', data_name, '.scad'))
 }
-
+# write_scad(data1, scad_template, 'Sample Text')
 
 #Read and write .scad files from data
 # utils::data(data1)
 # utils::data(data2)
 # utils::data(data3)
 # utils::data(data4)
-# write_scad(data1, scad_template, 'Set 1')
-# write_scad(data2, scad_template, 'Set 2')
+write_scad(data1, scad_template, 'Set 1')
+write_scad(data2, scad_template, 'Set 2')
 # write_scad(data3, scad_template)
 # write_scad(data4, scad_template)

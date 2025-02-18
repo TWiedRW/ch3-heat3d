@@ -21,7 +21,7 @@ stimuli_labels <- stimuli %>%
   group_by(pair_id) %>%
   mutate(within_pair = sample(c('p1','p2'))) %>%
   left_join(tbl_good_letters, by = c('pair_id', 'within_pair')) %>%
-  select(pair_id, z, within_pair, label, label_stl) %>%
+  select(pair_id, within_pair, label, label_stl) %>%
   ungroup()
 
 
