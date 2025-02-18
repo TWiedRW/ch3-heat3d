@@ -1,0 +1,100 @@
+---
+title: "Simulation Study"
+format: html
+bibliography: references.bib
+---
+
+The purpose of this document is to conduct a simulation study.
+
+## Study Design
+
+A single lineup consists of:
+
+-   3 media types
+-   10 comparisons
+-   3 of 6 data sets
+
+## Power Laws
+
+The current issue is that constructing stimuli needs to be done with the consideration that ratios and the physical distance will both influence in how participants respond. For example, using values of 10 and 20 produce a ratio of 50% with a physical distance of 10, but values of 45 and 90 produce the same ratio with a physical distance of 45.
+
+To alleviate these concerns, we will explore various power laws fitted to simulated data.
+
+### Weber's Law
+
+Weber's Law is given by
+
+$$
+\frac{\Delta I}{I}=K
+$$
+
+where $I$ is the stimuli intensity, $\Delta I$ is the change in stimuli, and $K$ is the Weber constant.
+
+A study on 2D vs. 3D bar charts yielded a Weber constant of 0.019 for 3D bar charts [@hughes].
+
+
+```{r}
+
+
+```
+
+### Steven's Power Law
+
+A limitation of Weber's Law is that it relies on just noticeable differences. 
+
+$$\psi(I)=kI^\alpha$$
+
+where $I$ is the intensity of the stimuli, $k$ is the proportionality constant, and $\psi(I)$ is the perceived intensity of the stimuli. 
+
+## Data simulation
+
+```{r}
+library(tidyverse)
+s <- 10:100
+s <- expand.grid(x1 = s, x2 = s)
+stimuli <- s %>% 
+  filter(x1 <= x2) %>% 
+  mutate(trueratio = 100*x1/x2) %>% 
+  mutate(spl.3 = 100*(x1/x2)^.3,
+         spl.7 = 100*(x1/x2)^.7,
+         spl.9 = 100*(x1/x2)^.9)
+stimuli %>% 
+  pivot_longer(spl.3:spl.9, names_to = 'power', values_to = 'seen') %>% 
+  ggplot(mapping = aes(x = trueratio, y = seen)) + 
+  geom_line() + 
+  scale_y_continuous(limits = c(0,100)) + 
+  facet_wrap(~power) + 
+  theme_bw()
+```
+
+
+## Helper functions
+
+```{r}
+vis_estimate <- function(smaller, larger, svp = 1){
+  # smaller: smaller of two values
+  # larger:  larger of two values
+  # svp:     alpha for Steven's Power Law 
+  estimate <- 100*(smaller/larger)^svp
+  return(estimate)
+}
+```
+
+```{r}
+
+s <- 10:100
+stimuli <- expand.grid(smaller = s, larger = s) %>% 
+  filter(smaller<=larger)
+
+stimuli %>% 
+  mutate(estimate = map2(smaller, larger, \(s,l)(vis_estimate(s,l,.8) + rnorm(50, sd = 3)))) %>% 
+  # slice_sample(n = 10) %>%
+  unnest(estimate) %>% 
+  mutate(truth = 100*smaller/larger) %>% 
+  ggplot(mapping = aes(x = truth, y = estimate)) + 
+  geom_point(alpha = 1/100) + 
+  scale_x_continuous(limits = c(0,100)) + 
+  scale_y_continuous(limits = c(0,100)) +
+  theme_bw()
+```
+

@@ -6,7 +6,7 @@ library(shinythemes)
 ui.consent <- {
   fluidPage(theme = shinytheme('cerulean'),
   fluidRow(
-    column(
+    shiny::column(
       width = 8, offset = 2,
       wellPanel(
         selectInput('is-218-student',

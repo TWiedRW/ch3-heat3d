@@ -1,0 +1,24 @@
+---
+title: "exp-design"
+author: "Tyler Wiederich"
+format: html
+---
+
+This document outlines several experimental designs.
+
+
+# Treatments
+
+- Media types (2d-digital/2dd, 3d-digital/3dd, and 3d-printed/3dp)
+- Comparison (value compared to constant stimuli, 9)
+- Set (alternative heatmap layout, 2 or 3)
+
+# Design options
+
+
+
+
+
+
+
+
