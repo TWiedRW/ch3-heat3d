@@ -26,4 +26,4 @@ stimuli_labels <- stimuli %>%
 
 
 #Change to T if you need to replace stimuli labels
-if(F) usethis::use_data(stimuli_labels, overwrite = T)
+if(T) usethis::use_data(stimuli_labels, overwrite = T)
