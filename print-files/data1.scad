@@ -56,7 +56,7 @@ function addvec(v, av) = (len(v) == len(av)) ? [ for (i = [ 0 : len(v)-1 ]) v[i]
 
 // Letter extrusion code
 // https://files.openscad.org/examples/Basics/text_on_cube.html
-font = "Liberation Sans";
+font = "Atkinson Hyperlegible Next";
 
 module letter(l, size=letter_size, height=letter_height) {
 	// Use linear_extrude() to make the letters 3D objects as they
