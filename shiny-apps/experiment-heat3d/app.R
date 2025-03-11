@@ -188,12 +188,12 @@ server <- function(input, output, server) {
     appValues$data_consent <- input$data_consent
     appValues$completion_code <- generate_completion_code(valid_words)
 
-    message(glue('The following app values were created:'))
-    message(glue('appStartTime: {appValues$appStartTime}'))
-    message(glue('session: {appValues$session}'))
-    message(glue('informed_consent: {appValues$informed_consent}'))
-    message(glue('data_consent: {appValues$data_consent}'))
-    message(glue('completion_code: {appValues$completion_code}'))
+    message(glue('The following app values were generated:'))
+    message(glue('\tappStartTime: {appValues$appStartTime}'))
+    message(glue('\tsession: {appValues$session}'))
+    message(glue('\tinformed_consent: {appValues$informed_consent}'))
+    message(glue('\tdata_consent: {appValues$data_consent}'))
+    message(glue('\tcompletion_code: {appValues$completion_code}'))
 
     # Close app if user does not want to participate in experiment
     if(appValues$informed_consent == 'FALSE'){
