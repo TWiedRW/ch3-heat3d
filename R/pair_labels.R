@@ -5,7 +5,8 @@
 set.seed(2022)
 data("stimuli")
 #Letters for pairs
-good_letters <- sample(c(1,2,4,5,6,7,8,13,14,18))
+good_letters <- sample(match(c('a','d','f','g','h','m','q','r','y'), #9 pairs
+                             letters))
 L <- LETTERS[good_letters]
 l <- letters[good_letters]
 tbl_good_letters <- tibble(pair_id = seq_along(good_letters)) %>%
@@ -26,4 +27,4 @@ stimuli_labels <- stimuli %>%
 
 
 #Change to T if you need to replace stimuli labels
-if(T) usethis::use_data(stimuli_labels, overwrite = T)
+if(F) usethis::use_data(stimuli_labels, overwrite = T)
