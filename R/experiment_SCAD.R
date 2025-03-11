@@ -52,11 +52,9 @@ write_scad <- function(data, template, bottom_text){
 # write_scad(data1, scad_template, 'Sample Text')
 
 #Read and write .scad files from data
-# utils::data(data1)
-# utils::data(data2)
-# utils::data(data3)
-# utils::data(data4)
-# write_scad(data1, scad_template, 'Set 1')
-# write_scad(data2, scad_template, 'Set 2')
-# write_scad(data3, scad_template)
-# write_scad(data4, scad_template)
+utils::data(data1)
+utils::data(data2)
+
+write_scad(data1, scad_template, 'Set 1')
+write_scad(data2, scad_template, 'Set 2')
+

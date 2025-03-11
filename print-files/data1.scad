@@ -17,16 +17,16 @@ bar_size_array = [
 
 
 letter_array = [
-["","","","F","","","n","","",""],
-["E","","","","","","","","N",""],
-["","f","","","","","","","",""],
-["","R","","","","","","","",""],
-["","","","","r","","","","",""],
-["e","","","","","","","","",""],
-["h","","","H","","","","","",""],
-["","","a","","","","","","","d"],
-["m","","","","","","","D","","b"],
-["","A","","M","","","B","","",""]
+["","","","H","","","m","","",""],
+["G","","","","","","","","M",""],
+["","h","","","","","","","",""],
+["","Y","","","","","","","",""],
+["","","","","y","","","","",""],
+["g","","","","","","","","",""],
+["a","","","A","","","","","",""],
+["","","q","","","","","","","f"],
+["r","","","","","","","F","","d"],
+["","Q","","R","","","D","","",""]
 ];
 
 x_axis_label = "Factor 1";
@@ -35,6 +35,10 @@ y_axis_label = "Factor 2";
 bar_dims_xy=[10,10]; // in mm
 n_bars_xy=[10,10];
 plot_margins_xy=[[10,10],[10,10]]; // in mm
+
+base_color = [0, 0, 0]; // black
+label_color = [1, 1, 1]; // white
+bar_color = [.5, .5, .5]; // grey
 
 //---------------------------------------------------------------------
 
@@ -98,14 +102,16 @@ render(){
     difference(){
         union(){
             // Base
-            cube([base_x,base_y,base_z]);
+            color(base_color) cube([base_x,base_y,base_z]);
 
             // Bars
             for(i = [0:9]) {
                 for(j = [0:9]) {
                     translate([bar_y[j], bar_x[i], bar_z[i]])
+                        color(bar_color)
                         cube([bar_size_y[j], bar_size_x[i], bar_size_array[i][j]]);
                     translate([letter_y[j], letter_x[i], letter_z[i][j]])
+                        color(label_color)
                         letter(letter_array[i][j]);
                 }
             }
@@ -121,7 +127,8 @@ render(){
 
             for(i = [0:(len(labels)-1)]) {
                 translate([labels_x[i], labels_y[i], labels_z[i]])
-                rotate(rotation[i])
+                    rotate(rotation[i])
+                    color(label_color)
                     letter(labels[i]);
             }
 
@@ -129,6 +136,7 @@ render(){
         // Subtract off the code
         translate([base_x/2,base_y/2,letter_height])
             rotate([180,0,0])
+            color(label_color)
             letter(code, 7);
     }
 }
