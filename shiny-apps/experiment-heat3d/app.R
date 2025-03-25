@@ -4,6 +4,7 @@ library(shinythemes)
 library(shinyjs)
 library(glue)
 library(RSQLite)
+library(tidyverse)
 
 load('../../data/valid_words.rda')
 load('../../data/stimuli_labels.rda')
@@ -42,7 +43,7 @@ ui_consent <- fluidPage(
                                 "No, I am not a Stat 218 student" = "FALSE")),
         'Informed Consent will go here',
         radioButtons('data_consent',
-                     'Select "Yes" if you agree to let us collect your data',
+                     'Select "Yes" if you agree to the informed concent and you agree to let us collect your data',
                      choices = c('Yes, I agree' = "TRUE", 'No, I do not agree' = "FALSE"),
                      selected = ''),
         actionButton('submit_consent', 'Submit')
@@ -79,18 +80,7 @@ ui_demographics <- fluidPage(
       p('In this section, please fill out the following demographic questions.
         All questions must be answered before continuing the study.
         After completing the questions, a button will appear to move to the next page.'),
-      # column(width = 6, selectizeInput("user_age", "What category includes your age?",
-      #                                  choices = options_ages, width = '100%'),
-      #        selectizeInput("user_gender", "How would you describe your gender identity?",
-      #                       choices = options_gender, width = '100%'))
-      # ,
-      # column(width = 6, selectizeInput("user_education",
-      #                                  "What is your highest education level?",
-      #                                  choices = options_education, width = '100%'),
-      #        selectizeInput('user_reason',
-      #                       'How is your participation graded?',
-      #                       width = '100%',
-      #                       choices = options_reason)),
+
 
       selectizeInput("user_age", "What category includes your age?",
                      choices = options_ages, width = '100%'),
@@ -166,8 +156,8 @@ server <- function(input, output, server) {
   appValues <- reactiveValues(
     appStartTime = NULL,
     session = NULL,
-    informed_consent = NULL,
     data_consent = NULL,
+    user_pre_hash = NULL,
     user_id = NULL,
     completion_code = NULL
   )
@@ -175,31 +165,27 @@ server <- function(input, output, server) {
   # On startup or here?
   session <- reactive({as.character(floor(runif(1)*1e20))})
 
+  # Demographic values
+  demographicValues <- reactiveValues(
+    age = NULL,
+    gender = NULL,
+    education = NULL,
+    reason = NULL,
+    unique = NULL
+  )
 
   # ---- Consent logic ----
   observeEvent(input$submit_consent, {
     appValues$appStartTime <- appStartTime
     appValues$session <- session()
-    appValues$informed_consent <- input$informed_consent
     appValues$data_consent <- input$data_consent
     appValues$completion_code <- generate_completion_code(valid_words)
 
     message(glue('The following app values were generated:'))
     message(glue('\tappStartTime: {appValues$appStartTime}'))
     message(glue('\tsession: {appValues$session}'))
-    message(glue('\tinformed_consent: {appValues$informed_consent}'))
     message(glue('\tdata_consent: {appValues$data_consent}'))
     message(glue('\tcompletion_code: {appValues$completion_code}'))
-
-    # Close app if user does not want to participate in experiment
-    if(appValues$informed_consent == 'FALSE'){
-      showModal(modalDialog(
-        title = "System Message",
-        paste0('Informed consent was not provided. Please write down the following completion code and submit it to Canvas: ', appValues$completion_code, '. You may now exit the web browser.'),
-        easyClose = FALSE,
-        footer = NULL
-      ))
-    }
 
   })
 
@@ -207,11 +193,29 @@ server <- function(input, output, server) {
 
 
   observeEvent(input$submit_demographics, {
-    #ATTENTION: Save demographic information here
 
+    # Save demographic fields
+    demographicValues$user_age <- input$user_age
+    demographicValues$user_gender <- input$user_gender
+    demographicValues$user_education <- input$user_education
+    demographicValues$user_reason <- input$user_reason
+    demographicValues$user_unique <- input$user_unique
+
+    # Hash values
+    appValues$user_pre_hash <- glue('{appValues$completion_code}-{demographicValues$user_age}-{demographicValues$user_gender}-{demographicValues$user_education}-{demographicValues$user_reason}-{demographicValues$user_unique}')
+    appValues$user_id <- rlang::hash(appValues$user_pre_hash)
+
+    # Print recorded values
+    message(glue('The following demographic fields were populated:'))
+    message(glue('\tuser_age: {demographicValues$user_age}'))
+    message(glue('\tuser_gender: {demographicValues$user_gender}'))
+    message(glue('\tuser_education: {demographicValues$user_education}'))
+    message(glue('\tuser_reason: {demographicValues$user_reason}'))
+    message(glue('\tuser_unique: {demographicValues$user_unique}'))
+    message(glue('\tuser_pre_hash: {appValues$user_pre_hash}'))
+    message(glue('\tuser_id: {appValues$user_id}'))
 
     #Maybe use app start time too in user_id?
-    appValues$user_id <- rlang::hash(glue('{input$user_age}-{input$user_gender}-{input$user_education}-{input$user_reason}-{input$user_unique}'))
     message(glue('A new user was created at {appValues$appStartTime}: {appValues$user_id}'))
   })
   # ---- Instructions logic ----
