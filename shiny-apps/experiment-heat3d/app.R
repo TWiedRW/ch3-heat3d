@@ -1,3 +1,39 @@
+# ---- MAJOR TO-DO ----
+#| Create 3dp stl files for set2
+#| Create logic to save data to database
+#| Informed concent, instructions, practice, end page
+#| Save number of clicks on 3dd charts
+#| Remove 3dp for online-only participants
+#| Add confidence question after each chart group
+#|    Note -
+#|
+
+# ---- MINOR TO-DO ----
+#| Placement of helper plot
+#| Match text font on 2dd to 3dd/3dp (hyperlegible)
+#| Render graphs only when the grouping changes
+#|    This should help with 3dd resetting every time, but
+#|    I am skeptical since the entire experiment page is
+#|    created with renderUI.
+#| Change initial viewing angle for 3dd
+#|
+#|
+
+
+# ---- Idea list ----
+#| Use updated radio buttons instead of value definitions
+#|    As of now, I can get it working for all trials except
+#|    the first trial. I suspect it is because the update
+#|    function runs before the initial experiment loads in
+#|
+
+
+
+
+
+
+# ---- Shiny App Initialization ----
+
 # Load packages and functions
 library(shiny)
 library(shinythemes)
@@ -8,11 +44,17 @@ library(tidyverse)
 
 load('../../data/valid_words.rda')
 load('../../data/stimuli_labels.rda')
+load('../../data/data1.rda')
+load('../../data/data2.rda')
+load('../../data/plan.rda')
 
 source('../../R/shiny_fn-generate_completion_code.R')
 source('../../R/shiny_fn-randomize_order.R')
 source('../../R/shiny_fn-create_db.R')
 source('../../R/shiny_fn-pick_block.R')
+source('../../R/shiny_fn-plot_helper.R')
+source('../../R/shiny_fn-plot_2dd.R')
+source('../../R/shiny_fn-plot_3dd.R')
 
 
 
@@ -286,8 +328,63 @@ server <- function(input, output, server) {
 
   })
 
+  # Create helper plot
+  output$plot_helper <- renderPlot({
+    switch (expValues$user_slice$set,
+            'set1' = plot_helper(data1, expValues$user_slice$pair_id),
+            'set2' = plot_helper(data2, expValues$user_slice$pair_id)
+    )
+  })
+
+  # Create plot for 2dd
+  output$plot_2dd <- renderPlot({
+    switch (expValues$user_slice$set,
+            'set1' = plot_2dd(data1),
+            'set2' = plot_2dd(data2)
+    )
+  })
+
+  # Create plot for 3dd
+  output$plot_3dd <- renderRglwidget({
+    switch (expValues$user_slice$set,
+            'set1' = render_3dd('../../print-files/rgl-data1-base.stl',
+                                '../../print-files/rgl-data1-bars.stl',
+                                '../../print-files/rgl-data1-letters.stl'),
+            'set2' = render_3dd('../../print-files/rgl-data2-base.stl',
+                                '../../print-files/rgl-data2-bars.stl',
+                                '../../print-files/rgl-data2-letters.stl')
+    )
+    rglwidget()
+  })
+
+  # Create plot for 3dp
+  output$plot_3dp <- renderImage({
+    switch (expValues$user_slice$set,
+      'set1' = list(src='www/set1-3dp.JPG', width = '400px'),
+      'set2' = list(src='www/set2-3dp.JPG', width = '400px')
+    )
+  }, deleteFile = F)
+
+
+  # Render UI for chart helper
+  output$experiment_plot_helper <- renderUI({
+    validate(need(input$user_helper, ''))
+      plotOutput('plot_helper', width = '50%')
+  })
+
+  # Render UI for experiment chart
   output$experiment_plot <- renderUI({
-    h2('placeholder')
+    switch (expValues$user_slice$media,
+            '2dd' = plotOutput('plot_2dd'),
+            '3dd' = rglwidgetOutput('plot_3dd'),
+            '3dp' = tagList(
+              h3('Use the 3D chart that looks like the image below.'),
+              imageOutput('plot_3dp')
+            )
+
+    )
+      # plotOutput('plot_helper', width = '70%')
+
   })
 
 
@@ -295,14 +392,16 @@ server <- function(input, output, server) {
   output$experiment_display <- renderUI({
 
     fluidPage(
+      tags$head(
+        tags$link(rel = "stylesheet", type = "text/css", href = "styles.css")
+      ),
       sidebarLayout(
         sidebarPanel(
           h2(glue('Trial {expValues$user_trial_num} of {expValues$user_trial_max}')),
           h3(glue('Group {expValues$user_set_num} of {expValues$user_set_max}')),
-          p(glue('Use the following definitions for Trial {expValues$user_trial_num}.')),
+          p(glue('Use the following definitions for Trial {expValues$user_trial_num}. If you need help identifying the values on the chart, there is an option at the bottom of this section to help.')),
           h4(glue('Value 1: {expValues$user_slice$p1}')),
           h4(glue('Value 2: {expValues$user_slice$p2}')),
-          checkboxInput('pair_helper', 'Select this checkbox if you need help identifying the two values on the chart.'),
 
           radioButtons('user_guess_smaller',
                        'Which of the following values is larger?',
@@ -310,14 +409,18 @@ server <- function(input, output, server) {
                        selected = ''),
           sliderInput('user_guess_slider',
                       'If the larger value you selected above represents 100 units, how many units does the smaller value represent?',
-                      min = 0, max = 100, value = 50),
+                      min = 0, max = 100, value = 50, ticks = F, step = 0.01),
+
           actionButton('submit_user_trial',
-                       'Submit')
+                       'Submit'),
+
+          checkboxInput('user_helper', 'Select this checkbox if you need help identifying the two values on the chart.')
 
         ),
         mainPanel(
-          uiOutput('experiment_plot', width = '400px'),
-          tableOutput('user_slice')
+          uiOutput('experiment_plot', width = '100%'),
+          tableOutput('user_slice'),
+          uiOutput('experiment_plot_helper')
         )
       )
     )
@@ -328,10 +431,25 @@ server <- function(input, output, server) {
     # ...
 
 
+
     #Update trial number and trial slice
     if(expValues$user_trial_num < expValues$user_trial_max){
       expValues$user_trial_num <- expValues$user_trial_num + 1
       expValues$user_slice <- dplyr::filter(expValues$user_results, user_trial_order == expValues$user_trial_num)
+
+      if(expValues$user_set_num != expValues$user_slice$user_set_order){
+        # Alt phrasing ideas: https://www.marquette.edu/student-affairs/assessment-likert-scales.php
+        showModal(modalDialog(
+          radioButtons('user_confidence',
+                       'Rate the confidence of your answers for the previous group of questions.',
+                       choices = c('1 - Not confident', '2 - Slightly confident', '3 - Somewhat confident', '4 - Moderately confident', '5 - Extremely confident')),
+          actionButton('submit_confidence', 'Submit'),
+          title = 'Some title here I guess',
+          footer = NULL
+
+        ))
+      }
+
       expValues$user_set_num <- expValues$user_slice$user_set_order
     } else if(expValues$user_trial_num  == expValues$user_trial_max){
       # Move to ending page
@@ -349,6 +467,13 @@ server <- function(input, output, server) {
     #                                'They are the same.'),
     #                    selected = '')
 
+  })
+
+  observeEvent(input$submit_confidence, {
+    # Save confidence
+    # ...
+    validate(need(input$user_confidence, 'You must select your confidence before continuing.'))
+    removeModal()
   })
 
 
