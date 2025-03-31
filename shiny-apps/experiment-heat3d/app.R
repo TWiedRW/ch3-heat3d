@@ -201,6 +201,8 @@ server <- function(input, output, server) {
     demographicValues$user_reason <- input$user_reason
     demographicValues$user_unique <- input$user_unique
 
+
+
     # Hash values
     appValues$user_pre_hash <- glue('{appValues$completion_code}-{demographicValues$user_age}-{demographicValues$user_gender}-{demographicValues$user_education}-{demographicValues$user_reason}-{demographicValues$user_unique}')
     appValues$user_id <- rlang::hash(appValues$user_pre_hash)
@@ -242,6 +244,10 @@ server <- function(input, output, server) {
     user_guess_slider = NULL,
     data_consent = NULL
   )
+
+
+
+
   observeEvent(input$submit_start_exp, {
     #User information
     expValues$user_id <- appValues$user_id
@@ -252,6 +258,15 @@ server <- function(input, output, server) {
     #Trial information
     expValues$user_results <- randomize_order(expValues$block, plan)
 
+    #Label information
+    expValues$user_results <- expValues$user_results %>%
+      left_join(stimuli_labels, relationship = 'many-to-many',
+                by = 'pair_id') %>%
+      select(-c(label_stl)) %>%
+      pivot_wider(values_from = label,
+                  names_from = within_pair)
+
+
     expValues$user_trial_num <- min(expValues$user_results$user_trial_order)
     expValues$user_trial_max <- max(expValues$user_results$user_trial_order)
 
@@ -261,14 +276,22 @@ server <- function(input, output, server) {
     #Set information
     expValues$user_set_num <- expValues$user_slice$user_set_order
     expValues$user_set_max <- max(expValues$user_results$user_set_order)
+
+    #Update values
+    # updateRadioButtons(inputId = 'user_guess_smaller',
+    #                    choices = c(expValues$user_slice$p1,
+    #                                expValues$user_slice$p2,
+    #                                'The two values are the same.'),
+    #                    selected = '')
+
   })
 
-  output$experiment_plot <- renderPlot({
-    ggplot(mapping = aes(x = 1, y = 1, label = 'Plot Placeholder')) +
-      geom_text() +
-      theme(aspect.ratio = 1)
+  output$experiment_plot <- renderUI({
+    h2('placeholder')
   })
 
+
+  # Experiment UI
   output$experiment_display <- renderUI({
 
     fluidPage(
@@ -276,9 +299,14 @@ server <- function(input, output, server) {
         sidebarPanel(
           h2(glue('Trial {expValues$user_trial_num} of {expValues$user_trial_max}')),
           h3(glue('Group {expValues$user_set_num} of {expValues$user_set_max}')),
+          p(glue('Use the following definitions for Trial {expValues$user_trial_num}.')),
+          h4(glue('Value 1: {expValues$user_slice$p1}')),
+          h4(glue('Value 2: {expValues$user_slice$p2}')),
+          checkboxInput('pair_helper', 'Select this checkbox if you need help identifying the two values on the chart.'),
+
           radioButtons('user_guess_smaller',
                        'Which of the following values is larger?',
-                       choices = c('Value 1', 'Value 2'),
+                       choices = c('Value 1', 'Value 2', 'They are the same.'),
                        selected = ''),
           sliderInput('user_guess_slider',
                       'If the larger value you selected above represents 100 units, how many units does the smaller value represent?',
@@ -288,7 +316,7 @@ server <- function(input, output, server) {
 
         ),
         mainPanel(
-          plotOutput('experiment_plot', width = '400px'),
+          uiOutput('experiment_plot', width = '400px'),
           tableOutput('user_slice')
         )
       )
@@ -296,7 +324,7 @@ server <- function(input, output, server) {
   })
 
   observeEvent(input$submit_user_trial, {
-    #Save data into database here
+    # Save data into database here
     # ...
 
 
@@ -308,12 +336,18 @@ server <- function(input, output, server) {
     } else if(expValues$user_trial_num  == expValues$user_trial_max){
       # Move to ending page
       # ...
-      message(glue('User {appValues$user_id} has completed the experiment!'))
+      message(glue('The following user has completed the experiment!'))
+      message(glue('\t{appValues$user_id}'))
     } else {
       message('Trial number exeeds maximun number of trials. What happened???')
     }
 
-
+    #Update values
+    # updateRadioButtons(inputId = 'user_guess_smaller',
+    #                    choices = c(expValues$user_slice$p1,
+    #                                expValues$user_slice$p2,
+    #                                'They are the same.'),
+    #                    selected = '')
 
   })
 
