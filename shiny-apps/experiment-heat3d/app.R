@@ -1,11 +1,10 @@
 # ---- MAJOR TO-DO ----
 #| Create 3dp stl files for set2
 #| Create logic to save data to database
-#| Informed concent, instructions, practice, end page
+#| Informed consent, instructions, practice, end page
 #| Save number of clicks on 3dd charts
-#| Remove 3dp for online-only participants
-#| Add gradient scale to 2dd
-#|
+#| Disable ability to click on tabs
+#| Fix 3dp so that it closely resembles 3dd
 
 
 
@@ -34,7 +33,10 @@
 #|    the icon is, but seems to be better now that steps
 #|    are 0.1 instead of 0.01
 #| 218 vs. non-218 versions (completion codes, etc. )
+#|    Informed consent for non-218 includes reference to replication
+#|    of CM's 1984 study.
 #| Font sizes for value definitions
+#|
 #|
 
 
@@ -92,31 +94,31 @@ if(!(database %in% list.files(recursive = T))){
 
 # ---- Informed Consent ----
 ui_consent <- fluidPage(
-  fluidRow(
-    column(
-      width = 8, offset = 2,
-      wellPanel(
-        p('Option to select new or returning user, plus buttons and text form'),
-        selectInput('is_218_student',
-                    label = 'Are you currently enrolled in Stat 218?',
-                    choices = c("Please pick one of the following" = "",
-                                "Yes, I am a Stat 218 student" = "TRUE",
-                                "No, I am not a Stat 218 student" = "FALSE"),
-                    selected = '', selectize = T),
-        conditionalPanel('input.is_218_student == True && input.is_218_student!=""', includeHTML('informed-consent/graphics-consent-218.html')),
-        conditionalPanel('input.is_218_student == False && input.is_218_student!=""', includeHTML('informed-consent/graphics-consent-dept.html')),
-
+  fluidRow(column(12, align = 'center', h1('Heat3d: A study on 3D Heatmaps'))),
+  sidebarLayout(
+    sidebarPanel(
+      selectInput('is_218_student',
+                  label = 'Are you currently enrolled in Stat 218?',
+                  choices = c("Please pick one of the following" = "",
+                              "Yes, I am a Stat 218 student" = "TRUE",
+                              "No, I am not a Stat 218 student" = "FALSE"),
+                  selected = '', selectize = T),
+      conditionalPanel(
+        'input.is_218_student != ""',
+        p('Please read the informed consent document. A link to download a pdf version of the informed consent is provided at the bottom of the this page.'),
         radioButtons('data_consent',
-                     'Select "Yes" if you agree to the informed concent and you agree to let us collect your data',
+                     'Select "Yes" if you agree to the informed consent and you agree to let us collect your data',
                      choices = c('Yes, I agree' = "TRUE", 'No, I do not agree' = "FALSE"),
                      selected = ''),
         actionButton('submit_consent', 'Submit')
       )
+    ),
+    mainPanel(
+      conditionalPanel('input.is_218_student == "TRUE" && input.is_218_student!=""', includeHTML('informed-consent/graphics-consent-218.html')),
+      conditionalPanel('input.is_218_student == "FALSE" && input.is_218_student!=""', includeHTML('informed-consent/graphics-consent-dept.html'))
     )
   )
 )
-
-
 
 
 
@@ -150,7 +152,6 @@ ui_demographics <- fluidPage(
         All questions must be answered before continuing the study.
         After completing the questions, a button will appear to move to the next page.'),
 
-
       selectizeInput("user_age", "What category includes your age?",
                      choices = options_ages, width = '100%'),
       selectizeInput("user_gender", "How would you describe your gender identity?",
@@ -182,11 +183,64 @@ ui_instructions <- fluidPage(
   column(width = 8, offset = 2,
    wellPanel(
     h2('Instructions'),
-    p('In this experiment, you will be using various mediums of data visualization to compare two values.
-      The experiment interface will provide you with a digital rendering of a data visualizaiton, or prompt you to use one of the 3D-printed graphs.'),
+    p('For this survey, you will be using charts to estimate the relationship between a pair of values across different chart types.
+    These charts consist of 2D digitally rendered heatmaps, 3D digitally rendered heatmaps, and, if applicable, 3D printed heatmaps.'),
+    uiOutput('instruction_plots'),
+    fluidRow(column(4, style = "margin-bottom: 0px;", tags$figure(
+      class = "centerFigure",
+      tags$img(
+        src = "2dd-example.png",
+        height = "300px",
+        alt = "2dd"
+      ),
+      tags$figcaption("2D Digital")
+    )),
+    column(4, style = "margin-bottom: 0px;", tags$figure(
+      class = "centerFigure",
+      tags$img(
+        src = "3dd-example.png",
+        height = "300px",
+        alt = "3dd"
+      ),
+      tags$figcaption("3D Digital")
+    )),
+    column(4, style = "margin-bottom: 0px;", tags$figure(
+      class = "centerFigure",
+      tags$img(
+        src = "3dp-example.png",
+        height = "300px",
+        alt = "3dp"
+      ),
+      tags$figcaption("3D Printed")
+    ))),
+    checkboxInput('user_online', label = 'Select this option if you do not have access to the 3D printed heatmaps.',
+                  value = F),
+
+
+
+    p('Pairs of values are defined by upper and lower case instances of the same letter and are located on the heatmap.
+    Each question will define the pair of values and you will need to identify the locations of the values on the heatmap.
+    If it is difficult to identify the location of the values on heatmap, there is an option to produce a map showing the locations.'),
+
+    p('Once you have identified the location of the values, you will need to select which of the two values in the pair is larger in magnitude.
+    If you believe that the two values are of the same magnitude, you may check that they are the same size.
+
+
+
+
+
+
+      '),
+    radioButtons('instruction_guess_smaller',
+                 'Which of the following values is larger?',
+                 choices = c('Value 1', 'Value 2', 'They are the same.'),
+                 selected = ''),
+
+
     p('More text will go here, plus pictures...'),
     actionButton('submit_start_exp', 'Start Experiment')
   )),
+  fluidRow(column(12, align = 'center', h1('Practice Question'))),
   fluidRow(
     sidebarLayout(
       sidebarPanel(
@@ -266,6 +320,8 @@ server <- function(input, output, server) {
 
   # ---- Consent logic ----
   observeEvent(input$submit_consent, {
+    validate(need(input$data_consent != '', "You must select an option for whether or not your data can be collected."))
+
     appValues$appStartTime <- appStartTime
     appValues$session <- session()
     appValues$data_consent <- input$data_consent
@@ -277,7 +333,12 @@ server <- function(input, output, server) {
     message(glue('\tdata_consent: {appValues$data_consent}'))
     message(glue('\tcompletion_code: {appValues$completion_code}'))
 
-    updateNavbarPage(inputId = 'navpage', selected = 'Demographics')
+    if(input$data_consent == T){
+      updateNavbarPage(inputId = 'navpage', selected = 'Demographics')
+    } else {
+      updateNavbarPage(inputId = 'navpage', selected = 'Instructions')
+    }
+
 
   })
 
@@ -491,6 +552,16 @@ server <- function(input, output, server) {
     )
   })
 
+  observeEvent(input$user_guess_smaller, {
+    if(input$user_guess_smaller == 'They are the same.'){
+      updateSliderInput(inputId = 'user_guess_slider', value = 100)
+      shinyjs::disable(id = 'user_guess_slider')
+    } else {
+      shinyjs::enable(id = 'user_guess_slider')
+    }
+
+  })
+
   observeEvent(input$submit_user_trial, {
     # Save data into database here
     # ...
@@ -527,7 +598,20 @@ server <- function(input, output, server) {
         expValues$user_last_trial <- TRUE
       }
     } else if(expValues$user_trial_num  == expValues$user_trial_max){
+      showModal(modalDialog(
+        radioButtons('user_confidence',
+                     glue('Rate the confidence of your answers for the previous group of questions (Group {expValues$user_set_num}).'),
+                     choices = c('1 - Not confident',
+                                 '2 - Slightly confident',
+                                 '3 - Somewhat confident',
+                                 '4 - Moderately confident',
+                                 '5 - Extremely confident'),
+                     selected = ''),
+        actionButton('submit_confidence', 'Submit', disabled = T),
+        title = 'Some title here I guess',
+        footer = NULL
 
+      ))
       # Move to ending page
       message(glue('The following user has completed the experiment!'))
       message(glue('\t{appValues$user_id}'))
