@@ -1,13 +1,21 @@
 # Creates order for subject to complete trials
 # Note: similar to split plot with wp as set x media and sp as pair_id
 
-randomize_order <- function(participant_block, plan){
+randomize_order <- function(participant_block, plan, remove_3dp){
 
-  one_run_fixed <- expand_grid(
-    set = c('set1', 'set2'),
-    media = c('2dd', '3dd', '3dp'),
-    pair_id = dplyr::filter(plan, block == participant_block)$pair_id
-  )
+  if(remove_3dp == F){
+    one_run_fixed <- expand_grid(
+      set = c('set1', 'set2'),
+      media = c('2dd', '3dd', '3dp'),
+      pair_id = dplyr::filter(plan, block == participant_block)$pair_id
+    )
+  } else {
+    one_run_fixed <- expand_grid(
+      set = c('set1', 'set2'),
+      media = c('2dd', '3dd'),
+      pair_id = dplyr::filter(plan, block == participant_block)$pair_id
+    )
+  }
 
   one_run_random <- one_run_fixed %>%
     group_by(set, media) %>%

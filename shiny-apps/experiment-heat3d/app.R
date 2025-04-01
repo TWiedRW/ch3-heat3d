@@ -190,7 +190,7 @@ ui_instructions <- fluidPage(
       class = "centerFigure",
       tags$img(
         src = "2dd-example.png",
-        height = "300px",
+        width = "90%",
         alt = "2dd"
       ),
       tags$figcaption("2D Digital")
@@ -199,7 +199,7 @@ ui_instructions <- fluidPage(
       class = "centerFigure",
       tags$img(
         src = "3dd-example.png",
-        height = "300px",
+        width = "90%",
         alt = "3dd"
       ),
       tags$figcaption("3D Digital")
@@ -208,7 +208,7 @@ ui_instructions <- fluidPage(
       class = "centerFigure",
       tags$img(
         src = "3dp-example.png",
-        height = "300px",
+        width = "90%",
         alt = "3dp"
       ),
       tags$figcaption("3D Printed")
@@ -418,7 +418,8 @@ server <- function(input, output, server) {
     message(glue('Block {expValues$block} was chosen for user {expValues$user_id}'))
 
     #Trial information
-    expValues$user_results <- randomize_order(expValues$block, plan)
+    expValues$user_results <- randomize_order(expValues$block, plan, remove_3dp = input$user_online)
+
 
     #Label information
     expValues$user_results <- expValues$user_results %>%
