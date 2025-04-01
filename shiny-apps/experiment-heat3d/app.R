@@ -440,12 +440,12 @@ server <- function(input, output, server) {
     expValues$user_set_num <- expValues$user_slice$user_set_order
     expValues$user_set_max <- max(expValues$user_results$user_set_order)
 
-    #Update values
-    # updateRadioButtons(inputId = 'user_guess_smaller',
-    #                    choices = c(expValues$user_slice$p1,
-    #                                expValues$user_slice$p2,
-    #                                'The two values are the same.'),
-    #                    selected = '')
+    # Update values
+    shinyjs::delay(10, {updateRadioButtons(inputId = 'user_guess_smaller',
+                       choices = c(expValues$user_slice$p1,
+                                   expValues$user_slice$p2,
+                                   'The two values are the same.'),
+                       selected = '')})
 
   })
 
@@ -621,12 +621,12 @@ server <- function(input, output, server) {
       message('Trial number exeeds maximun number of trials. What happened???')
     }
 
-    #Update values
-    # updateRadioButtons(inputId = 'user_guess_smaller',
-    #                    choices = c(expValues$user_slice$p1,
-    #                                expValues$user_slice$p2,
-    #                                'They are the same.'),
-    #                    selected = '')
+    # Update values
+    updateRadioButtons(inputId = 'user_guess_smaller',
+                       choices = c(expValues$user_slice$p1,
+                                   expValues$user_slice$p2,
+                                   'They are the same.'),
+                       selected = '')
 
   })
 
