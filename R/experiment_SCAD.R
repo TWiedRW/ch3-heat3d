@@ -54,7 +54,8 @@ write_scad <- function(data, template, bottom_text){
 #Read and write .scad files from data
 utils::data(data1)
 utils::data(data2)
+utils::data(practice_data)
 
 write_scad(data1, scad_template, 'Set 1')
 write_scad(data2, scad_template, 'Set 2')
-
+write_scad(practice_data, scad_template, 'Practice')

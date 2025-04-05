@@ -398,6 +398,7 @@ server <- function(input, output, server) {
     user_trial_max = NULL,
     user_set_num = NULL,
     user_set_max = NULL,
+    user_3d_matrix = NULL,
     user_slice = NULL,
     user_guess_smaller = NULL,
     user_guess_slider = NULL,
@@ -468,13 +469,13 @@ server <- function(input, output, server) {
   # Create plot for 3dd
   output$plot_3dd <- renderRglwidget({
     switch (expValues$user_slice$set,
-            'set1' = render_3dd('../../print-files/rgl-data1-base.stl',
-                                '../../print-files/rgl-data1-bars.stl',
-                                '../../print-files/rgl-data1-letters.stl'),
+            'set1' = render_3dd('../../print-files/set1/rgl-data1-base.stl',
+                                '../../print-files/set1/rgl-data1-bars.stl',
+                                '../../print-files/set1/rgl-data1-letters.stl'),
             #MAJOR CHANGE: NEED TO CONVERT BACK TO data2 WHEN FILES ARE CREATED
-            'set2' = render_3dd('../../print-files/rgl-data1-base.stl',
-                                '../../print-files/rgl-data1-bars.stl',
-                                '../../print-files/rgl-data1-letters.stl')
+            'set2' = render_3dd('../../print-files/set2/rgl-data2-base.stl',
+                                '../../print-files/set2/rgl-data2-bars.stl',
+                                '../../print-files/set2/rgl-data2-letters.stl')
     )
     rglwidget()
   })
@@ -501,7 +502,7 @@ server <- function(input, output, server) {
             '3dd' = tagList(
               rglwidgetOutput('plot_3dd'),
               helpText('You may use your mouse to move the chart on the screen.'),
-              helpText('Right click: move the plot.'),
+              helpText('Left click: move the plot.'),
               helpText('Scroll: zoom in and out.')
             ),
             '3dp' = tagList(
