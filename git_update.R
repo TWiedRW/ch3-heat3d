@@ -18,14 +18,13 @@ modified <- names(tmp) == "modified"
 modified <- unlist(tmp[modified])
 
 # If db has been modified
-if (any(stringr::str_detect(modified, "(experiment_interface/.*\\.db)|(experiment_interface/codes.txt)"))) {
+if (any(stringr::str_detect(modified, "(shiny-apps/experiment-heat3d/.*\\.db)"))) {
   
   # Copy database/codes to one drive
   file.copy(modified, file.path("/btrstorage", "OneDrive", "Data", "2025-3d-heatmaps"), overwrite = T)
 
   # Add changed db to commit and commit
-  git2r::add(repo = '.', "experiment_interface/*.db")
-  git2r::add(repo = '.', "experiment_interface/codes.txt")
+  git2r::add(repo = '.', "shiny-apps/experiment-heat3d/*.db")
   try(git2r::commit(message = "Update data and codes"))
 
   # Update
