@@ -1,5 +1,4 @@
 # ---- MAJOR TO-DO ----
-#| instructions, end page
 #| Save number of clicks on 3dd charts
 #| Disable ability to click on tabs
 #| Fix 3dp so that it closely resembles 3dd
@@ -66,6 +65,7 @@ load('../../data/stimuli_labels.rda')
 load('../../data/data1.rda')
 load('../../data/data2.rda')
 load('../../data/plan.rda')
+load('../../data/practice_data.rda')
 
 source('../../R/shiny_fn-generate_completion_code.R')
 source('../../R/shiny_fn-randomize_order.R')
@@ -493,7 +493,7 @@ server <- function(input, output, server) {
 
   # Create plot for 3dd
   output$plot_3dd_practice <- renderRglwidget({
-    render_3dd('../../print-files/practice/rgl-practice_data-base.stl',
+    plot_3dd('../../print-files/practice/rgl-practice_data-base.stl',
                                 '../../print-files/practice/rgl-practice_data-bars.stl',
                                 '../../print-files/practice/rgl-practice_data-letters.stl')
     rglwidget()
@@ -729,10 +729,10 @@ server <- function(input, output, server) {
   # Create plot for 3dd
   output$plot_3dd <- renderRglwidget({
     switch (expValues$user_slice$set,
-            'set1' = render_3dd('../../print-files/set1/rgl-data1-base.stl',
+            'set1' = plot_3dd('../../print-files/set1/rgl-data1-base.stl',
                                 '../../print-files/set1/rgl-data1-bars.stl',
                                 '../../print-files/set1/rgl-data1-letters.stl'),
-            'set2' = render_3dd('../../print-files/set2/rgl-data2-base.stl',
+            'set2' = plot_3dd('../../print-files/set2/rgl-data2-base.stl',
                                 '../../print-files/set2/rgl-data2-bars.stl',
                                 '../../print-files/set2/rgl-data2-letters.stl')
     )
@@ -827,6 +827,7 @@ server <- function(input, output, server) {
 
   observeEvent(input$submit_user_trial, {
     # Save data into database here
+    validate(need(input$user_guess_larger != '', label = 'You must select an answer!'))
     expValues$trialEndTime <- Sys.time()
     results <- tibble(
       user_id = appValues$user_id,
