@@ -76,6 +76,7 @@ source('../../R/shiny_fn-plot_2dd.R')
 source('../../R/shiny_fn-plot_3dd.R')
 source('../../R/shiny_fn-write_to_db.R')
 source('../../R/shiny_fn-practice_order.R')
+source('../../R/shiny_fn-show_instruction_modal.R')
 
 
 
@@ -272,10 +273,16 @@ ui_experiment <- fluidPage(
 ui_wrapup <- fluidPage(
   column(width = 8, offset = 2,
     h2('Experiment complete'),
-    p('Thank you for completing the experiment.
-      Your completion code is below.'),
-    p('More text about saving code to Canvas'),
-    textOutput('user_completion_code')
+    # p('Thank you for completing the experiment!.
+    #   Your completion code is below.'),
+    conditionalPanel('input.is_218_student == "TRUE"',
+                     p('Your completion code for STAT 218 is below.
+                       Please save this value for your records and submit it to Canvas since you will not have access to the code once you leave this page.
+                       '),
+                     textOutput('user_completion_code')),
+    br(),
+    p('Thank you for participating in our experiment. You may now safely close this application.')
+
   )
 )
 
@@ -344,6 +351,7 @@ server <- function(input, output, server) {
     } else {
       updateNavbarPage(inputId = 'navpage', selected = 'Practice')
       message('This user did not consent to data collection. Their results will not be saved.')
+      show_instruction_modal()
     }
   })
 
@@ -397,7 +405,7 @@ server <- function(input, output, server) {
     )
 
     if(appValues$can_save){
-      write_to_db(users, database, write = T)
+      write_to_db(users, database, write = appValues$can_save)
       message(glue('Table "users" was successfully updated for user: {appValues$user_id}'))
     } else{
       message(glue('User {appValues$user_id} is under 19 years old, so their responses will not be recorded'))
@@ -405,7 +413,7 @@ server <- function(input, output, server) {
 
     # Update page
     updateNavbarPage(inputId = 'navpage', selected = 'Practice')
-
+    show_instruction_modal()
 })
   # ---- Instructions logic ----
   observeEvent(input$submit_start_exp, {
@@ -493,7 +501,7 @@ server <- function(input, output, server) {
 
 
   # Render UI for chart helper
-  output$practice_plot_helper <- renderUI({
+  output$practice_plot_helper_ui <- renderUI({
     validate(need(input$user_practice_helper, ''))
     plotOutput('practice_plot_helper', width = '50%')
   })
@@ -527,6 +535,9 @@ server <- function(input, output, server) {
           h1('Practice'),
           h2(glue('Trial {practiceValues$user_practice_trial_num} of {practiceValues$user_practice_trial_max}')),
           h3(glue('Group {practiceValues$user_practice_set_num} of {practiceValues$user_practice_set_max}')),
+          p('Click the button below to display the instruction screen again.'),
+          actionButton('show_instructions', 'See instructions'),
+          br(),
           radioButtons('user_practice_guess_larger',
                        'Which of the following values is larger?',
                        choices = c('Value 1', 'Value 2', 'They are the same.'),
@@ -547,7 +558,7 @@ server <- function(input, output, server) {
                  uiOutput('practice_plot', width = '100%'),
           ),
           column(width = 6,
-                 uiOutput('practice_plot_helper')
+                 uiOutput('practice_plot_helper_ui')
           )
 
 
@@ -565,6 +576,14 @@ server <- function(input, output, server) {
   #   }
   #
   # })
+
+  observeEvent(input$show_instructions, {
+    show_instruction_modal()
+  })
+
+  observeEvent(input$submit_close_instructions, {
+    removeModal()
+  })
 
   observeEvent(input$submit_practice_trial, {
 
@@ -819,7 +838,7 @@ server <- function(input, output, server) {
       user_guess_slider = input$user_guess_slider
     ) %>%
       bind_cols(expValues$user_slice)
-    write_to_db(results, database, write = appValues$data_consent)
+    write_to_db(results, database, write = appValues$can_save)
 
     # user_helper_toggle <- isolate({input$user_helper})
 
@@ -901,7 +920,7 @@ server <- function(input, output, server) {
       user_confidence = input$user_confidence
     )
 
-    write_to_db(confidence, database, write = appValues$data_consent)
+    write_to_db(confidence, database, write = appValues$can_save)
 
     #Validate does not display message, but will work
     # validate(need(input$user_confidence, 'You must select your confidence before continuing.'))
