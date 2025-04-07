@@ -157,19 +157,6 @@
       ],
       "Hash": "496f1ac14c8eb1c560e07a96515eea76"
     },
-    "SpatialPack": {
-      "Package": "SpatialPack",
-      "Version": "0.4-1",
-      "Source": "Repository",
-      "Repository": "CRAN",
-      "Requirements": [
-        "R",
-        "fastmatrix",
-        "graphics",
-        "stats"
-      ],
-      "Hash": "41f5cf2952d9207588f1961737f43038"
-    },
     "askpass": {
       "Package": "askpass",
       "Version": "1.2.0",
@@ -235,13 +222,6 @@
         "vctrs"
       ],
       "Hash": "40415719b5a479b87949f3aa0aee737c"
-    },
-    "bmp": {
-      "Package": "bmp",
-      "Version": "0.3",
-      "Source": "Repository",
-      "Repository": "CRAN",
-      "Hash": "c71b569d923cdc420491907928595aca"
     },
     "boot": {
       "Package": "boot",
@@ -532,17 +512,6 @@
       ],
       "Hash": "451e5edf411987991ab6a5410c45011f"
     },
-    "downloader": {
-      "Package": "downloader",
-      "Version": "0.4",
-      "Source": "Repository",
-      "Repository": "CRAN",
-      "Requirements": [
-        "digest",
-        "utils"
-      ],
-      "Hash": "f4f2a915e0dedbdf016a83b63477349f"
-    },
     "dplyr": {
       "Package": "dplyr",
       "Version": "1.1.4",
@@ -648,16 +617,6 @@
       "Source": "Repository",
       "Repository": "CRAN",
       "Hash": "aa5e1cd11c2d15497494c5292d7ffcc8"
-    },
-    "fastmatrix": {
-      "Package": "fastmatrix",
-      "Version": "0.5-7721",
-      "Source": "Repository",
-      "Repository": "CRAN",
-      "Requirements": [
-        "R"
-      ],
-      "Hash": "e8cdb305f382c0bb431044b41dae06ff"
     },
     "fontawesome": {
       "Package": "fontawesome",
@@ -1060,50 +1019,6 @@
         "uuid"
       ],
       "Hash": "99df65cfef20e525ed38c3d2577f7190"
-    },
-    "igraph": {
-      "Package": "igraph",
-      "Version": "2.1.4",
-      "Source": "Repository",
-      "Repository": "CRAN",
-      "Requirements": [
-        "Matrix",
-        "R",
-        "cli",
-        "cpp11",
-        "grDevices",
-        "graphics",
-        "lifecycle",
-        "magrittr",
-        "methods",
-        "pkgconfig",
-        "rlang",
-        "stats",
-        "utils",
-        "vctrs"
-      ],
-      "Hash": "db7352c3d239d0a319d2e3d0d040ed16"
-    },
-    "imager": {
-      "Package": "imager",
-      "Version": "1.0.2",
-      "Source": "Repository",
-      "Repository": "CRAN",
-      "Requirements": [
-        "R",
-        "Rcpp",
-        "downloader",
-        "grDevices",
-        "igraph",
-        "jpeg",
-        "magrittr",
-        "methods",
-        "png",
-        "purrr",
-        "readbitmap",
-        "stringr"
-      ],
-      "Hash": "cd7b885ad219b89e96523c1205670ccd"
     },
     "ini": {
       "Package": "ini",
@@ -1682,19 +1597,6 @@
         "spacefillr"
       ],
       "Hash": "ed06cfea0d3da55df9e991b6d0be031f"
-    },
-    "readbitmap": {
-      "Package": "readbitmap",
-      "Version": "0.1.5",
-      "Source": "Repository",
-      "Repository": "CRAN",
-      "Requirements": [
-        "bmp",
-        "jpeg",
-        "png",
-        "tiff"
-      ],
-      "Hash": "ec19e2be05f06df441857070a456dbe5"
     },
     "readr": {
       "Package": "readr",
