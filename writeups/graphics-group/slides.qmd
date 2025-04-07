@@ -154,11 +154,30 @@ where
 
 1) Ask participants which value in a stimuli pair is larger
 2) Ask participants to estimate the value of the smaller stimuli
-3) For each dataset and media combination, ask participant 
+3) After each dataset and media combination, ask participant to rate their level of confidence
+
+## Population
+
+This study will be used in STAT 218 courses at UNL as a required project.
+
+  - Students who are at least 19 years old and consent to data collection
+    
+Students will also complete a series of reflections.
+
+  - Pre-experiment
+  - Post-experiment
+  - Abstract / paper
+  - Video presentation
 
 ## Other considerations
 
 Type of responses
 
-- 
+- Difference between stimuli and participant response
+    - Cleveland and McGill (1984) used $\log_2(\text{Error}+1/8)$ 
 
+Construction of Media
+
+- How to most similarly construct stimuli so that we can accurately estimate the differences between media types?
+    - Color scales for 2dd
+    - STL colors for 3dd vs. filament colors for 3dp
