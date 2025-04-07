@@ -4,11 +4,11 @@ plot_3dd <- function(base_file, bars_file, letters_file, ...){
   open3d()
   par3d(windowRect = c(20, 30, 600, 600))
   readSTL(base_file,
-          color = '#1D2124', ...)
+          color = '#F5F5F5', ...)
   readSTL(bars_file,
           color = '#74CCFF', ...)
   readSTL(letters_file,
-          color = '#FFFFFF', ...)
+          color = '#000000', ...)
   rgl::clear3d(type = 'lights')
 
   # Front and counter clockwise

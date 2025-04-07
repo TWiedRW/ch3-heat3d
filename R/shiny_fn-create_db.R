@@ -4,7 +4,7 @@
 create_db <- function(output_location, plan){
   require(RSQLite)
   conn <- dbConnect(SQLite(), output_location)
-  load('../../data/plan.rda')
+  # load('../../data/plan.rda')
   num_blocks = max(plan$block)
   blocks <- data.frame(
     block = 1:num_blocks,
