@@ -1,6 +1,6 @@
 # ---- MAJOR TO-DO ----
 #| Create logic to save data to database
-#| Informed consent, instructions, practice, end page
+#| instructions, practice, end page
 #| Save number of clicks on 3dd charts
 #| Disable ability to click on tabs
 #| Fix 3dp so that it closely resembles 3dd
@@ -78,6 +78,7 @@ source('../../R/shiny_fn-plot_helper.R')
 source('../../R/shiny_fn-plot_2dd.R')
 source('../../R/shiny_fn-plot_3dd.R')
 source('../../R/shiny_fn-write_to_db.R')
+source('../../R/shiny_fn-practice_order.R')
 
 
 
@@ -96,7 +97,7 @@ if(!(database %in% list.files(recursive = T))){
 
 # ---- Informed Consent ----
 ui_consent <- fluidPage(
-  fluidRow(column(12, align = 'center', h1('Heat3d: A study on 3D Heatmaps'))),
+  fluidRow(shiny::column(12, align = 'center', h1('Heat3d: A study on 3D Heatmaps'))),
   sidebarLayout(
     sidebarPanel(
       selectInput('is_218_student',
@@ -235,7 +236,7 @@ ui_instructions <- fluidPage(
       '),
     radioButtons('instruction_guess_smaller',
                  'Which of the following values is larger?',
-                 choices = c('Value 1', 'Value 2', 'They are the same.'),
+                 choices = c('Value 1', 'Value 2', 'They are the same'),
                  selected = ''),
 
 
@@ -255,10 +256,11 @@ ui_instructions <- fluidPage(
   )
 )
 
-# ---- Practice (currently inactive) ----
+# ---- Practice ----
 
 ui_practice <- fluidPage(
-  actionButton('submit_start_exp', 'Start Experiment')
+  useShinyjs(),
+  uiOutput('practice_display')
 )
 
 
@@ -288,7 +290,7 @@ ui <- navbarPage(
   tabPanel('Informed Consent', ui_consent),
   tabPanel('Demographics', ui_demographics),
   tabPanel('Instructions', ui_instructions),
-  # tabPanel('Practice', ui_practice), # Disabled for now
+  tabPanel('Practice', ui_practice), # Disabled for now
   tabPanel('Experiment', ui_experiment),
   tabPanel('Wrap-up', ui_wrapup),
   tabPanel('Developer', uiOutput('dev_page'))
@@ -304,6 +306,7 @@ server <- function(input, output, server) {
     session = NULL,
     is_218_student = NULL,
     data_consent = NULL,
+    can_save = FALSE,
     user_pre_hash = NULL,
     user_id = NULL,
     completion_code = NULL
@@ -340,8 +343,9 @@ server <- function(input, output, server) {
 
     if(appValues$data_consent == T){
       updateNavbarPage(inputId = 'navpage', selected = 'Demographics')
+
     } else {
-      updateNavbarPage(inputId = 'navpage', selected = 'Instructions')
+      updateNavbarPage(inputId = 'navpage', selected = 'Practice')
       message('This user did not consent to data collection. Their results will not be saved.')
     }
   })
@@ -363,6 +367,7 @@ server <- function(input, output, server) {
     # Hash values
     appValues$user_pre_hash <- glue('{appValues$completion_code}-{demographicValues$user_age}-{demographicValues$user_gender}-{demographicValues$user_education}-{demographicValues$user_reason}-{demographicValues$user_unique}')
     appValues$user_id <- rlang::hash(appValues$user_pre_hash)
+    appValues$can_save <- (input$data_consent==T) & (input$user_age != "Under 19")
 
     # Print recorded values
     message(glue('The following demographic fields were populated:'))
@@ -383,9 +388,10 @@ server <- function(input, output, server) {
       session          =     appValues$session,
       is_218_student   =     appValues$is_218_student,
       data_consent     =     appValues$data_consent,
-      user_pre_hash    =     appValues$user_pre_hash, #DELETE THIS ONE
+      can_save         =     appValues$can_save,
+      # user_pre_hash    =     appValues$user_pre_hash, #DELETE THIS ONE
       user_id          =     appValues$user_id,
-      completion_code  =     appValues$completion_code, #DELETE THIS ONE
+      # completion_code  =     appValues$completion_code, #DELETE THIS ONE
       user_age         =     demographicValues$user_age,
       user_gender      =     demographicValues$user_gender,
       user_education   =     demographicValues$user_education,
@@ -393,23 +399,217 @@ server <- function(input, output, server) {
       user_unique      =     demographicValues$user_unique
     )
 
-    if(appValues$data_consent){
+    if(appValues$can_save){
       write_to_db(users, database, write = T)
       message(glue('Table "users" was successfully updated for user: {appValues$user_id}'))
     } else{
-      message(glue('User {appValues$user_id} did not consent to data collection. However, they should not have seen the demographics page???'))
+      message(glue('User {appValues$user_id} is under 19 years old, so their responses will not be recorded'))
     }
 
     # Update page
-    updateNavbarPage(inputId = 'navpage', selected = 'Instructions')
+    updateNavbarPage(inputId = 'navpage', selected = 'Practice')
 
 })
   # ---- Instructions logic ----
   observeEvent(input$submit_start_exp, {
+    shiny::removeModal()
     updateNavbarPage(inputId = 'navpage', selected = 'Experiment')
   })
 
   # ---- Practice logic ----
+
+  practiceValues <- reactiveValues(
+    user_id = NULL,
+    trialStartTime = NULL,
+    trialEndTime = NULL,
+    trialNumber = NULL,
+    trialSet = NULL,
+    block = NULL,
+    user_practice_results = NULL,
+    user_practice_trial_num = NULL,
+    user_practice_trial_max = NULL,
+    user_practice_set_num = NULL,
+    user_practice_set_max = NULL,
+    user_practice_3d_matrix = NULL,
+    user_practice_slice = NULL,
+    user_practice_helper = FALSE,
+    user_practice_guess_larger = NULL,
+    user_practice_guess_slider = NULL,
+    data_consent = NULL,
+    can_save = NULL,
+    user_practice_last_trial = FALSE
+  )
+
+  observeEvent((input$submit_consent) | (input$submit_demographics), {
+
+    #Trial information
+    practiceValues$user_practice_results <- practice_order()
+
+
+    #Label information
+    practiceValues$user_practice_results <- practiceValues$user_practice_results %>%
+      left_join(stimuli_labels, relationship = 'many-to-many',
+                by = 'pair_id') %>%
+      select(-c(label_stl)) %>%
+      pivot_wider(values_from = label,
+                  names_from = within_pair)
+
+
+    practiceValues$user_practice_trial_num <- min(practiceValues$user_practice_results$user_trial_order)
+    practiceValues$user_practice_trial_max <- max(practiceValues$user_practice_results$user_trial_order)
+
+    #First Trial
+    practiceValues$user_practice_slice <- dplyr::filter(practiceValues$user_practice_results,
+                                                        user_trial_order == practiceValues$user_practice_trial_num)
+
+    #Set information
+    practiceValues$user_practice_set_num <- practiceValues$user_practice_slice$user_set_order
+    practiceValues$user_practice_set_max <- max(practiceValues$user_practice_results$user_set_order)
+
+    # Update values
+    shinyjs::delay(10, {updateRadioButtons(inputId = 'user_practice_guess_larger',
+                                           choices = c(practiceValues$user_practice_slice$p1,
+                                                       practiceValues$user_practice_slice$p2,
+                                                       'The two values are the same.'),
+                                           selected = '')})
+
+  })
+
+  # Create helper plot
+  output$practice_plot_helper <- renderPlot({
+      'practice' = plot_helper(practice_data, practiceValues$user_practice_slice$pair_id)
+  })
+
+  # Create plot for 2dd
+  output$plot_2dd_practice <- renderPlot({
+    plot_2dd(practice_data)
+  })
+
+  # Create plot for 3dd
+  output$plot_3dd_practice <- renderRglwidget({
+    render_3dd('../../print-files/practice/rgl-practice_data-base.stl',
+                                '../../print-files/practice/rgl-practice_data-bars.stl',
+                                '../../print-files/practice/rgl-practice_data-letters.stl')
+    rglwidget()
+  })
+
+
+  # Render UI for chart helper
+  output$practice_plot_helper <- renderUI({
+    validate(need(input$user_practice_helper, ''))
+    plotOutput('practice_plot_helper', width = '50%')
+  })
+
+  # Render UI for experiment chart
+  output$practice_plot <- renderUI({
+    switch (practiceValues$user_practice_slice$media,
+            '2dd' = plotOutput('plot_2dd_practice'),
+            '3dd' = tagList(
+              rglwidgetOutput('plot_3dd_practice'),
+              helpText('You may use your mouse to move the chart on the screen.'),
+              helpText('Left click: move the plot.'),
+              helpText('Scroll: zoom in and out.')
+            )
+
+    )
+    # plotOutput('plot_helper', width = '70%')
+
+  })
+
+
+  # Practice UI
+  output$practice_display <- renderUI({
+
+    fluidPage(
+      tags$head(
+        tags$link(rel = "stylesheet", type = "text/css", href = "styles.css")
+      ),
+      sidebarLayout(
+        sidebarPanel(
+          h1('Practice'),
+          h2(glue('Trial {practiceValues$user_practice_trial_num} of {practiceValues$user_practice_trial_max}')),
+          h3(glue('Group {practiceValues$user_practice_set_num} of {practiceValues$user_practice_set_max}')),
+          radioButtons('user_practice_guess_larger',
+                       'Which of the following values is larger?',
+                       choices = c('Value 1', 'Value 2', 'They are the same.'),
+                       selected = ''),
+          sliderInput('user_practice_guess_slider',
+                      'If the larger value you selected above represents 100 units, how many units does the smaller value represent?',
+                      min = 0, max = 100, value = 50, ticks = F, step = 0.1),
+
+          actionButton('submit_practice_trial',
+                       'Submit'),
+
+          checkboxInput('user_practice_helper', 'Select this checkbox if you need help identifying the two values on the chart.'),
+          helpText('This is a practice trial. Your response is not recorded.')
+
+        ),
+        mainPanel(
+          column(width = 6,
+                 uiOutput('practice_plot', width = '100%'),
+          ),
+          column(width = 6,
+                 uiOutput('practice_plot_helper')
+          )
+
+
+        )
+      )
+    )
+  })
+
+  # observeEvent(input$user_practice_guess_larger, {
+  #   if(input$user_practice_guess_larger == 'They are the same.'){
+  #     updateSliderInput(inputId = 'user_practice_guess_slider', value = 100)
+  #     shinyjs::disable(id = 'user_practice_guess_slider')
+  #   } else {
+  #     shinyjs::enable(id = 'user_practice_guess_slider')
+  #   }
+  #
+  # })
+
+  observeEvent(input$submit_practice_trial, {
+
+
+    # Update trial number and trial slice
+    if(practiceValues$user_practice_trial_num < practiceValues$user_practice_trial_max){
+      practiceValues$user_practice_trial_num <- practiceValues$user_practice_trial_num + 1
+
+      practiceValues$user_practice_slice <- dplyr::filter(practiceValues$user_practice_results,
+                                                          user_trial_order == practiceValues$user_practice_trial_num)
+      # shinyjs::delay(100, updateSliderInput(inputId = 'user_practice_helper', value = user_practice_helper_toggle))
+
+      practiceValues$user_practice_set_num <- practiceValues$user_practice_slice$user_set_order
+      # If next trial is last trial, create marker for confidence question
+      if(practiceValues$user_practice_trial_num == practiceValues$user_practice_trial_max){
+        practiceValues$user_practice_last_trial <- TRUE
+      }
+    } else if(practiceValues$user_practice_trial_num  == practiceValues$user_practice_trial_max){
+
+      showModal(modalDialog(
+        p('You have successfully completed the practice trials. Click the button below to start the experiment.'),
+        actionButton('submit_start_exp', 'Start Experiment'),
+        title = 'Practice trials complete!',
+        easyClose = F,
+        footer = NULL
+      ))
+
+
+
+
+    } else {
+      message('Trial number exeeds maximun number of trials. What happened???')
+    }
+
+    # Update values
+    updateRadioButtons(inputId = 'user_practice_guess_larger',
+                       choices = c(practiceValues$user_practice_slice$p1,
+                                   practiceValues$user_practice_slice$p2,
+                                   'They are the same.'),
+                       selected = '')
+
+  })
+
 
 
 
@@ -433,6 +633,7 @@ server <- function(input, output, server) {
     user_guess_larger = NULL,
     user_guess_slider = NULL,
     data_consent = NULL,
+    can_save = NULL,
     user_last_trial = FALSE
   )
 
@@ -444,17 +645,18 @@ server <- function(input, output, server) {
     #User information
     expValues$user_id <- appValues$user_id
     expValues$data_consent <- appValues$data_consent
+    expValues$can_save <- appValues$can_save
     expValues$block <- pick_block(database)
     expValues$trialStartTime <- Sys.time()
     message(glue('Block {expValues$block} was chosen for user {expValues$user_id}'))
 
-    if(appValues$data_consent){
+    if(appValues$can_save){
       blocks <- tibble(
         block = expValues$block,
         user_id = expValues$user_id,
         system_time = expValues$trialStartTime
       )
-      write_to_db(blocks, database, write = appValues$data_consent)
+      write_to_db(blocks, database, write = appValues$can_save)
     }
 
     #Trial information
@@ -705,6 +907,7 @@ server <- function(input, output, server) {
     # validate(need(input$user_confidence, 'You must select your confidence before continuing.'))
     removeModal()
   })
+
 
 
   # ---- Post-experiment logic ----
