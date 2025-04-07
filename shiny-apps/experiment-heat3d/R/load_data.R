@@ -1,0 +1,6 @@
+load('../../data/valid_words.rda')
+load('../../data/stimuli_labels.rda')
+load('../../data/data1.rda')
+load('../../data/data2.rda')
+load('../../data/plan.rda')
+load('../../data/practice_data.rda')

@@ -67,6 +67,7 @@ load('../../data/data2.rda')
 load('../../data/plan.rda')
 load('../../data/practice_data.rda')
 
+source('R/load_data.R')
 source('../../R/shiny_fn-generate_completion_code.R')
 source('../../R/shiny_fn-randomize_order.R')
 source('../../R/shiny_fn-create_db.R')
