@@ -1,11 +1,8 @@
 # ---- MAJOR TO-DO ----
-#| Create logic to save data to database
-#| instructions, practice, end page
+#| instructions, end page
 #| Save number of clicks on 3dd charts
 #| Disable ability to click on tabs
 #| Fix 3dp so that it closely resembles 3dd
-#| Delete saving of completion code and pre-hash
-
 
 
 # ---- MINOR TO-DO ----
@@ -84,7 +81,7 @@ source('../../R/shiny_fn-practice_order.R')
 
 # Initial Values
 appStartTime <- Sys.time()
-database <- 'data/heat3d.db'
+database <- 'data/graphics-group(04-07-2025).db'
 
 # Create new database if one does not exist for {database}
 # Note: this only populates with blocking information since
@@ -180,81 +177,81 @@ ui_demographics <- fluidPage(
   )
 )
 
-# ---- Instructions ----
-
-ui_instructions <- fluidPage(
-  column(width = 8, offset = 2,
-   wellPanel(
-    h2('Instructions'),
-    p('For this survey, you will be using charts to estimate the relationship between a pair of values across different chart types.
-    These charts consist of 2D digitally rendered heatmaps, 3D digitally rendered heatmaps, and, if applicable, 3D printed heatmaps.'),
-    uiOutput('instruction_plots'),
-    fluidRow(column(4, style = "margin-bottom: 0px;", tags$figure(
-      class = "centerFigure",
-      tags$img(
-        src = "2dd-example.png",
-        width = "90%",
-        alt = "2dd"
-      ),
-      tags$figcaption("2D Digital")
-    )),
-    column(4, style = "margin-bottom: 0px;", tags$figure(
-      class = "centerFigure",
-      tags$img(
-        src = "3dd-example.png",
-        width = "90%",
-        alt = "3dd"
-      ),
-      tags$figcaption("3D Digital")
-    )),
-    column(4, style = "margin-bottom: 0px;", tags$figure(
-      class = "centerFigure",
-      tags$img(
-        src = "3dp-example.png",
-        width = "90%",
-        alt = "3dp"
-      ),
-      tags$figcaption("3D Printed")
-    ))),
-    checkboxInput('user_online', label = 'Select this option if you do not have access to the 3D printed heatmaps.',
-                  value = F),
-
-
-
-    p('Pairs of values are defined by upper and lower case instances of the same letter and are located on the heatmap.
-    Each question will define the pair of values and you will need to identify the locations of the values on the heatmap.
-    If it is difficult to identify the location of the values on heatmap, there is an option to produce a map showing the locations.'),
-
-    p('Once you have identified the location of the values, you will need to select which of the two values in the pair is larger in magnitude.
-    If you believe that the two values are of the same magnitude, you may check that they are the same size.
-
-
-
-
-
-
-      '),
-    radioButtons('instruction_guess_smaller',
-                 'Which of the following values is larger?',
-                 choices = c('Value 1', 'Value 2', 'They are the same'),
-                 selected = ''),
-
-
-    p('More text will go here, plus pictures...'),
-    actionButton('submit_start_exp', 'Start Experiment')
-  )),
-  fluidRow(column(12, align = 'center', h1('Practice Question'))),
-  fluidRow(
-    sidebarLayout(
-      sidebarPanel(
-        p('test')
-      ),
-      mainPanel(
-        p('test')
-      )
-    )
-  )
-)
+# # ---- Instructions ----
+#
+# ui_instructions <- fluidPage(
+#   column(width = 8, offset = 2,
+#    wellPanel(
+#     h2('Instructions'),
+#     p('For this survey, you will be using charts to estimate the relationship between a pair of values across different chart types.
+#     These charts consist of 2D digitally rendered heatmaps, 3D digitally rendered heatmaps, and, if applicable, 3D printed heatmaps.'),
+#     uiOutput('instruction_plots'),
+#     fluidRow(column(4, style = "margin-bottom: 0px;", tags$figure(
+#       class = "centerFigure",
+#       tags$img(
+#         src = "2dd-example.png",
+#         width = "90%",
+#         alt = "2dd"
+#       ),
+#       tags$figcaption("2D Digital")
+#     )),
+#     column(4, style = "margin-bottom: 0px;", tags$figure(
+#       class = "centerFigure",
+#       tags$img(
+#         src = "3dd-example.png",
+#         width = "90%",
+#         alt = "3dd"
+#       ),
+#       tags$figcaption("3D Digital")
+#     )),
+#     column(4, style = "margin-bottom: 0px;", tags$figure(
+#       class = "centerFigure",
+#       tags$img(
+#         src = "3dp-example.png",
+#         width = "90%",
+#         alt = "3dp"
+#       ),
+#       tags$figcaption("3D Printed")
+#     ))),
+#     checkboxInput('user_online', label = 'Select this option if you do not have access to the 3D printed heatmaps.',
+#                   value = F),
+#
+#
+#
+#     p('Pairs of values are defined by upper and lower case instances of the same letter and are located on the heatmap.
+#     Each question will define the pair of values and you will need to identify the locations of the values on the heatmap.
+#     If it is difficult to identify the location of the values on heatmap, there is an option to produce a map showing the locations.'),
+#
+#     p('Once you have identified the location of the values, you will need to select which of the two values in the pair is larger in magnitude.
+#     If you believe that the two values are of the same magnitude, you may check that they are the same size.
+#
+#
+#
+#
+#
+#
+#       '),
+#     radioButtons('instruction_guess_smaller',
+#                  'Which of the following values is larger?',
+#                  choices = c('Value 1', 'Value 2', 'They are the same'),
+#                  selected = ''),
+#
+#
+#     p('More text will go here, plus pictures...'),
+#     actionButton('submit_start_exp', 'Start Experiment')
+#   )),
+#   fluidRow(column(12, align = 'center', h1('Practice Question'))),
+#   fluidRow(
+#     sidebarLayout(
+#       sidebarPanel(
+#         p('test')
+#       ),
+#       mainPanel(
+#         p('test')
+#       )
+#     )
+#   )
+# )
 
 # ---- Practice ----
 
@@ -289,7 +286,7 @@ ui <- navbarPage(
   id = 'navpage',
   tabPanel('Informed Consent', ui_consent),
   tabPanel('Demographics', ui_demographics),
-  tabPanel('Instructions', ui_instructions),
+  # tabPanel('Instructions', ui_instructions),
   tabPanel('Practice', ui_practice), # Disabled for now
   tabPanel('Experiment', ui_experiment),
   tabPanel('Wrap-up', ui_wrapup),
@@ -367,7 +364,7 @@ server <- function(input, output, server) {
     # Hash values
     appValues$user_pre_hash <- glue('{appValues$completion_code}-{demographicValues$user_age}-{demographicValues$user_gender}-{demographicValues$user_education}-{demographicValues$user_reason}-{demographicValues$user_unique}')
     appValues$user_id <- rlang::hash(appValues$user_pre_hash)
-    appValues$can_save <- (input$data_consent==T) & (input$user_age != "Under 19")
+    appValues$can_save <- all((appValues$data_consent==T) & (demographicValues$user_age != "Under 19"))
 
     # Print recorded values
     message(glue('The following demographic fields were populated:'))
@@ -436,7 +433,8 @@ server <- function(input, output, server) {
     user_practice_guess_larger = NULL,
     user_practice_guess_slider = NULL,
     data_consent = NULL,
-    can_save = NULL,
+    user_online = NULL,
+    can_save = FALSE,
     user_practice_last_trial = FALSE
   )
 
@@ -588,6 +586,7 @@ server <- function(input, output, server) {
 
       showModal(modalDialog(
         p('You have successfully completed the practice trials. Click the button below to start the experiment.'),
+        checkboxInput('user_online', 'Select this button if you do not have access to the 3D-printed charts.'),
         actionButton('submit_start_exp', 'Start Experiment'),
         title = 'Practice trials complete!',
         easyClose = F,
@@ -633,7 +632,7 @@ server <- function(input, output, server) {
     user_guess_larger = NULL,
     user_guess_slider = NULL,
     data_consent = NULL,
-    can_save = NULL,
+    can_save = FALSE,
     user_last_trial = FALSE
   )
 
@@ -648,6 +647,7 @@ server <- function(input, output, server) {
     expValues$can_save <- appValues$can_save
     expValues$block <- pick_block(database)
     expValues$trialStartTime <- Sys.time()
+    appValues$user_online <- input$user_online
     message(glue('Block {expValues$block} was chosen for user {expValues$user_id}'))
 
     if(appValues$can_save){
@@ -660,7 +660,7 @@ server <- function(input, output, server) {
     }
 
     #Trial information
-    expValues$user_results <- randomize_order(expValues$block, plan, remove_3dp = input$user_online)
+    expValues$user_results <- randomize_order(expValues$block, plan, remove_3dp = appValues$user_online)
 
 
     #Label information
