@@ -1,10 +1,10 @@
 # ---- MAJOR TO-DO ----
-#| Create 3dp stl files for set2
 #| Create logic to save data to database
 #| Informed consent, instructions, practice, end page
 #| Save number of clicks on 3dd charts
 #| Disable ability to click on tabs
 #| Fix 3dp so that it closely resembles 3dd
+#| Delete saving of completion code and pre-hash
 
 
 
@@ -36,6 +36,7 @@
 #|    Informed consent for non-218 includes reference to replication
 #|    of CM's 1984 study.
 #| Font sizes for value definitions
+#| Time stamps for each page of the app
 #|
 #|
 
@@ -76,6 +77,7 @@ source('../../R/shiny_fn-pick_block.R')
 source('../../R/shiny_fn-plot_helper.R')
 source('../../R/shiny_fn-plot_2dd.R')
 source('../../R/shiny_fn-plot_3dd.R')
+source('../../R/shiny_fn-write_to_db.R')
 
 
 
@@ -300,6 +302,7 @@ server <- function(input, output, server) {
   appValues <- reactiveValues(
     appStartTime = NULL,
     session = NULL,
+    is_218_student = NULL,
     data_consent = NULL,
     user_pre_hash = NULL,
     user_id = NULL,
@@ -324,22 +327,23 @@ server <- function(input, output, server) {
 
     appValues$appStartTime <- appStartTime
     appValues$session <- session()
+    appValues$is_218_student <- input$is_218_student
     appValues$data_consent <- input$data_consent
     appValues$completion_code <- generate_completion_code(valid_words)
 
     message(glue('The following app values were generated:'))
     message(glue('\tappStartTime: {appValues$appStartTime}'))
     message(glue('\tsession: {appValues$session}'))
+    message(glue('\tis_218_student: {appValues$is_218_student}'))
     message(glue('\tdata_consent: {appValues$data_consent}'))
     message(glue('\tcompletion_code: {appValues$completion_code}'))
 
-    if(input$data_consent == T){
+    if(appValues$data_consent == T){
       updateNavbarPage(inputId = 'navpage', selected = 'Demographics')
     } else {
       updateNavbarPage(inputId = 'navpage', selected = 'Instructions')
+      message('This user did not consent to data collection. Their results will not be saved.')
     }
-
-
   })
 
   # ---- Demographics logic ----
@@ -348,11 +352,11 @@ server <- function(input, output, server) {
   observeEvent(input$submit_demographics, {
 
     # Save demographic fields
-    demographicValues$user_age <- input$user_age
-    demographicValues$user_gender <- input$user_gender
-    demographicValues$user_education <- input$user_education
-    demographicValues$user_reason <- input$user_reason
-    demographicValues$user_unique <- input$user_unique
+    demographicValues$user_age        <- input$user_age
+    demographicValues$user_gender     <- input$user_gender
+    demographicValues$user_education  <- input$user_education
+    demographicValues$user_reason     <- input$user_reason
+    demographicValues$user_unique     <- input$user_unique
 
 
 
@@ -373,6 +377,29 @@ server <- function(input, output, server) {
     # Maybe use app start time too in user_id?
     message(glue('A new user was created at {appValues$appStartTime}: {appValues$user_id}'))
 
+    # Write to database
+    users <- tibble(
+      appStartTime     =     appValues$appStartTime,
+      session          =     appValues$session,
+      is_218_student   =     appValues$is_218_student,
+      data_consent     =     appValues$data_consent,
+      user_pre_hash    =     appValues$user_pre_hash, #DELETE THIS ONE
+      user_id          =     appValues$user_id,
+      completion_code  =     appValues$completion_code, #DELETE THIS ONE
+      user_age         =     demographicValues$user_age,
+      user_gender      =     demographicValues$user_gender,
+      user_education   =     demographicValues$user_education,
+      user_reason      =     demographicValues$user_reason,
+      user_unique      =     demographicValues$user_unique
+    )
+
+    if(appValues$data_consent){
+      write_to_db(users, database, write = T)
+      message(glue('Table "users" was successfully updated for user: {appValues$user_id}'))
+    } else{
+      message(glue('User {appValues$user_id} did not consent to data collection. However, they should not have seen the demographics page???'))
+    }
+
     # Update page
     updateNavbarPage(inputId = 'navpage', selected = 'Instructions')
 
@@ -383,6 +410,8 @@ server <- function(input, output, server) {
   })
 
   # ---- Practice logic ----
+
+
 
 
   # ---- Experiment logic ----
@@ -400,7 +429,7 @@ server <- function(input, output, server) {
     user_set_max = NULL,
     user_3d_matrix = NULL,
     user_slice = NULL,
-    user_guess_smaller = NULL,
+    user_guess_larger = NULL,
     user_guess_slider = NULL,
     data_consent = NULL,
     user_last_trial = FALSE
@@ -411,11 +440,11 @@ server <- function(input, output, server) {
 
   observeEvent(input$submit_start_exp, {
 
-
     #User information
     expValues$user_id <- appValues$user_id
     expValues$data_consent <- appValues$data_consent
     expValues$block <- pick_block(database)
+    expValues$trialStartTime <- Sys.time()
     message(glue('Block {expValues$block} was chosen for user {expValues$user_id}'))
 
     #Trial information
@@ -442,7 +471,7 @@ server <- function(input, output, server) {
     expValues$user_set_max <- max(expValues$user_results$user_set_order)
 
     # Update values
-    shinyjs::delay(10, {updateRadioButtons(inputId = 'user_guess_smaller',
+    shinyjs::delay(10, {updateRadioButtons(inputId = 'user_guess_larger',
                        choices = c(expValues$user_slice$p1,
                                    expValues$user_slice$p2,
                                    'The two values are the same.'),
@@ -472,7 +501,6 @@ server <- function(input, output, server) {
             'set1' = render_3dd('../../print-files/set1/rgl-data1-base.stl',
                                 '../../print-files/set1/rgl-data1-bars.stl',
                                 '../../print-files/set1/rgl-data1-letters.stl'),
-            #MAJOR CHANGE: NEED TO CONVERT BACK TO data2 WHEN FILES ARE CREATED
             'set2' = render_3dd('../../print-files/set2/rgl-data2-base.stl',
                                 '../../print-files/set2/rgl-data2-bars.stl',
                                 '../../print-files/set2/rgl-data2-letters.stl')
@@ -531,7 +559,7 @@ server <- function(input, output, server) {
           p(glue('Value 1: {expValues$user_slice$p1}')),
           p(glue('Value 2: {expValues$user_slice$p2}')),
 
-          radioButtons('user_guess_smaller',
+          radioButtons('user_guess_larger',
                        'Which of the following values is larger?',
                        choices = c('Value 1', 'Value 2', 'They are the same.'),
                        selected = ''),
@@ -554,8 +582,8 @@ server <- function(input, output, server) {
     )
   })
 
-  observeEvent(input$user_guess_smaller, {
-    if(input$user_guess_smaller == 'They are the same.'){
+  observeEvent(input$user_guess_larger, {
+    if(input$user_guess_larger == 'They are the same.'){
       updateSliderInput(inputId = 'user_guess_slider', value = 100)
       shinyjs::disable(id = 'user_guess_slider')
     } else {
@@ -566,11 +594,25 @@ server <- function(input, output, server) {
 
   observeEvent(input$submit_user_trial, {
     # Save data into database here
-    # ...
+    expValues$trialEndTime <- Sys.time()
+    results <- tibble(
+      user_id = appValues$user_id,
+      trialStartTime = expValues$trialStartTime,
+      trialEndTime = expValues$trialEndTime,
+      trialNumber = NULL,
+      trialSet = NULL,
+      block = NULL,
+      user_trial_num = NULL,
+      user_set_num = NULL,
+      user_guess_larger = NULL,
+      user_guess_slider = NULL,
+    )
+    write_to_db(results, database, write = appValues$data_consent)
 
+    # Update start time for next trial
+    expValues$trialStartTime <- expValues$trialEndTime
 
-
-    #Update trial number and trial slice
+    # Update trial number and trial slice
     if(expValues$user_trial_num < expValues$user_trial_max){
       expValues$user_trial_num <- expValues$user_trial_num + 1
 
@@ -623,7 +665,7 @@ server <- function(input, output, server) {
     }
 
     # Update values
-    updateRadioButtons(inputId = 'user_guess_smaller',
+    updateRadioButtons(inputId = 'user_guess_larger',
                        choices = c(expValues$user_slice$p1,
                                    expValues$user_slice$p2,
                                    'They are the same.'),
@@ -642,6 +684,12 @@ server <- function(input, output, server) {
   observeEvent(input$submit_confidence, {
     # Save confidence
     # ...
+    confidence <- tibble(
+      user_id = expValues$user_id,
+      user_confidence = input$user_confidence
+    )
+
+    write_to_db(confidence, database, write = appValues$data_consent)
 
     #Validate does not display message, but will work
     # validate(need(input$user_confidence, 'You must select your confidence before continuing.'))
