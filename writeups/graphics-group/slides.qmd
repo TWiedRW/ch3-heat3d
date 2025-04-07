@@ -3,6 +3,7 @@ title: "Heat3d"
 subtitle: "A study on 3D-printed heatmaps"
 author: "Tyler Wiederich"
 date: "04/07/2025"
+date-format: long
 institute: "University of Nebraska-Lincoln"
 format: 
   revealjs:
@@ -42,6 +43,10 @@ The goal of this experiment is to see how well participants estimate values acro
 
 We use the method of constant stimuli for creating our stimuli.
 
+$$
+S=\text{Stimuli}
+$$
+
 ::: incremental
 -   All values are between 0 and 100
 -   The constant is 50
@@ -49,9 +54,7 @@ We use the method of constant stimuli for creating our stimuli.
 -   All other values between 50 and 90 are created such that the ratios between 0.556 and 1 are equally spaced
 -   Values between 0 and 50 are chosen such that the same ratios as above are used
 
-$$
-S=\text{Stimuli}
-$$
+
 :::
 
 ------------------------------------------------------------------------
@@ -110,7 +113,7 @@ With 9 pairs of values, it is expected to see 1.8 stimuli values in each row/col
 |-------|-------|-------|-------|-------|-------|-------|-------|-------|-------|-------|
 | Grid Position | 1     | 2     | 3     | 4     | 5     | 6     | 7     | 8     | 9     | 10    |
 | Expected      | 1.8   | 1.8   | 1.8   | 1.8   | 1.8   | 1.8   | 1.8   | 1.8   | 1.8   | 1.8   |
-| Observed      | $n_1$ | $n_2$ | $n_3$ | $n_4$ | $n_5$ | $n_6$ | $n_7$ | $n_8$ | $n_9$ | $n_10$ |
+| Observed      | $n_1$ | $n_2$ | $n_3$ | $n_4$ | $n_5$ | $n_6$ | $n_7$ | $n_8$ | $n_9$ | $n_{10}$ |
 
 $$
 \chi^2=\sum\frac{(\text{Observed}-\text{Expected})^2}{\text{Expected}}
@@ -138,17 +141,21 @@ Way too many trials for a single participant's attention span!
 Our main interest is the difference between media types, measured at a given ratio and dataset. To accomplish this and to reduce the number of trials per participant, we use 4 of the 9 possible stimuli pairs to create blocks.
 
 $$
-Y = \mu + P_i + S_j + \gamma_{ij} + D_k + M_l + (SD)_{jk} + (SM)_{jl} + (DM)_{kl} + (SDM)_{jkl} + e_{ijklm}
+2\times3\times4=24
 $$
 
-where 
+<!-- $$ -->
+<!-- Y = \mu + P_i + S_j + \gamma_{ij} + D_k + M_l + (SD)_{jk} + (SM)_{jl} + (DM)_{kl} + (SDM)_{jkl} + e_{ijklm} -->
+<!-- $$ -->
 
-- $P_i$ is the effect of block $i$
-- $S_j$ is the effect of stimuli pair $j$
-- $\gamma_{ij}\sim N(0,\sigma^2_\gamma)$ is the 
-- $D_k$ is the effect of dataset $k$
-- $M_l$ is the effect of media type $l$
-- $e_{ijklm}\sim N(0,\sigma^2)$ is the random error
+<!-- where  -->
+
+<!-- - $P_i$ is the effect of block $i$ -->
+<!-- - $S_j$ is the effect of stimuli pair $j$ -->
+<!-- - $\gamma_{ij}\sim N(0,\sigma^2_\gamma)$ is the  -->
+<!-- - $D_k$ is the effect of dataset $k$ -->
+<!-- - $M_l$ is the effect of media type $l$ -->
+<!-- - $e_{ijklm}\sim N(0,\sigma^2)$ is the random error -->
 
 ## Experiment
 
@@ -181,3 +188,5 @@ Construction of Media
 - How to most similarly construct stimuli so that we can accurately estimate the differences between media types?
     - Color scales for 2dd
     - STL colors for 3dd vs. filament colors for 3dp
+
+# Thank you!
