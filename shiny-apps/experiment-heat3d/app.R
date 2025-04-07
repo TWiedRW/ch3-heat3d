@@ -429,6 +429,7 @@ server <- function(input, output, server) {
     user_set_max = NULL,
     user_3d_matrix = NULL,
     user_slice = NULL,
+    user_helper = FALSE,
     user_guess_larger = NULL,
     user_guess_slider = NULL,
     data_consent = NULL,
@@ -446,6 +447,15 @@ server <- function(input, output, server) {
     expValues$block <- pick_block(database)
     expValues$trialStartTime <- Sys.time()
     message(glue('Block {expValues$block} was chosen for user {expValues$user_id}'))
+
+    if(appValues$data_consent){
+      blocks <- tibble(
+        block = expValues$block,
+        user_id = expValues$user_id,
+        system_time = expValues$trialStartTime
+      )
+      write_to_db(blocks, database, write = appValues$data_consent)
+    }
 
     #Trial information
     expValues$user_results <- randomize_order(expValues$block, plan, remove_3dp = input$user_online)
@@ -555,10 +565,6 @@ server <- function(input, output, server) {
         sidebarPanel(
           h2(glue('Trial {expValues$user_trial_num} of {expValues$user_trial_max}')),
           h3(glue('Group {expValues$user_set_num} of {expValues$user_set_max}')),
-          p(glue('Use the following definitions for Trial {expValues$user_trial_num}. If you need help identifying the values on the chart, there is an option at the bottom of this section to help.')),
-          p(glue('Value 1: {expValues$user_slice$p1}')),
-          p(glue('Value 2: {expValues$user_slice$p2}')),
-
           radioButtons('user_guess_larger',
                        'Which of the following values is larger?',
                        choices = c('Value 1', 'Value 2', 'They are the same.'),
@@ -570,13 +576,19 @@ server <- function(input, output, server) {
           actionButton('submit_user_trial',
                        'Submit'),
 
-          checkboxInput('user_helper', 'Select this checkbox if you need help identifying the two values on the chart.')
+          checkboxInput('user_helper', 'Select this checkbox if you need help identifying the two values on the chart.'),
+          conditionalPanel('input.data_consent == "FALSE"', shiny::helpText('Demo mode: your answers will not be saved.'))
 
         ),
         mainPanel(
-          uiOutput('experiment_plot', width = '100%'),
-          tableOutput('user_slice'),
-          uiOutput('experiment_plot_helper')
+          column(width = 6,
+            uiOutput('experiment_plot', width = '100%'),
+          ),
+          column(width = 6,
+            uiOutput('experiment_plot_helper')
+          )
+
+
         )
       )
     )
@@ -597,17 +609,17 @@ server <- function(input, output, server) {
     expValues$trialEndTime <- Sys.time()
     results <- tibble(
       user_id = appValues$user_id,
+      user_helper = input$user_helper,
       trialStartTime = expValues$trialStartTime,
       trialEndTime = expValues$trialEndTime,
-      trialNumber = NULL,
-      trialSet = NULL,
-      block = NULL,
-      user_trial_num = NULL,
-      user_set_num = NULL,
-      user_guess_larger = NULL,
-      user_guess_slider = NULL,
-    )
+      block = expValues$block,
+      user_guess_larger = input$user_guess_larger,
+      user_guess_slider = input$user_guess_slider
+    ) %>%
+      bind_cols(expValues$user_slice)
     write_to_db(results, database, write = appValues$data_consent)
+
+    # user_helper_toggle <- isolate({input$user_helper})
 
     # Update start time for next trial
     expValues$trialStartTime <- expValues$trialEndTime
@@ -617,7 +629,7 @@ server <- function(input, output, server) {
       expValues$user_trial_num <- expValues$user_trial_num + 1
 
       expValues$user_slice <- dplyr::filter(expValues$user_results, user_trial_order == expValues$user_trial_num)
-
+      # shinyjs::delay(100, updateSliderInput(inputId = 'user_helper', value = user_helper_toggle))
       if(expValues$user_set_num != expValues$user_slice$user_set_order | expValues$user_last_trial == T){
         # Alt phrasing ideas: https://www.marquette.edu/student-affairs/assessment-likert-scales.php
         showModal(modalDialog(
@@ -630,7 +642,7 @@ server <- function(input, output, server) {
                                    '5 - Extremely confident'),
                        selected = ''),
           actionButton('submit_confidence', 'Submit', disabled = T),
-          title = 'Some title here I guess',
+          title = 'Confidence Rating',
           footer = NULL
 
         ))
@@ -652,7 +664,7 @@ server <- function(input, output, server) {
                                  '5 - Extremely confident'),
                      selected = ''),
         actionButton('submit_confidence', 'Submit', disabled = T),
-        title = 'Some title here I guess',
+        title = 'Confidence Rating',
         footer = NULL
 
       ))
@@ -682,8 +694,6 @@ server <- function(input, output, server) {
 
 
   observeEvent(input$submit_confidence, {
-    # Save confidence
-    # ...
     confidence <- tibble(
       user_id = expValues$user_id,
       user_confidence = input$user_confidence
