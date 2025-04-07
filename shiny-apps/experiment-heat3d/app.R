@@ -311,7 +311,7 @@ server <- function(input, output, server) {
     session = NULL,
     is_218_student = NULL,
     data_consent = NULL,
-    can_save = FALSE,
+    can_save = TRUE,
     user_pre_hash = NULL,
     user_id = NULL,
     completion_code = NULL
@@ -373,7 +373,7 @@ server <- function(input, output, server) {
     # Hash values
     appValues$user_pre_hash <- glue('{appValues$completion_code}-{demographicValues$user_age}-{demographicValues$user_gender}-{demographicValues$user_education}-{demographicValues$user_reason}-{demographicValues$user_unique}')
     appValues$user_id <- rlang::hash(appValues$user_pre_hash)
-    appValues$can_save <- all((appValues$data_consent==T) & (demographicValues$user_age != "Under 19"))
+    appValues$can_save <- (appValues$data_consent==T)
 
     # Print recorded values
     message(glue('The following demographic fields were populated:'))
@@ -443,7 +443,7 @@ server <- function(input, output, server) {
     user_practice_guess_slider = NULL,
     data_consent = NULL,
     user_online = NULL,
-    can_save = FALSE,
+    can_save = TRUE,
     user_practice_last_trial = FALSE
   )
 
@@ -652,7 +652,7 @@ server <- function(input, output, server) {
     user_guess_larger = NULL,
     user_guess_slider = NULL,
     data_consent = NULL,
-    can_save = FALSE,
+    can_save = TRUE,
     user_last_trial = FALSE
   )
 
