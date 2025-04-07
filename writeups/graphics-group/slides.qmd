@@ -23,7 +23,7 @@ execute:
 
 ## Study participation
 
-Before we begin, please access (WEB LINK HERE) to participate in the pilot study!
+Before we begin, please access [https://twiedrw.shinyapps.io/experiment-heat3d/](https://twiedrw.shinyapps.io/experiment-heat3d/) to participate in the pilot study!
 
 ```{r}
 library(tidyverse)
