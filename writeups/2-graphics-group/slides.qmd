@@ -1,0 +1,192 @@
+---
+title: "Heat3d"
+subtitle: "A study on 3D-printed heatmaps"
+author: "Tyler Wiederich"
+date: "04/07/2025"
+date-format: long
+institute: "University of Nebraska-Lincoln"
+format: 
+  revealjs:
+    self-contained: true
+    fig-align: center
+    navigation-mode: vertical
+    slide-number: true
+    show-slide-number: print
+    smaller: true
+    logo: https://ucomm.unl.edu/sites/unl.edu.university-communication/files/styles/no_crop_960/public/media/image/nebraska-n.jpg?itok=sSPTwnWf
+execute: 
+  message: false
+  echo: false
+  warning: false
+  fig-align: 'center'
+---
+
+## Study participation
+
+Before we begin, please access [https://shiny.srvanderplas.com/heat3d/](https://shiny.srvanderplas.com/heat3d/) to participate in the pilot study!
+
+```{r}
+library(tidyverse)
+```
+
+# Methodology
+
+## Goal
+
+The goal of this experiment is to see how well participants estimate values across three chart types.
+
+-   2D-digital (2dd)
+-   3D-digital (3dd)
+-   3D-printed (3dp)
+
+## Stimuli Creation
+
+We use the method of constant stimuli for creating our stimuli.
+
+$$
+S=\text{Stimuli}
+$$
+
+::: incremental
+-   All values are between 0 and 100
+-   The constant is 50
+-   The largest value is 90
+-   All other values between 50 and 90 are created such that the ratios between 0.556 and 1 are equally spaced
+-   Values between 0 and 50 are chosen such that the same ratios as above are used
+
+
+:::
+
+------------------------------------------------------------------------
+
+```{r}
+load('../../data/stimuli.rda')
+theme_set(theme_bw())
+stimuli %>% 
+  rowwise() %>% 
+  mutate(ratio = round(min(values, constant) / max(values, constant), 2)) %>% 
+  ggplot(mapping = aes(x = pair_id, y = values)) + 
+  geom_bar(stat = 'identity', color = 'black', fill = 'lightgreen') +
+  geom_text(aes(x = 5, y = 54), label = 'Constant') +
+  geom_text(aes(x = pair_id, y = min(values)/2, label = ratio)) +
+  scale_y_continuous(limits = c(0, 105), expand = c(0,0)) + 
+  scale_x_continuous(breaks = 1:10) +
+  labs(x = 'Pair ID', y = 'Value') + 
+  theme(panel.grid.major.x = element_blank(),
+        panel.grid.minor.x = element_blank(),
+        # axis.text.x = element_blank(),
+        axis.ticks.x = element_blank(),
+        aspect.ratio = 1/2)
+```
+
+## Generating Heatmap Data
+
+The general shape of the heatmap is a mixture distribution between mathematical formula and uniform random noise.
+
+$$
+Z=0.3\cdot U(0,100) + 0.7\cdot f(X,Y)
+$$
+
+where $f(X,Y)$ is any given function, scaled between 0 and 100
+
+-   Top half of a sphere centered at 5.5
+-   Lower half of a sphere centered at 5.5
+
+## Stimuli Placement
+
+1)  Data is simulated from previous function to generate grid $(X=1\dots 10, Y=1\dots 10)$
+2)  Non-50 value is placed onto grid coordinate that minimizes $|Z-S|$
+3)  50 is placed similarly, but only on coordinates that have a Manhattan distance of 3 or 4
+
+$$
+|X_1-X_2|+|Y_1-Y_2| = 3 \text{ or } 4
+$$
+
+4)  Repeat process 20 times for a list of heatmaps
+5)  Use Chi-squared tests to find heatmaps where stimuli are somewhat equally spaced
+
+## Heatmap selection
+
+With 9 pairs of values, it is expected to see 1.8 stimuli values in each row/column of the heatmap.
+
+|               |       |       |       |       |       |       |       |       |       |       |
+|-------|-------|-------|-------|-------|-------|-------|-------|-------|-------|-------|
+| Grid Position | 1     | 2     | 3     | 4     | 5     | 6     | 7     | 8     | 9     | 10    |
+| Expected      | 1.8   | 1.8   | 1.8   | 1.8   | 1.8   | 1.8   | 1.8   | 1.8   | 1.8   | 1.8   |
+| Observed      | $n_1$ | $n_2$ | $n_3$ | $n_4$ | $n_5$ | $n_6$ | $n_7$ | $n_8$ | $n_9$ | $n_{10}$ |
+
+$$
+\chi^2=\sum\frac{(\text{Observed}-\text{Expected})^2}{\text{Expected}}
+$$
+
+We use the grid with the smallest average $\chi^2$ for the $X$ and $Y$ axes.
+
+
+# Study Design
+
+## Study Design
+
+For a full replicate, there are $3\times2\times9=54$ treatment combinations: 
+
+- 3 media types (2dd, 3dd, 3dp)
+- 2 datasets 
+- 9 pairs of stimuli
+
+Way too many trials for a single participant's attention span!
+
+![](frustrated.jpeg){.nostretch fig-align="center" height="256px"}
+
+## Incomplete Block
+
+Our main interest is the difference between media types, measured at a given ratio and dataset. To accomplish this and to reduce the number of trials per participant, we use 4 of the 9 possible stimuli pairs to create blocks.
+
+$$
+2\times3\times4=24
+$$
+
+<!-- $$ -->
+<!-- Y = \mu + P_i + S_j + \gamma_{ij} + D_k + M_l + (SD)_{jk} + (SM)_{jl} + (DM)_{kl} + (SDM)_{jkl} + e_{ijklm} -->
+<!-- $$ -->
+
+<!-- where  -->
+
+<!-- - $P_i$ is the effect of block $i$ -->
+<!-- - $S_j$ is the effect of stimuli pair $j$ -->
+<!-- - $\gamma_{ij}\sim N(0,\sigma^2_\gamma)$ is the  -->
+<!-- - $D_k$ is the effect of dataset $k$ -->
+<!-- - $M_l$ is the effect of media type $l$ -->
+<!-- - $e_{ijklm}\sim N(0,\sigma^2)$ is the random error -->
+
+## Experiment
+
+1) Ask participants which value in a stimuli pair is larger
+2) Ask participants to estimate the value of the smaller stimuli
+3) After each dataset and media combination, ask participant to rate their level of confidence
+
+## Population
+
+This study will be used in STAT 218 courses at UNL as a required project.
+
+  - Students who are at least 19 years old and consent to data collection
+    
+Students will also complete a series of reflections.
+
+  - Pre-experiment
+  - Post-experiment
+  - Abstract / paper
+  - Video presentation
+
+## Other considerations
+
+Type of responses
+
+- Difference between stimuli and participant response
+    - Cleveland and McGill (1984) used $\log_2(\text{Error}+1/8)$ 
+
+Construction of Media
+
+- How to most similarly construct stimuli so that we can accurately estimate the differences between media types?
+    - Color scales for 2dd
+    - STL colors for 3dd vs. filament colors for 3dp
+
+# Thank you!
