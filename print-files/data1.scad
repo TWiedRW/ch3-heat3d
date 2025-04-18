@@ -40,6 +40,20 @@ base_color = [0, 0, 0]; // black
 label_color = [1, 1, 1]; // white
 bar_color = [.5, .5, .5]; // grey
 
+height_diff = 5;
+max_height = max([for (i=0; i<len(bar_size_array); i=i+1) max(bar_size_array[i])]);
+height_levels = ceil(max_height/height_diff);
+
+
+// 20 values from the jet palette in viridis
+height_colors = [[0.19, 0.07, 0.23], [0.25, 0.22, 0.58], [0.27, 0.37, 0.82], [0.27, 0.50, 0.96],
+[0.23, 0.63, 0.98], [0.14, 0.76, 0.89], [0.09, 0.87, 0.75], [0.17, 0.94, 0.62],
+[0.36, 0.98, 0.45], [0.55, 1.00, 0.29], [0.71, 0.97, 0.21], [0.84, 0.90, 0.21],
+[0.93, 0.80, 0.23], [0.98, 0.69, 0.21], [0.99, 0.54, 0.15], [0.95, 0.38, 0.08],
+[0.88, 0.26, 0.04], [0.78, 0.16, 0.01], [0.64, 0.07, 0.00], [0.48, 0.02, 0.01]];
+echo(height_levels, " height levels with height size ", height_diff);
+
+
 //---------------------------------------------------------------------
 
 // Cumulative sum function
@@ -101,18 +115,36 @@ letter_z = [for(i=[0:(n_bars_xy[0]-1)]) addvec(bar_z, bar_size_array[i])];
 render(){
     difference(){
         union(){
-
+            // Base
+            color(base_color) cube([base_x,base_y,base_z]);
 
             // Bars
             for(i = [0:9]) {
-                for(j = [0:9]) {
+                for(j = [0:9]) {    
+                    union() {
+                        for(k = [0:height_levels]) {               
+                            myheight = max(0, min(bar_size_array[i][j] - k*height_diff, height_diff));
+                            barstart = bar_z[i] + k*height_diff;
+                            
+                            if(myheight > 0){
+                            echo("Bar with height ", myheight, " starting at ", barstart);
+                            translate([bar_y[j], bar_x[i], barstart])
+                                color(height_colors[k])
+                                cube([bar_size_y[j], bar_size_x[i], myheight]);
+                            }
+                        }
+                    } // Not sure if unioning this makes it easier or not but it seems like it'd at least result in fewer objects?
+                }
+            }
+            
+            // Letters
+            for(i = [0:9]) {
+                for(j = [0:9]) {   
                     translate([letter_y[j], letter_x[i], letter_z[i][j]])
                         color(label_color)
                         letter(letter_array[i][j]);
                 }
             }
-
-            // TODO: Create this based off of groups...
 
 
             labels_x = [base_x/2, margins_x[0]/2];
@@ -129,5 +161,10 @@ render(){
             }
 
         };
+        // Subtract off the code
+        translate([base_x/2,base_y/2,letter_height])
+            rotate([180,0,0])
+            color(label_color)
+            letter(code, 7);
     }
 }

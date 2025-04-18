@@ -113,58 +113,59 @@ letter_z = [for(i=[0:(n_bars_xy[0]-1)]) addvec(bar_z, bar_size_array[i])];
 
 
 render(){
-    union(){
-        // Base
-        color(base_color)
-        difference(){
-             cube([base_x,base_y,base_z]);
-            // Subtract off the code
-            translate([base_x/2,base_y/2,letter_height])
-                rotate([180,0,0])
-                letter(code, 7);
-        }
-        
-        // Bars
-        for(i = [0:9]) {
-            for(j = [0:9]) {    
-                union() {
-                    for(k = [0:height_levels]) {               
-                        myheight = max(0, min(bar_size_array[i][j] - k*height_diff, height_diff));
-                        barstart = bar_z[i] + k*height_diff;
-                        
-                        if(myheight > 0){
-                        echo("Bar with height ", myheight, " starting at ", barstart);
-                        translate([bar_y[j], bar_x[i], barstart])
-                            color(height_colors[k])
-                            cube([bar_size_y[j], bar_size_x[i], myheight]);
+    difference(){
+        union(){
+            // Base
+            color(base_color) cube([base_x,base_y,base_z]);
+
+            // Bars
+            for(i = [0:9]) {
+                for(j = [0:9]) {    
+                    union() {
+                        for(k = [0:height_levels]) {               
+                            myheight = max(0, min(bar_size_array[i][j] - k*height_diff, height_diff));
+                            barstart = bar_z[i] + k*height_diff;
+                            
+                            if(myheight > 0){
+                            echo("Bar with height ", myheight, " starting at ", barstart);
+                            translate([bar_y[j], bar_x[i], barstart])
+                                color(height_colors[k])
+                                cube([bar_size_y[j], bar_size_x[i], myheight]);
+                            }
                         }
-                    }
-                } // Not sure if unioning this makes it easier or not but it seems like it'd at least result in fewer objects?
+                    } // Not sure if unioning this makes it easier or not but it seems like it'd at least result in fewer objects?
+                }
             }
-        }
-        
-        // Letters
-        for(i = [0:9]) {
-            for(j = [0:9]) {   
-                translate([letter_y[j], letter_x[i], letter_z[i][j]])
+            
+            // Letters
+            for(i = [0:9]) {
+                for(j = [0:9]) {   
+                    translate([letter_y[j], letter_x[i], letter_z[i][j]])
+                        color(label_color)
+                        letter(letter_array[i][j]);
+                }
+            }
+
+
+
+            labels_x = [base_x/2, margins_x[0]/2];
+            labels_y = [margins_y[0]/2, base_y/2];
+            labels_z = [base_z, base_z];
+            rotation = [0, 90];
+            labels = [x_axis_label, y_axis_label];
+
+            for(i = [0:(len(labels)-1)]) {
+                translate([labels_x[i], labels_y[i], labels_z[i]])
+                    rotate(rotation[i])
                     color(label_color)
-                    letter(letter_array[i][j]);
+                    letter(labels[i]);
             }
-        }
 
-
-
-        labels_x = [base_x/2, margins_x[0]/2];
-        labels_y = [margins_y[0]/2, base_y/2];
-        labels_z = [base_z, base_z];
-        rotation = [0, 90];
-        labels = [x_axis_label, y_axis_label];
-
-        for(i = [0:(len(labels)-1)]) {
-            translate([labels_x[i], labels_y[i], labels_z[i]])
-                rotate(rotation[i])
-                color(label_color)
-                letter(labels[i]);
-        }
+        };
+        // Subtract off the code
+        translate([base_x/2,base_y/2,letter_height])
+            rotate([180,0,0])
+            color(label_color)
+            letter(code, 7);
     }
 }
