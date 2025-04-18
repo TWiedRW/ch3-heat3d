@@ -1,0 +1,313 @@
+---
+title: "Visualization in R"
+subtitle: "A SC3L Workshop"
+author: "Tyler Wiederich"
+institute: "University of Nebraska-Lincoln"
+format: 
+  revealjs:
+    self-contained: true
+    fig-align: center
+    navigation-mode: vertical
+    slide-number: true
+    show-slide-number: print
+    smaller: true
+    logo: https://ucomm.unl.edu/sites/unl.edu.university-communication/files/styles/no_crop_960/public/media/image/nebraska-n.jpg?itok=sSPTwnWf
+---
+
+```{r}
+knitr::opts_chunk$set(fig.align = 'center')
+```
+
+
+## About us
+
+:::: {.columns}
+
+::: {.column}
+
+- We are the Statistical Cross-disciplinary Collaboration & Consulting Lab (SC3L) from the UNL Department of Statistics.
+- We offer free statistical consulting services to students, faculty, and staff at UNL.
+- Workshops! Hosted from 1-2pm on Wednesdays and Thursdays.
+
+:::
+
+::: {.column}
+
+![](images/sc3l-logo.png){align=center}
+
+:::
+
+::::
+
+# Data Visualization in R
+
+## Why visualize data?
+
+Data visualization is an important step in understanding the relationships of variables in your dataset.
+
+- How does Factor A affect my response?
+- Is there an interaction between Factor A and Factor B?
+- Are there outliers in my dataset?
+
+```{r}
+#| fig-align: center
+
+
+library(ggplot2)
+ggplot(mpg, aes(x=displ, y = cty)) + 
+  geom_point(stat = 'identity') + 
+  labs(title = 'Does engine displacement correlate with miles per gallon?',
+       x = 'Engine Displacement (L)', 
+       y = 'City mpg') +
+  geom_smooth(method = 'lm', se = F, color = 'red') + 
+  theme_bw() + 
+  theme(aspect.ratio = 1/2)
+
+```
+
+## The basics
+
+R has multiple methods of creating visualizations, but our focus will be with the `ggplot2` package. This package uses the Grammar of Graphics approach, layering different building blocks to produce a graph.
+
+![](https://metricsf20.classes.ryansafner.com/images/gglayers.png){fig-align='center'}
+
+
+## The basics: data format
+
+Data needs to be formatted so that it is **tidy**, which is defined as one observation per row and each measurement as a column.
+
+```{r}
+set.seed(250)
+examp_data <- expand.grid(
+  Trt1 = 1:2,
+  Trt2 = 1:2,
+  Rep = 1:2
+)
+examp_data$response <- round(rnorm(8, 10),2)
+knitr::kable(examp_data, align = 'c')
+```
+
+
+## Example: not tidy
+
+```{r}
+library(dplyr)
+library(tidyr)
+set.seed(250)
+tidy_examp <- slice_sample(select(diamonds, cut, color, price), n = 100) %>% 
+  group_by(cut, color) %>% 
+  summarize(price = round(mean(price, na.rm = T)),
+            .groups = 'keep')
+tidy_examp %>% 
+  pivot_wider(names_from = cut,
+              values_from = price) %>% 
+  knitr::kable(caption = 'Average diamond price by cut and color')
+```
+
+
+
+
+## Example: tidy
+
+```{r}
+knitr::kable(head(tidy_examp,6), caption = 'Average diamond price by cut and color.')
+```
+
+
+
+
+## The basics: syntax
+
+```{r}
+#| include: true
+#| eval: false
+#| echo: true
+
+ggplot(data = data, mapping = aes(...)) + 
+  geom_FUNCTION(aes(...), ...) + 
+  scale_FUNCTION(...) +
+  facet_FUNCTION(...) + 
+  labs(title = '', subtitle = '', x = '', y = '') + 
+  theme_FUNCTION(...) + 
+  coord_FUNCTION(...)
+
+```
+
+## Preliminaries 
+
+```{r}
+#| eval: false
+#| echo: true
+
+install.packages(c('ggplot2', 'palmerpenguins', 'ggthemes'))
+library(ggplot2)
+library(palmerpenguins)
+library(ggthemes)
+```
+
+
+# Example 1
+
+## Example 1: penguins
+
+```{r}
+library(ggplot2)
+library(palmerpenguins)
+library(ggthemes)
+
+knitr::kable(head(penguins), caption = 'Palmer Penguins Data')
+```
+
+## Example 1: penguins
+
+```{r}
+#| echo: true
+
+ggplot(data = penguins, mapping = aes(x = bill_length_mm, y = bill_depth_mm, color = species)) + 
+  geom_point(aes(shape = species), alpha = 2/3, size = 1) + 
+  theme_bw() + 
+  labs(x = 'Bill length (mm)', y = 'Bill depth (mm)',
+       title = 'Bill length vs. Bill depth', subtitle = 'By species',
+       color = 'Species', shape = 'Species', caption = 'Source: palmerpenguins') +
+  facet_grid(.~island) + 
+  theme(aspect.ratio = 1/2,
+        legend.position = 'bottom')
+```
+
+
+## Your turn! 
+
+Using the `penguins` dataset, answer the following research question?
+
+- Are bill lengths and bill depths different by sex of each penguin species?
+- Hint: consider the use of color and facets.
+
+
+## Solution
+
+```{r}
+#| echo: true
+
+ggplot(data = penguins, mapping = aes(x = bill_length_mm, y = bill_depth_mm, color = sex)) + 
+  geom_point(aes(shape = sex), alpha = 2/3) +
+  facet_grid(.~species) + 
+  labs(x = 'Bill length (mm)', y = 'Bill depth (mm)',
+     title = 'Bill length vs. Bill depth', subtitle = 'By sex',
+     color = 'Sex', shape = 'Sex', caption = 'Source: palmerpenguins package') +
+  theme_bw() + 
+  theme(aspect.ratio = 1/2)
+
+```
+
+# Example 2
+
+## Example 2
+
+```{r}
+#| echo: true
+#| fig-align: center
+
+ggplot(data = economics, mapping = aes(x = date, y = uempmed)) + 
+  # geom_line(color = 'black') + 
+  geom_area(fill = 'skyblue', color = 'black') +
+  theme_bw() + 
+  labs(x = '',
+       y = 'Median durration of unemployment\n(in weeks)',
+       title = 'Longer unemployment during Great Recession',
+       subtitle = 'in the United States',
+       caption = 'Source: ggplot2::economics') + 
+  scale_x_date(date_breaks = '5 years', date_labels = '%Y') + 
+  scale_y_continuous(limits = c(0,27), expand = c(0,0)) + 
+  theme(aspect.ratio = 1/2)
+```
+
+
+
+
+## Your turn!
+
+Use the `economics2000s` dataset created below from the `economics` dataset.
+Create a visualization using `geom_bar()` to plot the average unemployment rate for each year.
+Additionally, use `theme()` to further customize your plot!
+
+Hints
+
+- `geom_bar()` requires the argument `stat=identity` when using both x and y in the `aes()` function.
+
+- Use `?theme()` or visit [https://ggplot2.tidyverse.org/reference/theme.html](https://ggplot2.tidyverse.org/reference/theme.html) to see available options.
+
+
+```{r}
+#| echo: true
+
+library(dplyr)
+library(lubridate)
+economics2000s <- economics %>% 
+  mutate(year = year(date)) %>% 
+  filter(year >= 2000) %>% 
+  group_by(year) %>% 
+  summarise(mean_unemploy = mean(100*unemploy/pop))
+
+```
+
+
+## Solution
+
+```{r}
+#| echo: true
+
+economics2000s %>% 
+  ggplot(mapping = aes(x = year, y = mean_unemploy)) + 
+  geom_bar(stat = 'identity', width = 1,
+           color = 'black', fill = 'skyblue') + 
+  labs(x = '', y = 'Unemployment rate (%)', title = 'Unemployment rate in the United States',
+       subtitle = '2000 to 2015') +
+  scale_y_continuous(limits = c(0, 5), expand = c(0,0)) + 
+  scale_x_continuous(breaks = 2000:2015) +
+  theme_bw() +
+  theme(aspect.ratio = 1/2, 
+        panel.grid.major.x = element_blank(), panel.grid.minor.x = element_blank(),
+        plot.background = element_rect(color = 'black', fill = 'grey80'),
+        plot.title = element_text(size = 16, family = 'times', face = 'bold', hjust = 0.5),
+        plot.subtitle = element_text(size = 12, family = 'times', hjust = 0.5))
+```
+
+# Saving your visualization
+
+## Saving your visualization
+
+```{r}
+#| echo: true
+#| eval: false
+
+myplot <- economics2000s %>% 
+  ggplot(mapping = aes(x = year, y = mean_unemploy)) + 
+  geom_bar(stat = 'identity', width = 1,
+           color = 'black', fill = 'skyblue') + 
+  labs(x = '', y = 'Unemployment rate (%)', title = 'Unemployment rate in the United States') +
+  scale_y_continuous(limits = c(0, 5), expand = c(0,0)) + 
+  scale_x_continuous(breaks = 2000:2015) +
+  theme_bw() + theme(aspect.ratio = 1/2)
+
+ggsave('unemploy.png', width = 6, dpi = 600)
+
+```
+
+
+![](unemploy.png){fig-align=center}
+
+
+## Your turn!
+
+Practice using the skills you learned on a dataset of your choice. If you do not have one, use the `diamonds` dataset from the `ggplot2` package.
+
+# Wrap-up
+
+## Thank you
+
+Additional resources
+
+- [https://ggplot2.tidyverse.org](https://ggplot2.tidyverse.org)
+- [https://r-graph-gallery.com/ggplot2-package.html](https://r-graph-gallery.com/ggplot2-package.html)
+
+Visit our website to schedule an appointment! [https://statistics.unl.edu/sc3lhelp-desk/](https://statistics.unl.edu/sc3lhelp-desk/)

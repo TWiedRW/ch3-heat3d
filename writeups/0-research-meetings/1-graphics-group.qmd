@@ -1,0 +1,222 @@
+---
+title: "Graphics Group Data"
+format: html
+---
+
+Data was collected on April 7th, 2025.
+
+```{r}
+# Packages
+library(tidyverse)
+library(RSQLite)
+```
+
+```{r}
+# Data
+conn <- dbConnect(SQLite(), '../../shiny-apps/experiment-heat3d/data/graphics-group(04-07-2025).db')
+dbListTables(conn)
+
+blocks <- dbReadTable(conn, 'blocks')
+confidence <- dbReadTable(conn, 'confidence')
+results <- dbReadTable(conn, 'results')
+users <- dbReadTable(conn, 'users')
+
+dbDisconnect(conn)
+
+```
+
+# Blocks
+
+```{r}
+blocks %>% 
+  dplyr::filter(!str_detect(user_id, 'Initial setup')) %>% 
+  group_by(block) %>% 
+  count() 
+```
+
+# Results
+
+Putting this together, I realized that I should probably create separate tables with the correct answers...
+
+```{r}
+# Necessary data files
+load('../../data/stimuli_labels.rda')
+load('../../data/data1.rda')
+load('../../data/data2.rda')
+
+# Table for correct label guess
+correct_larger <- data1 %>% 
+  filter(!is.na(pair_id)) %>% 
+  select(z, pair_id, within_pair) %>% 
+  left_join(stimuli_labels, by = c('pair_id', 'within_pair')) %>% 
+  group_by(pair_id) %>% 
+  filter(z == max(z)) %>% 
+  mutate(true_label = ifelse(pair_id == 5, 'They are the same.', label)) %>% 
+  select(pair_id, true_label) %>% 
+  distinct() 
+
+# Table for correct ratio
+correct_slider <- data1 %>% 
+  filter(!is.na(pair_id)) %>% 
+  select(z, pair_id, within_pair) %>% 
+  left_join(stimuli_labels, by = c('pair_id', 'within_pair')) %>% 
+  group_by(pair_id) %>% 
+  summarize(true_slider = round(100*min(z)/max(z), 3))
+
+# Joining tables and 
+results2 <- results %>% 
+  inner_join(users, by = 'user_id') %>% 
+  filter(!str_detect(user_unique, 'DELETE ME')) %>% 
+  left_join(correct_larger, by = 'pair_id') %>% 
+  left_join(correct_slider, by = 'pair_id') %>% 
+  mutate(correct_larger = ifelse(true_label == user_guess_larger, 1, 0),
+         slider_error = (true_slider - user_guess_slider))
+```
+
+
+```{r}
+results2 %>% 
+  ggplot(mapping = aes(x = true_slider, y = user_guess_slider, 
+                       group = true_slider)) + 
+  geom_boxplot(width = 10) + 
+  labs(title = 'Boxplots of all results',
+       x = 'True ratio', 
+       y = 'User estimate') +
+  geom_abline(mapping = NULL, slope = 1, intercept = 0, color = 'red') + 
+  scale_x_continuous(breaks = unique(correct_slider$true_slider)) + 
+  scale_y_continuous(limits = c(0, 100)) + 
+  theme_bw() + 
+  theme(aspect.ratio = 1, legend.position = 'bottom')
+```
+
+```{r}
+results2 %>% 
+  ggplot(mapping = aes(x = factor(true_slider), 
+                       y = user_guess_slider,
+                       fill = factor(pair_id))) + 
+  geom_boxplot(width = 1/2) + 
+  labs(title = 'By Pair ID',
+       x = 'True ratio', 
+       y = 'User estimate',
+       fill = 'Pair ID') +
+  scale_y_continuous(limits = c(0, 100)) + 
+  theme_bw() + 
+  theme(aspect.ratio = 1, legend.position = 'right')
+```
+
+```{r}
+results2 %>% 
+  ggplot(mapping = aes(x = factor(true_slider), 
+                       y = user_guess_slider,
+                       fill = factor(media))) + 
+  geom_boxplot(width = 1/2) + 
+  labs(title = 'By Media',
+       x = 'True ratio', 
+       y = 'User estimate',
+       fill = 'Media') +
+  scale_y_continuous(limits = c(0, 100)) + 
+  theme_bw() + 
+  theme(aspect.ratio = 1, legend.position = 'right')
+```
+
+
+
+```{r}
+results2 %>% 
+  ggplot(mapping = aes(x = factor(true_slider), 
+                       y = user_guess_slider,
+                       fill = factor(set))) + 
+  geom_boxplot(width = 1/2) + 
+  labs(title = 'By Media',
+       x = 'True ratio', 
+       y = 'User estimate',
+       fill = 'Dataset') +
+  scale_y_continuous(limits = c(0, 100)) + 
+  theme_bw() + 
+  theme(aspect.ratio = 1, legend.position = 'right')
+```
+
+```{r}
+results2 %>% 
+  ggplot(mapping = aes(x = factor(true_slider), 
+                       y = user_guess_slider,
+                       fill = factor(pair_id))) + 
+  geom_boxplot(width = 1/2) + 
+  labs(title = 'By Media',
+       x = 'True ratio', 
+       y = 'User estimate',
+       fill = 'Media') +
+  scale_y_continuous(limits = c(0, 100)) + 
+  facet_grid(set~media) +
+  theme_bw() + 
+  theme(aspect.ratio = 1, legend.position = 'right')
+```
+
+```{r}
+results2 %>% 
+  ggplot(mapping = aes(x = slider_error, y = factor(pair_id))) + 
+  geom_boxplot() + 
+  labs(title = 'Error by Pair ID and Media',
+       y = 'Pair ID', x = 'Error') + 
+  facet_grid(~media) + 
+  theme_bw() + 
+  theme(aspect.ratio = 2)
+```
+
+
+```{r}
+results2 %>% 
+  mutate(time_seconds = trialEndTime - trialStartTime) %>% 
+  ggplot(mapping = aes(x = time_seconds)) + 
+  geom_histogram(fill = 'grey80', color = 'black') + 
+  facet_grid(media~., scales = 'free_y') + 
+  labs(title = 'Histogram of trial completion time',
+       x = 'Time (s)', 'Count') + 
+  theme_bw() + 
+  theme(aspect.ratio = 1/3)
+```
+
+```{r}
+results2 %>% 
+  group_by(user_id) %>% 
+  summarize(total_time_m = (max(trialEndTime) - max(appStartTime))/60) %>% 
+  ggplot(mapping = aes(x = total_time_m)) + 
+  geom_histogram(binwidth = 5, color = 'black', fill = 'grey80') + 
+  theme_bw() + 
+  labs(x = 'Completion Time (min)', y = 'Count', title = 'Time spent for experiment completion')
+```
+
+```{r}
+results2 %>% 
+  ggplot(mapping = aes(x = true_slider, y = correct_larger)) + 
+  geom_point() + 
+  geom_smooth(method = 'glm') + 
+  scale_x_continuous(breaks = unique(correct_slider$true_slider)) + 
+  facet_grid(~media) + 
+  labs(title = 'Correctly identifying larger value', x = 'True ratio', y = 'Correct or not') + 
+  theme_bw()
+```
+
+```{r}
+results3 <- results2 %>% 
+  arrange(user_id, trialStartTime) %>% 
+  group_by(user_id, set, media) %>% 
+  nest() %>% 
+  ungroup() %>% 
+  group_by(user_id) %>% 
+  mutate(order = 1:n()) %>% 
+  select(user_id, set, media, order)
+confidence %>% 
+  inner_join(users) %>% 
+  filter(!str_detect(user_unique, 'DELETE ME')) %>% 
+  group_by(user_id) %>% 
+  mutate(order = 1:n()) %>% 
+  full_join(results3, by = c('user_id', 'order')) %>% 
+  ggplot(mapping = aes(x = user_confidence)) + 
+  geom_bar(fill = 'grey80', color = 'black') + 
+  labs(x = '', y = 'Count', title = 'Distribution of confidence') +
+  theme_bw() + 
+  theme(aspect.ratio = 1/3, axis.text.x = element_text(angle = 30, hjust = 1)) + 
+  facet_grid(media~., scales = 'free_y')
+```
+
