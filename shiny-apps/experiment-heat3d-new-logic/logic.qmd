@@ -1,0 +1,96 @@
+---
+title: "Shiny App Logic"
+date: today
+date-format: long
+format: html
+---
+
+# Startup
+
+1. Record time
+2. Create session identifier
+
+# Informed Consent
+
+1. Ask students if they are completing the experiment as part of Stat 218
+2. Ask students if they consent to data collection
+
+On selecting consent option, move to next page.
+
+```{mermaid}
+flowchart TD
+    A[Student selects consent option] -->|Yes| B[Demographics Page]
+    A -->|No| C[Experiment Page]
+```
+
+## Inputs
+
+| Input ID       | Type           | Notes |
+|----------------|----------------|-------|
+| is_stat_218    | radioButtons   |       |
+| is_online      | radioButtons   |       |
+| data_consent   | radioButtons   |       |
+| submit_consent | actionButton   |       |
+
+## Server
+
+```{mermaid}
+flowchart TD
+    A[User clicks submit_consent] --> L[Validate options]
+    L --> M[Generate completion code]
+    L --> B[Update user_values with is_stat_218, is_online, and data_consent]
+    L --> K[Save time]
+    B --> C{data_consent}
+    B --> D{is_online}
+    C -- True --> E[Generate block, update block table]
+    C -- False --> F[Generate block, do not update block table]
+    D -- True --> G[Generate trials]
+    D -- False --> H[Generate trials without 3dp]
+    E --> I[Proceed to Demographics page]
+    F --> J[Proceed to Experiment page]
+```
+
+# Demographics
+
+1. Ask users their age, gender, education level, participation
+2. Ask users unique question
+
+## Inputs
+
+| Input ID           | Type           | Notes |
+|--------------------|----------------|-------|
+| user_age           | selectizeInput |       |
+| user_gender        | selectizeInput |       |
+| user_education     | selectizeInput |       |
+| user_reason        | selectizeInput |       |
+| user_unique        | textInput      |       |
+| submit_demographic | actionButton   |       |
+
+## Server
+
+```{mermaid}
+flowchart TD
+    A[User clicks submit_demographic] --> B[Validate demographic inputs]
+    B --> C[Save Time]
+    B --> D[Create Hash with session id, start time, and user information]
+    D --> E[Proceed to Experiment page]
+
+```
+
+# Experiment
+
+Rather than having separate pages for practice and experiment stages, 
+this UI will contain both and operate with a toggle state. 
+Three sets of trial data will be used: practice, experiment, and current. 
+
+Upon initialization, the experiment state will be set to "practice".
+This updates the current trial data to contain the practice trial data.
+When the last practice chart is given, it will switch to the "experiment"
+state.
+
+An "observe" function will monitor for the change in experiment state. 
+Once it changes, the current trial data switches to the experiment data.
+
+All trials are given through a reactive slice from the current trial data. 
+
+

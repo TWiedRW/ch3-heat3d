@@ -1,0 +1,15 @@
+#showInstructions {
+  width: 100%;
+  margin: 0 auto;
+}
+
+#submit {
+  width: 50%;
+  margin: 0 auto;
+}
+
+.checkbox {
+  visibility: hidden;
+  height: 0px;
+}
+
