@@ -232,8 +232,11 @@ server <- function(input, output) {
     is_218_student = NULL,
     is_online = NULL,
     data_consent = NULL,
-    er_age = NULL,
-    user_gender = NULL
+    user_age = NULL,
+    user_gender = NULL,
+    user_education = NULL,
+    user_reason = NULL,
+    user_unique = NULL
   )
 
   app_values <- reactiveValues(
@@ -255,7 +258,9 @@ server <- function(input, output) {
 
     #Current trials based on app state
     current_trials_data = NULL,
-    current_max = NULL
+    current_max = NULL,
+    current_media = "start",
+    current_set = "start"
   )
 
   current_slice <- reactive({
@@ -331,16 +336,21 @@ server <- function(input, output) {
     req(is.reactive(current_slice))
     trial <- current_slice() %>%
       dplyr::left_join(data_labels, by = c("pair_id"))
-
-
     exp_choices <- c(trial$p1, trial$p2, "Both values are the same")
-
     updateRadioButtons(inputId = "userLarger",
                        choices = exp_choices,
                        selected = "")
-
   })
 
+  observe({
+    req(is.reactive(current_slice))
+    if(app_values$current_media != current_slice()$media[1]) {
+      app_values$current_media <- current_slice()$media[1]
+    }
+    if(app_values$current_set != current_slice()$set[1]) {
+      app_values$current_set <- current_slice()$set[1]
+    }
+  })
 
 
   observeEvent(input$showInstructions, {
@@ -389,8 +399,8 @@ server <- function(input, output) {
   # Create plot for 2dd
   output$plot_2dd <- renderPlot({
     req(is.reactive(current_slice))
-    req(current_slice()$media[1] == "2dd")
-    switch(current_slice()$set[1],
+    req(app_values$current_media == "2dd")
+    switch(app_values$current_set,
             'practice' = plot_2dd(practice_data, stimuli_labels),
             'set1' = plot_2dd(data1, stimuli_labels),
             'set2' = plot_2dd(data2, stimuli_labels)
@@ -400,8 +410,8 @@ server <- function(input, output) {
   # Create plot for 3dd
   output$plot_3dd <- rgl::renderRglwidget({
     req(is.reactive(current_slice))
-    req(current_slice()$media[1] == "3dd")
-    switch(current_slice()$set[1],
+    req(app_values$current_media == "3dd")
+    switch(app_values$current_set,
           "practice" = plot_3dd(
               "../../print-files/practice/rgl-practice_data-base.stl",
               "../../print-files/practice/rgl-practice_data-bars.stl",
@@ -424,8 +434,8 @@ server <- function(input, output) {
   # Create plot for 3dp
   output$plot_3dp <- renderImage({
     req(is.reactive(current_slice))
-    req(current_slice()$media[1] == "3dp")
-    switch(current_slice()$set[1],
+    req(app_values$current_media == "3dp")
+    switch(app_values$current_set,
       "set1" = list(src = "www/set1-3dp.JPG", width = "400px"),
       "set2" = list(src = "www/set2-3dp.JPG", width = "400px")
     )
@@ -433,7 +443,7 @@ server <- function(input, output) {
 
   output$exp_plot <- renderUI({
     req(is.reactive(current_slice))
-    switch(current_slice()$media[1],
+    switch(app_values$current_media,
       "2dd" = plotOutput("plot_2dd", height = "400px"),
       "3dd" = rgl::rglwidgetOutput("plot_3dd", height = "400px"),
       "3dp" = imageOutput("plot_3dp", height = "400px")
