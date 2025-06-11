@@ -291,9 +291,6 @@ server <- function(input, output) {
   )
     # Pick block for user
     user_values$block <- pick_block(database)
-    if(input$data_consent == "FALSE") {
-      user_values$can_save <- FALSE
-    }
 
     #Initialize trials
     app_values$experiment_trials_data <- randomize_order(user_block, plan, input$is_online=="FALSE")
@@ -308,7 +305,16 @@ server <- function(input, output) {
     app_values$current_max <- app_values$practice_max
     app_values$current_counter <- 1
     updateNavbarPage(inputId = "expNav", selected = "Experiment")
-    modal_instructions() })
+  
+    # Move to Experiment tab if data consent is not given
+    if(input$data_consent == "FALSE") {
+      user_values$can_save <- FALSE
+      updateNavbarPage(inputId = "expNav", selected = "Experiment")
+      modal_instructions() 
+    } else {
+      updateNavbarPage(inputId = "expNav", selected = "Demographics")
+    }
+  })
 
   observeEvent(input$submit_demographics, {
     validate(
@@ -332,6 +338,10 @@ server <- function(input, output) {
     } else {
       user_values$can_save <- TRUE
     }
+
+    # Move to experiment tab
+    updateNavbarPage(inputId = "expNav", selected = "Experiment")
+    modal_instructions()
   }
   )
   # Submit button logic
