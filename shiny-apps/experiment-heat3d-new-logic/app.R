@@ -7,13 +7,13 @@ library(RSQLite)
 library(tidyverse)
 library(magrittr)
 
-# Load data
-load("../../data/plan.rda")
 load("../../data/valid_words.rda")
 load("../../data/stimuli_labels.rda")
 load("../../data/data1.rda")
 load("../../data/data2.rda")
+load("../../data/plan.rda")
 load("../../data/practice_data.rda")
+
 
 source("../../R/shiny_fn-generate_completion_code.R")
 source("../../R/shiny_fn-randomize_order.R")
@@ -24,7 +24,8 @@ source("../../R/shiny_fn-plot_2dd.R")
 source("../../R/shiny_fn-plot_3dd.R")
 source("../../R/shiny_fn-write_to_db.R")
 source("../../R/shiny_fn-practice_order.R")
-source("../../R/shiny_fn-show_instruction_modal.R")
+#source("../../R/shiny_fn-show_instruction_modal.R")
+source("modals/modal_instructions.R")
 
 
 
@@ -48,7 +49,7 @@ data_labels <- bind_rows(practice_data, data1, data2) %>%
   distinct() %>%
   pivot_wider(names_from = within_pair, values_from = label)
 
-
+user_block <- 3 #NEED TO BE CHANGED
 
 # ---- Informed Consent ----
 ui_consent <- fluidPage(
@@ -99,9 +100,10 @@ ui_consent <- fluidPage(
       helpText("If your Stat 218 course is held in-person, 
                 you will need to have access to the 3D-printed charts."),
       conditionalPanel(
-        'input.is_218_student != "" && 
-        input.is_online != "" && 
-        input.data_consent != ""',
+        #'input.is_218_student != "" && 
+        #input.is_online != "" && 
+        #input.data_consent != ""',
+        'true',
         p("Click on the button below to advance to the next page."),
         div(style = "text-align: center; width: 100%;",
           actionButton("submit_consent", "Continue")
@@ -147,13 +149,13 @@ ui_demographics <- fluidPage(
           move to the next page."),
 
       selectizeInput("user_age", "What category includes your age?",
-                     choices = options_ages, width = "100%"),
+                     choices = options_ages, width = "30%"),
       selectizeInput("user_gender",
                      "How would you describe your gender identity?",
-                     choices = options_gender, width = "100%"),
+                     choices = options_gender, width = "50%"),
       selectizeInput("user_education",
                      "What is your highest education level?",
-                     choices = options_education, width = "100%"),
+                     choices = options_education, width = "70%"),
       selectizeInput("user_reason",
                      "How is your participation graded?",
                      width = "100%",
@@ -189,22 +191,26 @@ ui_experiment <- fluidPage(
     sidebarPanel(
       uiOutput("trialHeader"),
       conditionalPanel("input.isPractice",
+                       p("The first four trials are for practice. Solutions will be shown after each question. Click the 'Show Instructions' to display the instructions at any point during the practice trials."), # nolint
                        actionButton("showInstructions", "Show Instructions")),
       p("Use the values indicated on the plot below for this trial."),
       plotOutput("plotHelper", height = "200px"),
       checkboxInput("isPractice", "practice", value = TRUE),
-      radioButtons("userLarger", "Which value represents a larger quantity?",
-                   choices = 1:3),
+      radioButtons("userLarger", "Question 1: Which value represents a larger quantity?",
+                   choices = 1:3, selected = ""),
       sliderInput("userSlider",
-                  "If the larger value you selected above represents 100 units, 
+                  "Question 2: If the larger value you selected above represents 100 units, 
                   how many units is the smaller value?",
                   min = 0, max = 100, value = runif(1, 0, 100)),
       div(style = "text-align: center;", actionButton("submit", "Submit"))
     ),
     mainPanel(
+      textOutput("is_online_value"),
+      uiOutput("exp_plot"),
       textOutput("slider_clicks"),
       tableOutput("current_slice"),
-      tableOutput("current_trial_data")
+      tableOutput("current_trial_data"),
+      tableOutput("trial_table"),
     )
   )
 )
@@ -226,7 +232,7 @@ server <- function(input, output) {
     is_218_student = NULL,
     is_online = NULL,
     data_consent = NULL,
-    user_age = NULL,
+    er_age = NULL,
     user_gender = NULL
   )
 
@@ -254,16 +260,21 @@ server <- function(input, output) {
 
   current_slice <- reactive({
     req(!is.null(app_values$current_trials_data))
-    app_values$current_trials_data[app_values$current_counter,]
+    app_values$current_trials_data[app_values$current_counter, ]
   })
 
   # Initial startup values
   observeEvent(input$submit_consent, {
-
+    #validate(
+    #  need(input$is_218_student != "", "Please select if you are enrolled in Stat 218."),
+    #  need(input$data_consent != "", "Please indicate your data consent choice."),
+    #  need(input$is_online != "", "Please indicate if you have access to the 3D-printed charts.")
+    #)
     # Pick block for user
 
+
     #Initialize trials
-    app_values$experiment_trials_data <- randomize_order(user_block, plan, TRUE)
+    app_values$experiment_trials_data <- randomize_order(user_block, plan, input$is_online=="FALSE")
     app_values$practice_trials_data <- practice_order(plan = plan)
 
     #Initialize max values
@@ -275,7 +286,8 @@ server <- function(input, output) {
     app_values$current_max <- app_values$practice_max
     app_values$current_counter <- 1
     updateNavbarPage(inputId = "expNav", selected = "Experiment")
-  })
+ 
+    modal_instructions() })
 
   # Submit button logic
   observeEvent(input$submit, {
@@ -292,11 +304,12 @@ server <- function(input, output) {
     } else if ((app_values$current_counter == app_values$current_max) &
                  app_values$exp_state == "experiment") {
       # Experiment is complete
-    message('Experiment is complete')
-      showModal(modalDialog(p('You successfully completed the experiment. Here is your completion code: ',
-                              p('Completion code placeholder'),
-                              p('Save this code as you will not have access once you exit the application.'),
-                              title = 'Experiment complete!')))
+      showModal(modalDialog(p("You successfully completed the experiment. 
+                              Here is your completion code: ",
+                              p("Completion code placeholder"),
+                              p("Save this code as you will not have access 
+                                  once you exit the application."),
+                              title = "Experiment complete!")))
     } else {
       # Update to next trial
       app_values$current_counter <- app_values$current_counter + 1
@@ -323,12 +336,19 @@ server <- function(input, output) {
     exp_choices <- c(trial$p1, trial$p2, "Both values are the same")
 
     updateRadioButtons(inputId = "userLarger",
-                       choices = exp_choices)
+                       choices = exp_choices,
+                       selected = "")
 
   })
 
+
+
+  observeEvent(input$showInstructions, {
+    modal_instructions()
+  })
+  
   observeEvent(input$userSlider, {
-    app_values$slider_clicks = app_values$slider_clicks + 1
+    app_values$slider_clicks <- app_values$slider_clicks + 1
   })
 
   output$plotHelper <- renderPlot({
@@ -345,13 +365,80 @@ server <- function(input, output) {
   })
 
   output$trialHeader <- renderUI({
-    tagList(
-      h2(glue::glue("Trial {app_values$current_counter} of 
+      trial_header <- switch(as.character(current_slice()$media)[1],
+      "2dd" = "2D Heat Map",
+      "3dd" = "3D Heat Map - Digital",
+      "3dp" = "3D Heat Map - Physical",
+      ""   )
+
+    trial_state <- switch(app_values$exp_state,
+      "practice" = "Practice ",
+      "experiment" = ""
+    )
+ 
+   tagList(
+      h2(glue::glue("{trial_state}Trial {app_values$current_counter} of 
                     {app_values$current_max}"),
          style = "text-align: center;"),
+      h3(trial_header, style = "text-align: center;"))
+  })
+  output$trial_table <- renderTable({
+    app_values$current_trials_data
+  })
+
+  # Create plot for 2dd
+  output$plot_2dd <- renderPlot({
+    req(is.reactive(current_slice))
+    req(current_slice()$media[1] == "2dd")
+    switch(current_slice()$set[1],
+            'practice' = plot_2dd(practice_data, stimuli_labels),
+            'set1' = plot_2dd(data1, stimuli_labels),
+            'set2' = plot_2dd(data2, stimuli_labels)
     )
   })
 
+  # Create plot for 3dd
+  output$plot_3dd <- rgl::renderRglwidget({
+    req(is.reactive(current_slice))
+    req(current_slice()$media[1] == "3dd")
+    switch(current_slice()$set[1],
+          "practice" = plot_3dd(
+              "../../print-files/practice/rgl-practice_data-base.stl",
+              "../../print-files/practice/rgl-practice_data-bars.stl",
+              "../../print-files/practice/rgl-practice_data-letters.stl"
+          ),
+          "set1" = plot_3dd(
+              "../../print-files/set1/rgl-data1-base.stl",
+              "../../print-files/set1/rgl-data1-bars.stl",
+              "../../print-files/set1/rgl-data1-letters.stl"
+          ),
+          "set2" = plot_3dd(
+              "../../print-files/set2/rgl-data2-base.stl",
+              "../../print-files/set2/rgl-data2-bars.stl",
+              "../../print-files/set2/rgl-data2-letters.stl"
+          )
+    )
+    rgl::rglwidget()
+  })
+
+  # Create plot for 3dp
+  output$plot_3dp <- renderImage({
+    req(is.reactive(current_slice))
+    req(current_slice()$media[1] == "3dp")
+    switch(current_slice()$set[1],
+      "set1" = list(src = "www/set1-3dp.JPG", width = "400px"),
+      "set2" = list(src = "www/set2-3dp.JPG", width = "400px")
+    )
+  }, deleteFile = FALSE)
+
+  output$exp_plot <- renderUI({
+    req(is.reactive(current_slice))
+    switch(current_slice()$media[1],
+      "2dd" = plotOutput("plot_2dd", height = "400px"),
+      "3dd" = rgl::rglwidgetOutput("plot_3dd", height = "400px"),
+      "3dp" = imageOutput("plot_3dp", height = "400px")
+    )
+  })
 
 }
 

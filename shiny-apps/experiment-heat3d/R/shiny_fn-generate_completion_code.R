@@ -7,8 +7,8 @@ generate_completion_code <- function(valid_words){
     #          movies.fandom.com (movie transcripts)
     # Idea: words are from the Star Wars prequel series, filtered out bad words,
     #       stop words, and words not in my computer's dictionary
-    all_words <- read.table('/usr/share/dict/web2',
-                            header = F)$V1
+    # all_words <- read.table('/usr/share/dict/web2',
+    #                         header = F)$V1
     bad_words <- read.table('https://www.cs.cmu.edu/~biglou/resources/bad-words.txt')$V1
 
 
