@@ -409,6 +409,7 @@ server <- function(input, output, session) {
       app_values$exp_state <- "experiment"
       app_values$current_counter <- 1
       app_values$slider_clicks <- -1
+      app_values$clicks_3dd <- 0
       showModal(modalDialog(p("You successfully completed the practice trials. 
                                The actual experiment is next."),
                             title = "Practice trials completed",
