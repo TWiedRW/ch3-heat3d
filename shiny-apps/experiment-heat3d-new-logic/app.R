@@ -24,7 +24,6 @@ source("../../R/shiny_fn-plot_2dd.R")
 source("../../R/shiny_fn-plot_3dd.R")
 source("../../R/shiny_fn-write_to_db.R")
 source("../../R/shiny_fn-practice_order.R")
-#source("../../R/shiny_fn-show_instruction_modal.R")
 source("modals/modal_instructions.R")
 
 
@@ -182,6 +181,7 @@ ui_demographics <- fluidPage(
 
 # ---- Experiment ----
 ui_experiment <- fluidPage(
+  shinyjs::useShinyjs(),
   tags$head(
     tags$link(rel = "stylesheet", type = "text/css", href = "styles.css")
   ),
@@ -205,6 +205,7 @@ ui_experiment <- fluidPage(
     ),
     mainPanel(
       #textOutput("slider_clicks_txt"),
+      textOutput("rgl_clicks"),
       uiOutput("exp_plot"),
       #tableOutput("current_slice"),
       #tableOutput("current_trial_data"),
@@ -223,7 +224,7 @@ app_ui <- navbarPage(
 )
 
 # ---- Server Logic ----
-server <- function(input, output) {
+server <- function(input, output, session) {
 
   # Create a reactive value to store user information
   user_values <- reactiveValues(
@@ -249,7 +250,7 @@ server <- function(input, output) {
     slider_clicks = -1,
     current_counter = NULL,
     slider_start = 0,
-    clicks_3dd = -1,
+    clicks_3dd = 0,
 
     #All trials information
     experiment_trials_data = NULL,
@@ -418,6 +419,7 @@ server <- function(input, output) {
       # Update to next trial
       app_values$current_counter <- app_values$current_counter + 1
       app_values$slider_clicks <- -1
+      app_values$clicks_3dd <- 0
     }
   })
 
@@ -556,9 +558,23 @@ server <- function(input, output) {
     req(is.reactive(current_slice))
     switch(app_values$current_media,
       "2dd" = plotOutput("plot_2dd", height = "400px"),
-      "3dd" = rgl::rglwidgetOutput("plot_3dd", height = "400px"),
+      "3dd" = tagList(
+        rgl::rglwidgetOutput("plot_3dd", height = "400px"),
+        verbatimTextOutput("rgl_params") # Add this line to show rgl parameters
+      ),
       "3dp" = imageOutput("plot_3dp", height = "400px")
     )
+  })
+
+
+  onclick("plot_3dd", {
+    app_values$clicks_3dd <- app_values$clicks_3dd + 1
+    message(glue("3D plot clicked {app_values$clicks_3dd} times."))
+  })
+
+  output$rgl_clicks <- renderText({
+    req(app_values$clicks_3dd)
+    paste("3D plot clicks:", app_values$clicks_3dd)
   })
 
 }
