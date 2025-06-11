@@ -26,12 +26,9 @@ source("../../R/shiny_fn-write_to_db.R")
 source("../../R/shiny_fn-practice_order.R")
 source("modals/modal_instructions.R")
 
-
-
 # Initial Values
 app_start_time <- Sys.time()
 database <- "data/development.db"
-
 # Create new database if one does not exist for {database}
 # Note: this only populates with blocking information since
 #   it is required when selecting blocks.
@@ -237,6 +234,7 @@ server <- function(input, output, session) {
     user_education = NULL,
     user_reason = NULL,
     user_unique = NULL,
+    user_id = NULL,
     can_save = NULL
   )
 
@@ -302,7 +300,8 @@ server <- function(input, output, session) {
 
     # Generate completion code
     user_values$completion_code <- generate_completion_code(valid_words)
-    write_to_db(data.frame(completion_code = user_values$completion_code),
+    completion_code <- data.frame(code = user_values$completion_code)
+    write_to_db(completion_code,
                 database, write = TRUE)
     message(glue("Completion code generated: {user_values$completion_code}"))
 
@@ -318,7 +317,7 @@ server <- function(input, output, session) {
     app_values$current_trials_data <- app_values$practice_trials_data
     app_values$current_max <- app_values$practice_max
     app_values$current_counter <- 1
-  
+
     # Move to Experiment tab if data consent is not given
     if(input$data_consent == "FALSE") {
       user_values$can_save <- FALSE
@@ -345,6 +344,14 @@ server <- function(input, output, session) {
     user_values$user_education <- input$user_education
     user_values$user_reason <- input$user_reason
     user_values$user_unique <- input$user_unique
+
+    user_values$user_id <- rlang::hash(paste(user_values$user_age,
+                                             user_values$user_gender,
+                                             user_values$user_education,
+                                             user_values$user_reason,
+                                             user_values$user_unique,
+                                             #user_values$completion_code,
+                                             app_values$app_start_time, collapse = "-"))
 
     # Allow data saving if user is not under 19
     if (input$user_age == "Under 19") {
@@ -379,6 +386,7 @@ server <- function(input, output, session) {
 
     exp_results <- current_slice() %>%
       dplyr::mutate(
+        user_id = user_values$user_id,
         user_larger = exp_values$user_larger,
         user_slider = exp_values$user_slider,
         slider_clicks = app_values$slider_clicks,
@@ -420,6 +428,7 @@ server <- function(input, output, session) {
       app_values$current_counter <- app_values$current_counter + 1
       app_values$slider_clicks <- -1
       app_values$clicks_3dd <- 0
+      app_values$trial_start_time <- Sys.time()
     }
   })
 
@@ -560,9 +569,12 @@ server <- function(input, output, session) {
       "2dd" = plotOutput("plot_2dd", height = "400px"),
       "3dd" = tagList(
         rgl::rglwidgetOutput("plot_3dd", height = "400px"),
-        verbatimTextOutput("rgl_params") # Add this line to show rgl parameters
+        helpText("You can interact with the 3D plot above: click and hold to rotate, and scroll to zoom.")
       ),
-      "3dp" = imageOutput("plot_3dp", height = "400px")
+      "3dp" = tagList(
+        imageOutput("plot_3dp", height = "400px"),
+        helpText("Use the 3D printed chart that looks like the image below.")
+      )
     )
   })
 
