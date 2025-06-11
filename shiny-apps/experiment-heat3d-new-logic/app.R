@@ -236,7 +236,8 @@ server <- function(input, output) {
     user_gender = NULL,
     user_education = NULL,
     user_reason = NULL,
-    user_unique = NULL
+    user_unique = NULL,
+    can_save = NULL
   )
 
   app_values <- reactiveValues(
@@ -271,13 +272,28 @@ server <- function(input, output) {
 
   # Initial startup values
   observeEvent(input$submit_consent, {
-    #validate(
-    #  need(input$is_218_student != "", "Please select if you are enrolled in Stat 218."),
-    #  need(input$data_consent != "", "Please indicate your data consent choice."),
-    #  need(input$is_online != "", "Please indicate if you have access to the 3D-printed charts.")
-    #)
+    validate(
+    need(
+      input$is_218_student != "",
+      "Please select if you are enrolled in Stat 218."
+    ),
+    need(
+      input$data_consent != "",
+      "Please indicate your data consent choice."
+    ),
+    need(
+      input$is_online != "",
+      paste(
+        "Please indicate if you have access to the",
+        "3D-printed charts."
+      )
+    )
+  )
     # Pick block for user
-
+    user_values$block <- pick_block(database)
+    if(input$data_consent == "FALSE") {
+      user_values$can_save <- FALSE
+    }
 
     #Initialize trials
     app_values$experiment_trials_data <- randomize_order(user_block, plan, input$is_online=="FALSE")
@@ -294,6 +310,30 @@ server <- function(input, output) {
     updateNavbarPage(inputId = "expNav", selected = "Experiment")
     modal_instructions() })
 
+  observeEvent(input$submit_demographics, {
+    validate(
+      need(input$user_age != "", "Please select your age category."),
+      need(input$user_gender != "", "Please select your gender identity."),
+      need(input$user_education != "", "Please select your highest education level."),
+      need(input$user_reason != "", "Please select how your participation is graded."),
+      need(input$user_unique != "", "Please provide a unique identifier.")
+    )
+
+    # Save user demographics
+    user_values$user_age <- input$user_age
+    user_values$user_gender <- input$user_gender
+    user_values$user_education <- input$user_education
+    user_values$user_reason <- input$user_reason
+    user_values$user_unique <- input$user_unique
+
+    # Allow data saving if user is not under 19
+    if (input$user_age == "Under 19") {
+      user_values$can_save <- FALSE
+    } else {
+      user_values$can_save <- TRUE
+    }
+  }
+  )
   # Submit button logic
   observeEvent(input$submit, {
     if ((app_values$current_counter == app_values$current_max) &
