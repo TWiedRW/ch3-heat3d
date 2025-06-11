@@ -389,6 +389,7 @@ server <- function(input, output, session) {
         user_id = user_values$user_id,
         user_larger = exp_values$user_larger,
         user_slider = exp_values$user_slider,
+        slider_start = app_values$slider_start,
         slider_clicks = app_values$slider_clicks,
         clicks_3dd = app_values$clicks_3dd,
         slider_start = app_values$slider_start,
