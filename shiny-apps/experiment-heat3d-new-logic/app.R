@@ -202,15 +202,15 @@ ui_experiment <- fluidPage(
                   "Question 2: If the larger value you selected above represents 100 units, 
                   how many units is the smaller value?",
                   min = 0, max = 100, value = 50),
+      helpText("You must move the slider at least once to submit your answer."),
       div(style = "text-align: center;", actionButton("submit", "Submit"))
     ),
     mainPanel(
-      textOutput("is_online_value"),
+      textOutput("slider_clicks_txt"),
       uiOutput("exp_plot"),
-      textOutput("slider_clicks"),
       tableOutput("current_slice"),
       tableOutput("current_trial_data"),
-      tableOutput("trial_table"),
+      tableOutput("trial_table")
     )
   )
 )
@@ -227,6 +227,7 @@ app_ui <- navbarPage(
 # ---- Server Logic ----
 server <- function(input, output) {
 
+  # Create a reactive value to store user information
   user_values <- reactiveValues(
     # User information
     is_218_student = NULL,
@@ -240,6 +241,7 @@ server <- function(input, output) {
     can_save = NULL
   )
 
+  # Create a reactive value to store the app values
   app_values <- reactiveValues(
 
     #App state
@@ -249,6 +251,7 @@ server <- function(input, output) {
     slider_clicks = -1,
     current_counter = NULL,
     slider_start = 0,
+    clicks_3dd = -1,
 
     #All trials information
     experiment_trials_data = NULL,
@@ -263,6 +266,12 @@ server <- function(input, output) {
     current_max = NULL,
     current_media = "start",
     current_set = "start"
+  )
+
+  # Create a reactive value to store the experiment data
+  exp_values <- reactiveValues(
+    user_larger = NULL,
+    user_slider = NULL
   )
 
   current_slice <- reactive({
@@ -304,13 +313,13 @@ server <- function(input, output) {
     app_values$current_trials_data <- app_values$practice_trials_data
     app_values$current_max <- app_values$practice_max
     app_values$current_counter <- 1
-    updateNavbarPage(inputId = "expNav", selected = "Experiment")
   
     # Move to Experiment tab if data consent is not given
     if(input$data_consent == "FALSE") {
       user_values$can_save <- FALSE
       updateNavbarPage(inputId = "expNav", selected = "Experiment")
       modal_instructions() 
+      app_values$trial_start_time <- Sys.time()
     } else {
       updateNavbarPage(inputId = "expNav", selected = "Demographics")
     }
@@ -342,15 +351,43 @@ server <- function(input, output) {
     # Move to experiment tab
     updateNavbarPage(inputId = "expNav", selected = "Experiment")
     modal_instructions()
+    app_values$trial_start_time <- Sys.time()
+
   }
   )
   # Submit button logic
   observeEvent(input$submit, {
+    validate(
+      need(input$userLarger != "", "Please select which value is larger."),
+      need(app_values$slider_clicks > 0, "You must move the slider at least once.")
+    )
+
+    exp_values$user_larger <- input$userLarger
+    exp_values$user_slider <- input$userSlider
+
+    exp_results <- current_slice() %>%
+      dplyr::mutate(
+        user_larger = exp_values$user_larger,
+        user_slider = exp_values$user_slider,
+        slider_clicks = app_values$slider_clicks,
+        slider_start = app_values$slider_start,
+        start_time = app_values$trial_start_time,
+        end_time = Sys.time()
+      )
+
+    # Write results to database
+    if(user_values$can_save) {
+      write_to_db(exp_results, database, write = TRUE)
+      message("Results written to database.")
+    }
+
+
     if ((app_values$current_counter == app_values$current_max) &
           app_values$exp_state == "practice") {
       # Change from practice state to experiment state
       app_values$exp_state <- "experiment"
       app_values$current_counter <- 1
+      app_values$slider_clicks <- -1
       showModal(modalDialog(p("You successfully completed the practice trials. 
                                The actual experiment is next."),
                             title = "Practice trials completed",
@@ -430,7 +467,7 @@ server <- function(input, output) {
   })
 
   output$trialHeader <- renderUI({
-      trial_header <- switch(as.character(current_slice()$media)[1],
+    trial_header <- switch(as.character(current_slice()$media)[1],
       "2dd" = "2D Heat Map",
       "3dd" = "3D Heat Map - Digital",
       "3dp" = "3D Heat Map - Physical",
@@ -449,6 +486,11 @@ server <- function(input, output) {
   })
   output$trial_table <- renderTable({
     app_values$current_trials_data
+  })
+
+  output$slider_clicks_txt <- renderText({
+    req(is.reactive(current_slice))
+    paste("Slider clicks:", app_values$slider_clicks)
   })
 
   # Create plot for 2dd
