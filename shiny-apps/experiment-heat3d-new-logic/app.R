@@ -201,7 +201,7 @@ ui_experiment <- fluidPage(
       sliderInput("userSlider",
                   "Question 2: If the larger value you selected above represents 100 units, 
                   how many units is the smaller value?",
-                  min = 0, max = 100, value = runif(1, 0, 100)),
+                  min = 0, max = 100, value = 50),
       div(style = "text-align: center;", actionButton("submit", "Submit"))
     ),
     mainPanel(
@@ -247,6 +247,7 @@ server <- function(input, output) {
     #Counters
     slider_clicks = -1,
     current_counter = NULL,
+    slider_start = 0,
 
     #All trials information
     experiment_trials_data = NULL,
@@ -291,7 +292,6 @@ server <- function(input, output) {
     app_values$current_max <- app_values$practice_max
     app_values$current_counter <- 1
     updateNavbarPage(inputId = "expNav", selected = "Experiment")
- 
     modal_instructions() })
 
   # Submit button logic
@@ -301,7 +301,6 @@ server <- function(input, output) {
       # Change from practice state to experiment state
       app_values$exp_state <- "experiment"
       app_values$current_counter <- 1
-      updateSliderInput(inputId = "userSlider", value = runif(1, 0, 100))
       showModal(modalDialog(p("You successfully completed the practice trials. 
                                The actual experiment is next."),
                             title = "Practice trials completed",
@@ -319,7 +318,6 @@ server <- function(input, output) {
       # Update to next trial
       app_values$current_counter <- app_values$current_counter + 1
       app_values$slider_clicks <- -1
-      updateSliderInput(inputId = "userSlider", value = runif(1, 0, 100))
     }
   })
 
@@ -329,6 +327,13 @@ server <- function(input, output) {
       app_values$current_max <- app_values$experiment_max
       updateCheckboxInput(inputId = "isPractice", value = FALSE)
     }
+  })
+
+  observeEvent(current_slice(), {
+    req(is.reactive(current_slice))
+    app_values$slider_start <- runif(1, 0, 100)
+    updateSliderInput(inputId = "userSlider",
+                      value = app_values$slider_start)
   })
 
 
@@ -379,7 +384,7 @@ server <- function(input, output) {
       "2dd" = "2D Heat Map",
       "3dd" = "3D Heat Map - Digital",
       "3dp" = "3D Heat Map - Physical",
-      ""   )
+      "")
 
     trial_state <- switch(app_values$exp_state,
       "practice" = "Practice ",
@@ -401,9 +406,9 @@ server <- function(input, output) {
     req(is.reactive(current_slice))
     req(app_values$current_media == "2dd")
     switch(app_values$current_set,
-            'practice' = plot_2dd(practice_data, stimuli_labels),
-            'set1' = plot_2dd(data1, stimuli_labels),
-            'set2' = plot_2dd(data2, stimuli_labels)
+      "practice" = plot_2dd(practice_data, stimuli_labels),
+      "set1" = plot_2dd(data1, stimuli_labels),
+      "set2" = plot_2dd(data2, stimuli_labels)
     )
   })
 
