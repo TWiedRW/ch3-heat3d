@@ -1,4 +1,4 @@
-plot_helper <- function(data, trial_pair_id){
+plot_helper <- function(data, trial_pair_id, stimuli_labels){
   data %>%
     mutate(pair_id = ifelse(pair_id == trial_pair_id, pair_id, NA)) %>%
     left_join(stimuli_labels, by = join_by(pair_id, within_pair)) %>%

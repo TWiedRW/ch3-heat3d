@@ -1,6 +1,6 @@
 # Creates order for practice run
 
-practice_order <- function(){
+practice_order <- function(plan){
 
     one_run_fixed <- expand_grid(
       set = c('practice'),
@@ -11,11 +11,11 @@ practice_order <- function(){
     # slice_sample(prop = 1) %>%
     nest() %>%
     ungroup() %>%
-    slice_sample(prop = 1) %>%
+    #slice_sample(prop = 1) %>%
     mutate(user_set_order = row_number()) %>%
     unnest(data) %>%
     mutate(user_trial_order = row_number())
 
   return(one_run_fixed)
 }
-
+# practice_order()
