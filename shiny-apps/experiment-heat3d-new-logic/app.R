@@ -49,8 +49,6 @@ data_labels <- bind_rows(practice_data, data1, data2) %>%
   distinct() %>%
   pivot_wider(names_from = within_pair, values_from = label)
 
-user_block <- 3 #NEED TO BE CHANGED
-
 # ---- Informed Consent ----
 ui_consent <- fluidPage(
   div(
@@ -302,7 +300,7 @@ server <- function(input, output) {
     user_values$block <- pick_block(database)
 
     #Initialize trials
-    app_values$experiment_trials_data <- randomize_order(user_block, plan, input$is_online=="FALSE")
+    app_values$experiment_trials_data <- randomize_order(user_values$block, plan, input$is_online=="FALSE")
     app_values$practice_trials_data <- practice_order(plan = plan)
 
     #Initialize max values
@@ -481,8 +479,9 @@ server <- function(input, output) {
    tagList(
       h2(glue::glue("{trial_state}Trial {app_values$current_counter} of 
                     {app_values$current_max}"),
-         style = "text-align: center;"),
-      h3(trial_header, style = "text-align: center;"))
+         style = "text-align: center;")
+      #h3(trial_header, style = "text-align: center;"))
+   )
   })
   output$trial_table <- renderTable({
     app_values$current_trials_data
