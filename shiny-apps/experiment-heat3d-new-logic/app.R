@@ -204,11 +204,11 @@ ui_experiment <- fluidPage(
       div(style = "text-align: center;", actionButton("submit", "Submit"))
     ),
     mainPanel(
-      textOutput("slider_clicks_txt"),
+      #textOutput("slider_clicks_txt"),
       uiOutput("exp_plot"),
-      tableOutput("current_slice"),
-      tableOutput("current_trial_data"),
-      tableOutput("trial_table")
+      #tableOutput("current_slice"),
+      #tableOutput("current_trial_data"),
+      #tableOutput("trial_table")
     )
   )
 )
@@ -299,6 +299,12 @@ server <- function(input, output) {
     # Pick block for user
     user_values$block <- pick_block(database)
 
+    # Generate completion code
+    user_values$completion_code <- generate_completion_code(valid_words)
+    write_to_db(data.frame(completion_code = user_values$completion_code),
+                database, write = TRUE)
+    message(glue("Completion code generated: {user_values$completion_code}"))
+
     #Initialize trials
     app_values$experiment_trials_data <- randomize_order(user_values$block, plan, input$is_online=="FALSE")
     app_values$practice_trials_data <- practice_order(plan = plan)
@@ -344,6 +350,13 @@ server <- function(input, output) {
       user_values$can_save <- FALSE
     } else {
       user_values$can_save <- TRUE
+      blocks <- tibble(
+        block = user_values$block,
+        user_id = user_values$user_id,
+        system_time = Sys.time()
+      )
+      write_to_db(blocks, database, write = user_values$can_save)
+      message("Block information updated")
     }
 
     # Move to experiment tab
