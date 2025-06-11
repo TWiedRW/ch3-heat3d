@@ -381,6 +381,7 @@ server <- function(input, output) {
         user_larger = exp_values$user_larger,
         user_slider = exp_values$user_slider,
         slider_clicks = app_values$slider_clicks,
+        clicks_3dd = app_values$clicks_3dd,
         slider_start = app_values$slider_start,
         start_time = app_values$trial_start_time,
         end_time = Sys.time()
@@ -408,10 +409,11 @@ server <- function(input, output) {
       # Experiment is complete
       showModal(modalDialog(p("You successfully completed the experiment. 
                               Here is your completion code: ",
-                              p("Completion code placeholder"),
+                                div(style = "text-align: center;", p(strong(user_values$completion_code))),
                               p("Save this code as you will not have access 
-                                  once you exit the application."),
-                              title = "Experiment complete!")))
+                                  once you exit the application. You may now close this window."),
+                              title = "Experiment complete!"),
+                              footer = NULL))
     } else {
       # Update to next trial
       app_values$current_counter <- app_values$current_counter + 1
