@@ -1,3 +1,8 @@
+# TODO
+#| 1. Save changes to 3dd plot
+#| 2. Update practice 3dd plot
+#| 3. Show correct answers for practice trials
+
 # Load packages and functions
 library(shiny)
 library(shinythemes)
@@ -6,6 +11,8 @@ library(glue)
 library(RSQLite)
 library(tidyverse)
 library(magrittr)
+
+message(glue("Shiny app opened at: {getwd()}"))
 
 load("../../data/valid_words.rda")
 load("../../data/stimuli_labels.rda")
@@ -25,10 +32,13 @@ source("../../R/shiny_fn-plot_3dd.R")
 source("../../R/shiny_fn-write_to_db.R")
 source("../../R/shiny_fn-practice_order.R")
 source("modals/modal_instructions.R")
+source("modals/modal_show_correct.R")
 
 # Initial Values
 app_start_time <- Sys.time()
 database <- "data/development.db"
+message(glue("Active database: {database}"))
+
 # Create new database if one does not exist for {database}
 # Note: this only populates with blocking information since
 #   it is required when selecting blocks.
@@ -47,6 +57,7 @@ data_labels <- bind_rows(practice_data, data1, data2) %>%
 
 # ---- Informed Consent ----
 ui_consent <- fluidPage(
+  theme = shinythemes::shinytheme("sandstone"),
   div(
     style = "text-align: center;",
     h1("Stat 218 Experiment: 2D and 3D Heat Maps")
@@ -91,8 +102,11 @@ ui_consent <- fluidPage(
         selected = "",
         selectize = TRUE
       ),
-      helpText("If your Stat 218 course is held in-person, 
-                you will need to have access to the 3D-printed charts."),
+      conditionalPanel(
+        condition = "input.is_online == 'FALSE'",
+        helpText("If your Stat 218 course is held in-person, 
+          you will need to have access to the 3D-printed charts.")
+      ),
       conditionalPanel(
         #'input.is_218_student != "" && 
         #input.is_online != "" && 
@@ -106,65 +120,67 @@ ui_consent <- fluidPage(
 
     ),
     mainPanel(
-      p("Informed consent placeholder")
+      div(
+        style = "max-height: 600px; overflow-y: auto; border: 1px solid #ccc; padding: 10px;",
+        includeHTML("informed-consent/graphics-consent-218.html")
+      )
     )
   )
 )
 
 
 # ---- Demographics ----
-options_ages <- c("", "Under 19", "19-25", "26-30",
+options_ages <- c("Under 19", "19-25", "26-30",
                   "31-35", "36-40", "41-45", "46-50",
                   "51-55", "56-60", "Over 60",
                   "Prefer not to answer")
-options_gender <- c("", "Female", "Male",
+options_gender <- c("Female", "Male",
                     "Variant/Nonconforming",
                     "Prefer not to answer")
 
-options_education <- c("", "High School or Less",
+options_education <- c("High School or Less",
                        "Some Undergraduate Courses",
                        "Undergraduate Degree",
                        "Some Graduate Courses",
                        "Graduate Degree",
                        "Prefer not to answer")
-options_reason <- c("", "Participation credit",
+options_reason <- c("Participation credit",
                     "Extra credit",
                     "Other",
                     "Not applicable")
 
 ui_demographics <- fluidPage(
   column(
-    width = 8, offset = 2,
+    width = 6, offset = 3,
     wellPanel(
       div(style = "text-align: center;", h2("Demographics")),
-      p("In this section, please fill out the following demographic questions.
-        All questions must be answered before continuing the study.
-        After completing the questions, a button will appear to 
-          move to the next page."),
+      p("Please complete the following demographic questions. All fields are required before proceeding. Once all questions are answered, a button will appear to continue to the next page."),
 
-      selectizeInput("user_age", "What category includes your age?",
-                     choices = options_ages, width = "30%"),
-      selectizeInput("user_gender",
-                     "How would you describe your gender identity?",
-                     choices = options_gender, width = "50%"),
-      selectizeInput("user_education",
-                     "What is your highest education level?",
-                     choices = options_education, width = "70%"),
-      selectizeInput("user_reason",
-                     "How is your participation graded?",
-                     width = "100%",
-                     choices = options_reason),
+      div(
+        radioButtons("user_age", "What category includes your age?",
+             choices = options_ages, selected = "", inline = TRUE),
+        radioButtons("user_gender",
+             "How would you describe your gender identity?",
+             choices = options_gender, selected = "", inline = TRUE),
+        radioButtons("user_education",
+             "What is your highest education level?",
+             choices = options_education, selected = "", inline = TRUE),
+        radioButtons("user_reason",
+             "How is your participation graded?",
+             selected = "", inline = TRUE,
+             choices = options_reason)
+      ),
       div(style = "text-align: center;", h3("Unique Identifier")),
       p("The next question helps us to uniquely identify your responses 
       in our study. Your answer will not be used in attempt to identify you."),
       textInput("user_unique", "What is your favorite movie and/or actor?"),
 
       conditionalPanel(
-        '((input.user_age!="") && 
-        (input.user_gender!="") && 
-        (input.user_education!="") && 
-        (input.user_reason!="") && 
-        (input.user_unique!=""))',
+        'input.user_age !== "" && 
+         input.user_gender !== "" && 
+         input.user_education !== "" && 
+         input.user_reason !== "" && 
+         input.user_unique !== ""',
         p("Click on the button below to advance to the next page."),
         div(style = "text-align: center;",
             actionButton("submit_demographics", "Continue"))
@@ -190,9 +206,9 @@ ui_experiment <- fluidPage(
                        actionButton("showInstructions", "Show Instructions")),
       p("Use the values indicated on the plot below for this trial."),
       plotOutput("plotHelper", height = "200px"),
-      checkboxInput("isPractice", "practice", value = TRUE),
+      checkboxInput("isPractice",  "practice", value = TRUE),
       radioButtons("userLarger", "Question 1: Which value represents a larger quantity?",
-                   choices = 1:3, selected = ""),
+                   choices = 1:3, selected = "", inline = FALSE),
       sliderInput("userSlider",
                   "Question 2: If the larger value you selected above represents 100 units, 
                   how many units is the smaller value?",
@@ -202,7 +218,7 @@ ui_experiment <- fluidPage(
     ),
     mainPanel(
       #textOutput("slider_clicks_txt"),
-      textOutput("rgl_clicks"),
+      #textOutput("rgl_clicks"),
       uiOutput("exp_plot"),
       #tableOutput("current_slice"),
       #tableOutput("current_trial_data"),
@@ -302,7 +318,7 @@ server <- function(input, output, session) {
     user_values$completion_code <- generate_completion_code(valid_words)
     completion_code <- data.frame(code = user_values$completion_code)
     write_to_db(completion_code,
-                database, write = TRUE)
+                database = database, write = TRUE)
     message(glue("Completion code generated: {user_values$completion_code}"))
 
     #Initialize trials
@@ -371,9 +387,7 @@ server <- function(input, output, session) {
     updateNavbarPage(inputId = "expNav", selected = "Experiment")
     modal_instructions()
     app_values$trial_start_time <- Sys.time()
-
-  }
-  )
+  })
   # Submit button logic
   observeEvent(input$submit, {
     validate(
@@ -397,6 +411,27 @@ server <- function(input, output, session) {
         end_time = Sys.time()
       )
 
+    # Show correct answers if practice
+    # if (app_values$exp_state == "practice") {
+    #
+    #   # Isolate all reactive inputs
+    #   practice_guess_larger <- isolate(input$userLarger)
+    #   practice_guess_slider <- isolate(input$userSlider)
+    #   practice_slice <- isolate(current_slice())
+    #
+    #   # Determine correct answers
+    #   practice_slice %>%
+    #     left_join(switch(practice_slice$set,
+    #       "practice" = practice_data,
+    #       "set1" = data1,
+    #       "set2" = data2
+    #     ), by = c("pair_id"))
+    #
+    #   show_correct(guess_larger = practice_guess_larger,
+    #                guess_slider = practice_guess_slider,
+    #                plot_ui = uiOutput("exp_plot"))
+    # }
+
     # Write results to database
     if(user_values$can_save) {
       write_to_db(exp_results, database, write = TRUE)
@@ -412,7 +447,7 @@ server <- function(input, output, session) {
       app_values$slider_clicks <- -1
       app_values$clicks_3dd <- 0
       showModal(modalDialog(p("You successfully completed the practice trials. 
-                               The actual experiment is next."),
+                               The next set of charts will be used for the experiment."),
                             title = "Practice trials completed",
                             size = "xl"))
     } else if ((app_values$current_counter == app_values$current_max) &
@@ -457,7 +492,7 @@ server <- function(input, output, session) {
     exp_choices <- c(trial$p1, trial$p2, "Both values are the same")
     updateRadioButtons(inputId = "userLarger",
                        choices = exp_choices,
-                       selected = "")
+                       selected = "", inline = FALSE)
   })
 
   observe({
@@ -512,7 +547,12 @@ server <- function(input, output, session) {
    )
   })
   output$trial_table <- renderTable({
-    app_values$current_trials_data
+    app_values$current_trials_data %>%
+        left_join(switch(app_values$current_trials_data$set[1],
+          "practice" = practice_data,
+          "set1" = data1,
+          "set2" = data2
+        ), by = c("pair_id"))
   })
 
   output$slider_clicks_txt <- renderText({
@@ -579,7 +619,6 @@ server <- function(input, output, session) {
       )
     )
   })
-
 
   onclick("plot_3dd", {
     app_values$clicks_3dd <- app_values$clicks_3dd + 1
