@@ -71,13 +71,15 @@ ui_consent <- fluidPage(
                               "Yes, I am a Stat 218 student" = "TRUE",
                               "No, I am not a Stat 218 student" = "FALSE"),
                   selected = "", selectize = TRUE),
-      p("Please read the informed consent on the right side of the screen."),
-      p("You may download a PDF copy of the informed consent 
+      p("Please read the informed consent on the right side of the screen. You may download a PDF copy of the informed consent 
         by clicking the following link."),
-      tags$a(
-        href = "informed_consent.pdf",
-        target = "_blank",
-        "Download Informed Consent (PDF)"
+      div(
+        style = "text-align: center;",
+        tags$a(
+          href = "informed_consent.pdf",
+          target = "_blank",
+          "Download Informed Consent (PDF)"
+        )
       ),
       p(""),
       selectizeInput(
@@ -428,26 +430,6 @@ server <- function(input, output, session) {
         end_time = Sys.time()
       )
 
-    # Show correct answers if practice
-    # if (app_values$exp_state == "practice") {
-    #
-    #   # Isolate all reactive inputs
-    #   practice_guess_larger <- isolate(input$userLarger)
-    #   practice_guess_slider <- isolate(input$userSlider)
-    #   practice_slice <- isolate(current_slice())
-    #
-    #   # Determine correct answers
-    #   practice_slice %>%
-    #     left_join(switch(practice_slice$set,
-    #       "practice" = practice_data,
-    #       "set1" = data1,
-    #       "set2" = data2
-    #     ), by = c("pair_id"))
-    #
-    #   show_correct(guess_larger = practice_guess_larger,
-    #                guess_slider = practice_guess_slider,
-    #                plot_ui = uiOutput("exp_plot"))
-    # }
 
     # Write results to database
     if(user_values$can_save) {
@@ -501,6 +483,46 @@ server <- function(input, output, session) {
                       value = app_values$slider_start)
   })
 
+  observeEvent(input$showCorrect, {
+      req(app_values$exp_state == "practice")
+      req(input$userLarger != "")
+
+      practice_guess_larger <- isolate(input$userLarger)
+      practice_guess_slider <- isolate(input$userSlider)
+      practice_slice <- isolate(current_slice())
+
+      practice_slice %>%
+      left_join(switch(practice_slice$set,
+        "practice" = practice_data,
+        "set1" = data1,
+        "set2" = data2
+      ), by = c("pair_id"))
+
+      correct_solutions <- practice_slice %>%
+        left_join(switch(practice_slice$set,
+          "practice" = practice_data,
+          "set1" = data1,
+          "set2" = data2
+        ), by = c("pair_id")) %>%
+        left_join(stimuli_labels, by = c("pair_id", "within_pair")) %>%
+        mutate(
+          correct_slider = min(z)/max(z) * 100,
+          correct_larger = ifelse(
+            length(unique(z)) == 1,
+            "Both values are the same",
+            label[which.max(z)]
+          )
+        ) %>% 
+        select(set, media, pair_id, correct_larger, correct_slider) %>%
+        distinct()
+
+      show_correct(guess_larger = practice_guess_larger,
+             correct_larger = correct_solutions$correct_larger[1],
+             guess_slider = practice_guess_slider,
+             correct_slider = correct_solutions$correct_slider[1]
+      )
+      shinyjs::disable("practice_correct_slider")
+  })
 
   observe({
     req(is.reactive(current_slice))

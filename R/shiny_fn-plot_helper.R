@@ -5,7 +5,7 @@ plot_helper <- function(data, trial_pair_id, stimuli_labels){
     ggplot(mapping = aes(x = x, y = y, fill = factor(pair_id))) +
     geom_tile(color = 'black') +
     geom_text(aes(label = label), na.rm = T) +
-    labs(x = 'Factor A', y = 'Factor B',
+    labs(x = 'Factor 1', y = 'Factor 2',
          title = 'Location of values to compare') +
     theme_minimal() +
     theme(aspect.ratio = 1,

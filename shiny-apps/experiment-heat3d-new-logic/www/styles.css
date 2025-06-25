@@ -16,3 +16,24 @@
 #submit_consent {
   width: 100%;
 }
+
+
+#user_age .shiny-input-radiogroup .shiny-options-group {
+      display: flex !important;
+      flex-wrap: wrap;
+      justify-content: center;
+      text-align: left;
+}
+
+.irs-handle {
+  width: 5px !important;
+}
+
+.irs-single {
+  display: none !important;
+}
+
+.irs-min, .irs-max {
+  visibility: visible !important;
+  opacity: 1 !important;
+}

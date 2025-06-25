@@ -9,9 +9,9 @@ plot_2dd <- function(data, stimuli_labels, low_color, high_color){
     geom_tile() +
     # Use fontface = "bold" to get the bold version
     geom_text(aes(label = label), color = 'black', na.rm = TRUE, 
-      family = 'Atkinson Hyperlegible', fontface = "bold", size = 10) +
+      family = 'Atkinson Hyperlegible', fontface = "bold", size = 8) +
     scale_fill_gradient(low = '#0C2841', high = '#66D9FF', #limits = c(0, 100),
-                        labels = c('Smallest Value', 'Largest Value'), breaks = c(min(data$z), max(data$z)))+
+                        labels = c('Smallest\nValue', 'Largest\nValue'), breaks = c(min(data$z), max(data$z)))+
     labs(x = 'Factor 1', y = 'Factor 2', fill = '') +
     theme_minimal() +
     theme(aspect.ratio = 1, panel.grid = element_blank(),
