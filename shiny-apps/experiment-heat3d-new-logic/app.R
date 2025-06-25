@@ -201,24 +201,31 @@ ui_experiment <- fluidPage(
   sidebarLayout(
     sidebarPanel(
       uiOutput("trialHeader"),
-      conditionalPanel("input.isPractice",
-                       p("The first four trials are for practice. Solutions will be shown after each question. Click the 'Show Instructions' to display the instructions at any point during the practice trials."), # nolint
-                       actionButton("showInstructions", "Show Instructions")),
-      p("Use the values indicated on the plot below for this trial."),
-      plotOutput("plotHelper", height = "200px"),
+
+      p("For this trial, use the values indicated in the chart below to answer the questions."),
+      plotOutput("plotHelper", height = "150px"),
       checkboxInput("isPractice",  "practice", value = TRUE),
       radioButtons("userLarger", "Question 1: Which value represents a larger quantity?",
                    choices = 1:3, selected = "", inline = FALSE),
       sliderInput("userSlider",
                   "Question 2: If the larger value you selected above represents 100 units, 
                   how many units is the smaller value?",
-                  min = 0, max = 100, value = 50),
+                  min = 0, max = 100, value = 50, ticks = FALSE, step = 0.1),
       helpText("You must move the slider at least once to submit your answer."),
-      div(style = "text-align: center;", actionButton("submit", "Submit"))
+      div(style = "text-align: center;", actionButton("submit", "Submit", width = "50%"))
     ),
     mainPanel(
       #textOutput("slider_clicks_txt"),
       #textOutput("rgl_clicks"),
+      conditionalPanel("input.isPractice",
+                      div(
+                        style = "text-align: center;",
+                        h2("Instructions"),
+                        p("The first four trials are for practice. Click the 'Show Instructions' to display the instructions at any point during the practice trials. You may also display the correct solutions by clicking 'Show Solutions'."), # nolint
+                        actionButton("showInstructions", "Show Instructions", width = "35%"),
+                        actionButton("showCorrect", "Show Solution", width = "35%"),
+                        hr()
+                      )),
       uiOutput("exp_plot"),
       #tableOutput("current_slice"),
       #tableOutput("current_trial_data"),
@@ -231,6 +238,16 @@ ui_experiment <- fluidPage(
 app_ui <- navbarPage(
   "Heat Map Experiment",
   id = "expNav",
+  header = tags$head(
+    tags$script(HTML("
+      $(document).on('shiny:connected', function() {
+        $('.nav.navbar-nav > li > a').on('click', function(e) {
+          e.preventDefault();
+          return false;
+        });
+      });
+    "))
+  ),
   tabPanel("Informed Consent", ui_consent),
   tabPanel("Demographics", ui_demographics),
   tabPanel("Experiment", ui_experiment)
@@ -629,7 +646,6 @@ server <- function(input, output, session) {
     req(app_values$clicks_3dd)
     paste("3D plot clicks:", app_values$clicks_3dd)
   })
-
 }
 
 # Run the application
