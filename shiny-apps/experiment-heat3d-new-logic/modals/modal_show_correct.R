@@ -16,7 +16,7 @@ show_correct <- function(guess_larger, correct_larger, guess_slider, correct_sli
             style = "display: flex; justify-content: center; align-items: center;",
             sliderInput(
           inputId = "practice_guess_slider",
-          label = "Your answer:",
+          label = "Your value:",
           min = 0,
           max = 100,
           value = guess_slider,
@@ -28,7 +28,7 @@ show_correct <- function(guess_larger, correct_larger, guess_slider, correct_sli
             style = "display: flex; justify-content: center; align-items: center;",
             sliderInput(
           inputId = "practice_correct_slider",
-          label = "Correct answer:",
+          label = "True value:",
           min = 0,
           max = 100,
           value = correct_slider,

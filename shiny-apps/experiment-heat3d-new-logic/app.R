@@ -10,7 +10,7 @@ library(glue)
 library(RSQLite)
 library(tidyverse)
 library(magrittr)
-renv::snapshot()
+
 message(glue("Shiny app opened at: {getwd()}"))
 
 load("../../data/valid_words.rda")
