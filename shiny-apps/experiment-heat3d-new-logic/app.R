@@ -1,7 +1,6 @@
 # TODO
-#| 1. Save changes to 3dd plot
-#| 2. Update practice 3dd plot
-#| 3. Show correct answers for practice trials
+#| Add confidence questions
+#| Save each rgl scene
 
 # Load packages and functions
 library(shiny)
@@ -11,7 +10,7 @@ library(glue)
 library(RSQLite)
 library(tidyverse)
 library(magrittr)
-
+renv::snapshot()
 message(glue("Shiny app opened at: {getwd()}"))
 
 load("../../data/valid_words.rda")
