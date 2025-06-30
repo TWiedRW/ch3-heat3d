@@ -116,8 +116,8 @@ ui_consent <- fluidPage(
       )
     ),
     mainPanel(
-      conditionalPanel('input.is_218_student == "TRUE" && input.is_218_student!=""', includeHTML('informed-consent/graphics-consent-218.html')),
-      conditionalPanel('input.is_218_student == "FALSE" && input.is_218_student!=""', includeHTML('informed-consent/graphics-consent-dept.html'))
+      conditionalPanel('input.is_218_student == "TRUE" && input.is_218_student!=""', includeHTML('informed-consent/graphics-consent-218.html'))
+      # conditionalPanel('input.is_218_student == "FALSE" && input.is_218_student!=""', includeHTML('informed-consent/graphics-consent-dept.pdf'))
     )
   )
 )

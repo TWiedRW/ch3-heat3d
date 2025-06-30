@@ -189,8 +189,8 @@ results2 %>%
 ```{r}
 results2 %>% 
   ggplot(mapping = aes(x = true_slider, y = correct_larger)) + 
-  geom_point() + 
-  geom_smooth(method = 'glm') + 
+  geom_point(position = position_jitter(width = 1, height = 0.05)) + 
+  geom_smooth(method = 'glm', method.args = list(family = 'binomial')) + #method arguments, see example
   scale_x_continuous(breaks = unique(correct_slider$true_slider)) + 
   facet_grid(~media) + 
   labs(title = 'Correctly identifying larger value', x = 'True ratio', y = 'Correct or not') + 
@@ -218,5 +218,15 @@ confidence %>%
   theme_bw() + 
   theme(aspect.ratio = 1/3, axis.text.x = element_text(angle = 30, hjust = 1)) + 
   facet_grid(media~., scales = 'free_y')
+```
+
+
+```{r}
+results2 %>% 
+  ggplot(mapping = aes(x = factor(correct_larger))) + 
+  geom_bar() + 
+  facet_wrap(~media) + 
+  theme_bw() + 
+  labs(x = 'Correct Guess Larger', title = 'Counts of correct guess for larger value')
 ```
 
