@@ -9,6 +9,7 @@ format:
     number-sections: false
   html:
     number-sections: false
+format-links: false
 ---
 
 ## Study Information
