@@ -1,6 +1,7 @@
 # TODO
 #| Add confidence questions
 #| Save each rgl scene
+#| Save window size
 
 # Load packages and functions
 library(shiny)
@@ -35,7 +36,7 @@ source("modals/modal_show_correct.R")
 
 # Initial Values
 app_start_time <- Sys.time()
-database <- "data/development.db"
+database <- "data/stat218-summer2025.db"
 message(glue("Active database: {database}"))
 
 # Create new database if one does not exist for {database}
@@ -75,7 +76,7 @@ ui_consent <- fluidPage(
       div(
         style = "text-align: center;",
         tags$a(
-          href = "informed_consent.pdf",
+          href = "informed-consent/graphics-consent-218.pdf",
           target = "_blank",
           "Download Informed Consent (PDF)"
         )
@@ -399,6 +400,19 @@ server <- function(input, output, session) {
       )
       write_to_db(blocks, database, write = user_values$can_save)
       message("Block information updated")
+
+      users <- tibble(
+        user_id = user_values$user_id,
+        is_218_student = input$is_218_student,
+        is_online = !input$is_online,
+        data_consent = input$data_consent,
+        user_age = user_values$user_age,
+        user_gender = user_values$user_gender,
+        user_education = user_values$user_education,
+        user_reason = user_values$user_reason,
+        user_unique = user_values$user_unique,
+      )
+      write_to_db(users, database, write = user_values$can_save)
     }
 
     # Move to experiment tab
@@ -648,12 +662,17 @@ server <- function(input, output, session) {
     switch(app_values$current_media,
       "2dd" = plotOutput("plot_2dd", height = "400px"),
       "3dd" = tagList(
-        rgl::rglwidgetOutput("plot_3dd", height = "400px"),
-        helpText("You can interact with the 3D plot above: click and hold to rotate, and scroll to zoom.")
-      ),
+        div(
+          style = "text-align: center;",
+          rgl::rglwidgetOutput("plot_3dd", height = "400px"),
+          helpText("You can interact with the 3D plot above: click and hold to rotate, and scroll to zoom.")
+        )),
       "3dp" = tagList(
-        imageOutput("plot_3dp", height = "400px"),
-        helpText("Use the 3D printed chart that looks like the image below.")
+        div(
+          style = "text-align: center;",
+          h3("Use the 3D printed chart that looks like the image below."),
+          imageOutput("plot_3dp", height = "400px")
+        )
       )
     )
   })
