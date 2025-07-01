@@ -76,7 +76,7 @@ ui_consent <- fluidPage(
       div(
         style = "text-align: center;",
         tags$a(
-          href = "informed-consent/graphics-consent-218.pdf",
+          href = "https://github.com/TWiedRW/3d_graphical_perception/raw/main/experiment_interface/www/graphics-consent-218.pdf",
           target = "_blank",
           "Download Informed Consent (PDF)"
         )
