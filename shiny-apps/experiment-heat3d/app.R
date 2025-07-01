@@ -404,7 +404,7 @@ server <- function(input, output, session) {
       users <- tibble(
         user_id = user_values$user_id,
         is_218_student = input$is_218_student,
-        is_online = !input$is_online,
+        is_online = input$is_online,
         data_consent = input$data_consent,
         user_age = user_values$user_age,
         user_gender = user_values$user_gender,
