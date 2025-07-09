@@ -21,7 +21,7 @@ modified <- unlist(tmp[modified])
 if (any(stringr::str_detect(modified, pattern = ".db$"))) {
   
   # Copy database/codes to one drive
-  file.copy(modified, file.path("/btrstorage", "OneDrive", "Data", "2025-3d-heatmaps"), overwrite = T)
+#  file.copy(modified, file.path("/btrstorage", "OneDrive", "Data", "2025-3d-heatmaps"), overwrite = T)
 
   # Add changed db to commit and commit
   git2r::add(repo = '.', "*.db")
