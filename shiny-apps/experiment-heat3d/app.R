@@ -71,7 +71,7 @@ ui_consent <- fluidPage(
                               "Yes, I am a Stat 218 student" = "TRUE",
                               "No, I am not a Stat 218 student" = "FALSE"),
                   selected = "", selectize = TRUE),
-      p("Please read the informed consent on the right side of the screen. You may download a PDF copy of the informed consent 
+      p("Please read the informed consent on the right side of the screen. You may download a PDF copy of the informed consent
         by clicking the following link."),
       div(
         style = "text-align: center;",
@@ -106,12 +106,12 @@ ui_consent <- fluidPage(
       ),
       conditionalPanel(
         condition = "input.is_online == 'FALSE'",
-        helpText("If your Stat 218 course is held in-person, 
+        helpText("If your Stat 218 course is held in-person,
           you will need to have access to the 3D-printed charts.")
       ),
       conditionalPanel(
-        #'input.is_218_student != "" && 
-        #input.is_online != "" && 
+        #'input.is_218_student != "" &&
+        #input.is_online != "" &&
         #input.data_consent != ""',
         'true',
         p("Click on the button below to advance to the next page."),
@@ -173,15 +173,15 @@ ui_demographics <- fluidPage(
              choices = options_reason)
       ),
       div(style = "text-align: center;", h3("Unique Identifier")),
-      p("The next question helps us to uniquely identify your responses 
+      p("The next question helps us to uniquely identify your responses
       in our study. Your answer will not be used in attempt to identify you."),
       textInput("user_unique", "What is your favorite movie and/or actor?"),
 
       conditionalPanel(
-        'input.user_age !== "" && 
-         input.user_gender !== "" && 
-         input.user_education !== "" && 
-         input.user_reason !== "" && 
+        'input.user_age !== "" &&
+         input.user_gender !== "" &&
+         input.user_education !== "" &&
+         input.user_reason !== "" &&
          input.user_unique !== ""',
         p("Click on the button below to advance to the next page."),
         div(style = "text-align: center;",
@@ -210,7 +210,7 @@ ui_experiment <- fluidPage(
       radioButtons("userLarger", "Question 1: Which value represents a larger quantity?",
                    choices = 1:3, selected = "", inline = FALSE),
       sliderInput("userSlider",
-                  "Question 2: If the larger value you selected above represents 100 units, 
+                  "Question 2: If the larger value you selected above represents 100 units,
                   how many units is the smaller value?",
                   min = 0, max = 100, value = 50, ticks = FALSE, step = 0.1),
       helpText("You must move the slider at least once to submit your answer."),
@@ -357,7 +357,7 @@ server <- function(input, output, session) {
     if(input$data_consent == "FALSE") {
       user_values$can_save <- FALSE
       updateNavbarPage(inputId = "expNav", selected = "Experiment")
-      modal_instructions() 
+      modal_instructions()
       app_values$trial_start_time <- Sys.time()
     } else {
       updateNavbarPage(inputId = "expNav", selected = "Demographics")
@@ -458,17 +458,17 @@ server <- function(input, output, session) {
       app_values$current_counter <- 1
       app_values$slider_clicks <- -1
       app_values$clicks_3dd <- 0
-      showModal(modalDialog(p("You successfully completed the practice trials. 
+      showModal(modalDialog(p("You successfully completed the practice trials.
                                The next set of charts will be used for the experiment."),
                             title = "Practice trials completed",
                             size = "xl"))
     } else if ((app_values$current_counter == app_values$current_max) &
                  app_values$exp_state == "experiment") {
       # Experiment is complete
-      showModal(modalDialog(p("You successfully completed the experiment. 
+      showModal(modalDialog(p("You successfully completed the experiment.
                               Here is your completion code: ",
                                 div(style = "text-align: center;", p(strong(user_values$completion_code))),
-                              p("Save this code as you will not have access 
+                              p("Save this code as you will not have access
                                   once you exit the application. You may now close this window."),
                               title = "Experiment complete!"),
                               footer = NULL))
@@ -525,7 +525,7 @@ server <- function(input, output, session) {
             "Both values are the same",
             label[which.max(z)]
           )
-        ) %>% 
+        ) %>%
         select(set, media, pair_id, correct_larger, correct_slider) %>%
         distinct()
 
@@ -561,7 +561,7 @@ server <- function(input, output, session) {
   observeEvent(input$showInstructions, {
     modal_instructions()
   })
-  
+
   observeEvent(input$userSlider, {
     app_values$slider_clicks <- app_values$slider_clicks + 1
   })
@@ -590,9 +590,9 @@ server <- function(input, output, session) {
       "practice" = "Practice ",
       "experiment" = ""
     )
- 
+
    tagList(
-      h2(glue::glue("{trial_state}Trial {app_values$current_counter} of 
+      h2(glue::glue("{trial_state}Trial {app_values$current_counter} of
                     {app_values$current_max}"),
          style = "text-align: center;")
       #h3(trial_header, style = "text-align: center;"))
@@ -657,6 +657,15 @@ server <- function(input, output, session) {
     )
   }, deleteFile = FALSE)
 
+  output$plot_3dp_text <- renderText({
+    req(is.reactive(current_slice))
+    req(app_values$current_media == "3dp")
+    switch(app_values$current_set,
+      "set1" = "Select a 3D-printed chart from the bin labeled 'Set 1'. The chart will look similar to the image below.",
+      "set2" = "Select a 3D-printed chart from the bin labeled 'Set 2'. The chart will look similar to the image below."
+    )
+  })
+
   output$exp_plot <- renderUI({
     req(is.reactive(current_slice))
     switch(app_values$current_media,
@@ -670,7 +679,8 @@ server <- function(input, output, session) {
       "3dp" = tagList(
         div(
           style = "text-align: center;",
-          h3("Use the 3D printed chart that looks like the image below."),
+          #h3("Use the 3D printed chart that looks like the image below."),
+          tags$h4(textOutput("plot_3dp_text")),
           imageOutput("plot_3dp", height = "400px")
         )
       )
