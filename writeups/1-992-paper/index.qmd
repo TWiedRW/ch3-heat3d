@@ -1,6 +1,5 @@
 ---
-title: "Heat3d: A Study on 3D Heatmaps"
-subtitle: "STAT 992 Final Paper"
+title: "CHAPTER 3"
 author: Tyler Wiederich
 date: today
 date-format: long
@@ -29,7 +28,7 @@ Essentially, you will be writing the first ~70% of a paper examining some facet 
 library(tidyverse)
 ```
 
-# Introduction
+## Introduction
 
 In the 20th century, advancements in technology made data visualizations increasingly more affordable and accessible to a broader population. The primary change in formal data visualizations was from hand-drawn charts to computer-rendered charts [@tukey1965], yet other technological advances have allowed for data visualizations to enter other mediums. These include the ability to effectively use the 3-dimensional (3D) world around us with the novel use of 3D-printed charts. This newer type of visualization has gained a small amount of traction in recent years as a method of producing tangible charts.
 
@@ -37,7 +36,7 @@ At this time, there are few, if any, studies that evaluate 3D-printed charts for
 
 3D-printed visualizations have shown mixed or promising results across many disciplines. @katsioloudis2018 showed no evidence of a statistical difference in the method of 3D renderings when tasked with drawing a cross-sectional of a dodecahedron. This demonstrated that spatial awareness between computer-rendered and 3D-printed shapes is not largely different among engineering students. The use of 3D-printed maps for navigation for visually impaired persons showed positive feedback by @holloway2019, increasing the accessibility of navigation. In the clinical setting, 3D-printed anatomy structures were well accepted along with VR-glasses and 3D computer renderings [@muff2022]. With the rise of 3D-printed visualizations in scientific fields, we turn our attention to their use for statistical graphics.
 
-## Literature Review
+### Literature Review
 
 An identical dataset across multiple chart types does not ensure that the data is perceived in the same way [@cleveland1984; @hofmann2012; @vanderplas2020]. One of the main factors to this phenomena is with how data is encoded into the chart. These encodings include, but are not limited to, placement along axes, lengths, areas, volumes, and color scales. For example, bar charts and pie charts are two common visualizations that have long since been the topic of debate [@eells1926; @croxton1927; @cleveland1984]. In the case of bar charts and pie charts, encodings are represented by lengths and angles, respectively. Inherently, the comparison of different chart types is a comparison of encodings due to the changes in how data is being displayed.
 
@@ -49,11 +48,11 @@ Formal studies involving true 3D charts are limited, and it is unclear if they f
 
 We hypothesize that 3D charts in 3D environments will produce better information extraction than their computer rendered counterparts. Specifically, we will compare 3D-printed charts to digital 2D and 3D renderings. We suspect that this difference will hold across multiple data sets and different magnitudes of stimuli. In this paper, we evaluate the accuracy of numerical estimations on true 3D charts by conducting a factorial experiment that assessed chart types and ratios of pairs of stimuli. We discuss the construction of the stimuli and how we closely matched the charts to compare 2D, 3D-digital, and 3D-printed renderings of heatmap data.
 
-# Methods
+## Methods
 
 Our study is designed to evaluate and expand the literature on numerical estimation of 3D charts. In our study, our focus is on 2D and 3D heatmaps, which we carefully construct to ensure that differences are contributed to the dimensionality of the chart. All of our data and methods are publically available for open science and reproducibility at <https://github.com/TWiedRW/ch3-heat3d>. In this section, we discuss process of designing our experiment and participant recruitment.
 
-## Stimuli
+### Stimuli
 
 We denote "stimuli" to represent the magnitude of our chosen values. In a 3D Cartesian space, the X- and Y- axes represent the coordinates of the stimuli, and the Z-axis represents the value for the stimuli. Each X and Y coordinate is represented by a square tile with a 1:1 aspect ratio. For a 2D space, the Z-axis is replaced by a color gradient scale. All stimuli and remaining randomly generated values range between 0 and 100 units. In this experiment, $X=1, 2, \dots,10$ and $Y=1, 2,\dots,10$.
 
@@ -101,7 +100,7 @@ Mixture distribution of @eq-random-z using the formula for the top half of a sph
 
 The placement of stimuli values onto the randomly generated heatmap data was done via simulation to try to make their placement look as natural as possible. Twenty random heatmaps were generated. For each heatmap, the non-constant stimuli was placed onto the coordinate such that the difference between the stimuli and randomly generated value is minimized. The constant stimuli was then placed onto a coordinate with a Manhattan distance of three or four that minimizes the difference between the constant stimuli and randomly generated values, where the Manhattan distance is given by $|X_i - X_j| + |Y_i - Y_j|$ for stimuli $i$ and $j$. To ensure that stimuli placement is evenly position across the heatmap, the count of stimuli was computed separately across the X and Y axes. For example, in Data Set 1, the X-axis has four stimuli in $X=1$, three stimuli in $X=2$, and so forth. Chi-squared statistics were calculated for each axis and the heatmap with the smallest average Chi-squared statistic was selected as the final dataset. A visual inspection of this process showed that the stimuli were not clustered in any one area of the chart and that the stimuli look natural with respect to the random mixture distribution.
 
-## Charts
+### Charts
 
 Three types of charts were considered for this study: 2D-digital (2dd), 3D-digital (3dd), and 3D-printed (3dp). We constructed these charts so that they are as similar as possible, but inherent difference between dimensionality led to artistic decisions that attempt to focus solely on the dimensionality of the charts. The process of creating the charts is discussed in this section.
 
@@ -129,7 +128,7 @@ ggplot(mapping = aes(x = 1:10, y = 0)) +
   coord_equal()
 ```
 
-## Subject Recruitment
+### Subject Recruitment
 
 Participants were recruited from all STAT 218: *Introduction to Statistics* sections at University of Nebraska-Lincoln from June 2025 to Spring 2026. The experiment was incorporated into the curriculum as a project that allowed students to get hands-on experience with statistics. Throughout the project, students were also given a series of reflections to evaluate their perspectives on statistics. The first reflection had gathered students' thoughts on the scientific process before participating in the experiment. After the experiment participation, students reflected on what they thought the experiment was measuring. Lastly, students were given a written article and video presentation of the experiment and asked how their view of the experiment changed from their initial perspectives of the experiment's purpose.
 
@@ -141,7 +140,7 @@ To assess whether students completed the experiment or not, the experiment produ
 
 [^3]: @web2_dict
 
-## Experimental Design
+### Experimental Design
 
 Our experiment was designed with a 3 x 2 x 9 treatment structure. Media type is our main interest, with 2D-digital, 3D-digital, and 3D-printed charts. To ensure that results are not confounded with datasets, we used two datasets to create the heatmaps. A total of 9 stimuli pairs were placed into each dataset. The order of treatments was given so that media and dataset combinations were grouped together randomly in the sequence and stimuli pairs were randomized within the groupings.
 
@@ -149,7 +148,7 @@ Due to practical constraints, stimuli pairs were incompletely blocked. A full fa
 
 We measured three responses – two questions for each trial and one question for each media by dataset combination. For each trial, participants are initially asked which stimuli in a pair is larger or if the stimuli are the same value. Next, they were asked to estimate the magnitude of the smaller stimuli if the larger stimuli represents 100 units, which is a subtractive process [@veit]. After each grouping of media and dataset, participants were presented with a modal dialog window asking them to rate their confidence on a 5-point Likert scale for their answers of the previous group of charts.
 
-### Shiny Application
+#### Shiny Application
 
 A Shiny application [@shiny] was developed to administer the experiment. The application consisted of five sections: informed consent, demographics, practice, experiment, and wrap-up. The entire application is designed to be completed in approximately 30 minutes.
 
@@ -165,7 +164,7 @@ The experiment page was presented to participants after completion of the practi
 
 After completing all trials, participants were given the completion code and informed to copy the code to Canvas since they will not have access to the code after closing out of the experiment.
 
-### Method of Analysis
+#### Method of Analysis
 
 The design of our experiment is a balanced incomplete split-plot with replication, where media type and dataset is the whole plot and stimuli pair is the split plot. A similar design was presented by @mandal2020 for a single replicate. For our experiment, the ANOVA table is in [@tbl-anova].
 
@@ -221,7 +220,7 @@ In addition to linear mixed models, we used the bootstrap distribution of mean e
 
 After each media type and data set grouping, participants were given a question to rate their confidence on their answers. Here, we use descriptive statistics and visualizations to assess confidence across our treatment factors.
 
-# Limitations
+## Limitations
 
 Our study was designed to evaluate the accuracy of numerical estimation of stimuli pairs across three types of charts. However, numerical accuracy is not the only deciding factor in what makes a good chart design. Other factors include comprehension, recall, and overall preference [@fisher1997; @vanderplas2020]. Given the lack of current research into 3D-printed statistical graphics, we hope to provide some baseline insights into their use as a statistical tool.
 
@@ -229,6 +228,6 @@ We did not account for potential visual illusions in the construction of the hea
 
 Lastly, we wanted to construct heatmaps so that they closely resembled each other across dimensionality. The 3dd charts are identical to the 3dp charts, with the exception of heatmap colors. Here, the issue is that 3D heatmaps are not typically constructed by compiling stl files, but rather using packages such like `lattice` package [@lattice] to display the data. Due to parameter settings and code limitations, it may not be possible to get typical 3D renderings of charts to appear visually identical to 3D-printed counterparts.
 
-# Conclusion
+## Conclusion
 
-Our study provides insight into the novel use of 3D-printed statistical graphics. We hope that these charts may be useful for educational purposes, accessibility of visually impaired persons, or recreational use of statistical communication.
+Our study provides insight into the novel use of 3D-printed statistical graphics.We hope that these charts may be useful for educational purposes, accessibility of visually impaired persons, or recreational use of statistical communication.
