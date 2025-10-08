@@ -1,0 +1,213 @@
+---
+title: "Exploratory Data Analysis"
+date: today
+date-format: long
+format: 
+  html:
+    fig-align: center
+execute: 
+  echo: false
+  message: false
+  warning: false
+---
+
+## Loading data
+
+```{r}
+library(RSQLite)
+library(tidyverse)
+library(lme4)
+library(lmerTest)
+library(emmeans)
+theme_set(theme_bw())
+conn <- dbConnect(SQLite(), '../../shiny-apps/experiment-heat3d/data/stat218-summer2025.db')
+dbListTables(conn)
+blocks <- dbReadTable(conn, 'blocks')
+results <- dbReadTable(conn, 'exp_results')
+users <- dbReadTable(conn, 'users')
+dbDisconnect(conn)
+```
+
+## Correct Responses
+
+```{r}
+load('../../data/data1.rda')
+load('../../data/data2.rda')
+load('../../data/practice_data.rda')
+load('../../data/plan.rda')
+load('../../data/stimuli_labels.rda')
+load('../../data/stimuli.rda')
+
+set1_answers <- data1 %>% 
+  filter(!is.na(pair_id)) %>% 
+  group_by(pair_id) %>% 
+  mutate(truth = min(z)/max(z)) %>% 
+  left_join(stimuli_labels) %>% 
+  select(z, pair_id, true_ratio = truth, true_larger = label) %>% 
+  filter(z == max(z)) %>% mutate(set = 'set1')
+
+set2_answers <- data2 %>% 
+  filter(!is.na(pair_id)) %>% 
+  group_by(pair_id) %>% 
+  mutate(truth = min(z)/max(z)) %>% 
+  left_join(stimuli_labels) %>% 
+  select(z, pair_id, true_ratio = truth, true_larger = label) %>% 
+  filter(z == max(z)) %>% mutate(set = 'set2')
+
+practice_answers <- practice_data %>% 
+  filter(!is.na(pair_id)) %>% 
+  group_by(pair_id) %>% 
+  mutate(truth = min(z)/max(z)) %>% 
+  left_join(stimuli_labels) %>% 
+  select(z, pair_id, true_ratio = truth, true_larger = label) %>% 
+  filter(z == max(z)) %>% mutate(set = 'practice')
+
+answers <- bind_rows(set1_answers, set2_answers, practice_answers) %>% 
+  mutate(true_larger = ifelse(pair_id == 5, 'Both values are the same', true_larger)) %>% 
+  distinct()
+
+write_rds(answers, '../../data/solutions.rda')
+```
+
+
+
+## Data cleaning
+
+### Users
+
+For multiple users, several `is_online` options were selected. When removing this column, only unique user_id's are present. This is okay since we can figure out if they were online students or not using the trials they completed.
+
+```{r}
+clean_users <- users %>% 
+  filter(!str_detect(tolower(user_unique), 'test')) %>% 
+  select(-is_online) %>% 
+  distinct()
+```
+
+### Combining Solutions
+
+Due to some participants selecting multiple blocks (somehow), data needs to be cleaned. 
+
+- Left join blocks onto results (this will have duplicate entries)
+- Take difference between trial time with block selection time
+- Establish experiment stage (practice / experiment)
+- Filter out negative time differences with block (can't have trial start before block selection)
+- Filter out trials so that the time difference with block is the minimum, and thus the closest to block selection
+- Inner join with users data where 'test' entries are removed
+- Left join with solutions
+
+```{r}
+res_all <- results %>% 
+  # Join blocks
+  left_join(blocks, by = 'user_id', relationship = 'many-to-many') %>% 
+  
+  # Time difference of trial with block selection
+  mutate(trial_diff_with_block = start_time-system_time,
+         stage = ifelse(set == 'practice', 'practice', 'experiment')) %>% 
+  
+  # Remove trials that were before block selection
+  filter(trial_diff_with_block > 0) %>% 
+  
+  # Match blocks to closest trial
+  group_by(user_id, user_trial_order, stage) %>% 
+  filter(trial_diff_with_block == min(trial_diff_with_block)) %>% 
+  
+  # Remove test users
+  inner_join(clean_users, by = 'user_id') %>% 
+  
+  # Join solutions
+  left_join(answers, by = c('set', 'pair_id')) %>% 
+  
+  # Clarify responses
+  mutate(q1_correct = (user_larger == true_larger),
+         q2_signed_error = user_slider - 100*true_ratio,
+         q2_abs_error = abs(q2_signed_error),
+         q2_cm_error = log2(q2_abs_error + 1/8)) %>% 
+  
+  # Remove participants where experiment was not fully completed 
+  group_by(block, user_id) %>% 
+  filter(n() %in% c(20, 28))
+```
+
+
+### Blocks
+
+```{r}
+blocks_used <- res_all %>% 
+  group_by(user_id, block) %>% 
+  nest() %>% 
+  group_by(block) %>% 
+  count() 
+```
+
+To make sure that blocks were not systematically over or under selected, a Chi-squared test can be done on the counts of blocks from the results table.
+
+```{r}
+chisq.test(blocks_used$n)
+```
+
+
+
+```{r}
+ggplot(blocks_used, aes(x = factor(block), y = n)) + 
+  geom_bar(stat = 'identity', color = 'black', fill = '#139AEC', width = 1) + 
+  scale_y_continuous(limits = c(0, 16), expand = c(0,0),
+                     breaks = seq(0, 16, by = 2)) + 
+  theme(panel.grid.major.x = element_blank(),
+        aspect.ratio = 1/2) + 
+  labs(x = 'Block', y = 'Count')
+```
+
+Statistically and visually, the block selection process worked well.
+
+## Data Explroation
+
+```{r}
+res_q1 <- res_all %>% 
+  filter(set != 'practice')
+res_q2 <- res_q1 %>% 
+  filter(q1_correct, pair_id != 5)
+```
+
+
+```{r}
+res_all %>% 
+  ggplot(mapping = aes(x = '', fill = q1_correct)) + 
+  geom_bar() + 
+  coord_polar('y') + 
+  theme_void()
+```
+
+```{r}
+res_all %>% 
+  filter(set != 'practice') %>%
+  ggplot(mapping = aes(x = '', fill = q1_correct)) + 
+  geom_bar(position = position_fill()) + 
+  coord_polar('y') +
+  theme_void() + 
+  facet_grid(media ~ pair_id + set) + 
+  theme(aspect.ratio = 1, legend.position = 'bottom')
+```
+
+An immediate observation is that almost a quarter of responses were incorrect. Further inspection shows that a good majority of the errors occur for `pair_id = 5`, which is where the two stimuli were the same. The Set 6 also had a large number of incorrect answers, which is where the true percentage is 56.6%. Interestingly, this was mostly for 2dd charts and was not seen for set 1 (same percentage)
+
+```{r}
+res_all %>% 
+  # mutate(user_slider = ifelse(!q1_correct, 100-user_slider, user_slider)) %>% 
+  ggplot(mapping = aes(x = factor(round(100*true_ratio,1)), y = user_slider)) + 
+  # geom_boxplot(aes(fill = q1_correct), width = 2/4) +
+  geom_point(aes(color = q1_correct), position = position_jitter(width = 1/10, height = 0),
+           alpha = 1/5) +
+  facet_grid(set ~ media) + 
+  theme(aspect.ratio = 1/2, axis.text.x = element_text(angle = 90, hjust = 1))
+
+```
+
+
+## Write data
+
+```{r}
+write_csv(res_all, '../_data/stat218fall2025.csv')
+```
+
+
