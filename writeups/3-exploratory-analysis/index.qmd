@@ -162,6 +162,10 @@ Statistically and visually, the block selection process worked well.
 
 ## Data Explroation
 
+### Question 1: Right or Wrong
+
+The first question asks participants which value in the pair of stimuli is larger, giving the two labels on the stimuli or specifying that they are the same height.
+
 ```{r}
 res_q1 <- res_all %>% 
   filter(set != 'practice')
@@ -189,19 +193,58 @@ res_all %>%
   theme(aspect.ratio = 1, legend.position = 'bottom')
 ```
 
-An immediate observation is that almost a quarter of responses were incorrect. Further inspection shows that a good majority of the errors occur for `pair_id = 5`, which is where the two stimuli were the same. The Set 6 also had a large number of incorrect answers, which is where the true percentage is 56.6%. Interestingly, this was mostly for 2dd charts and was not seen for set 1 (same percentage)
+An immediate observation is that almost a quarter of responses were incorrect. Further inspection shows that a good majority of the errors occur for `pair_id = 5`, which is where the two stimuli were the same. The Set 6 also had a large number of incorrect answers, which is where the true percentage is 56.6%. Interestingly, this was mostly for 2dd charts and was not seen for set 1 (same percentage).
+
+
 
 ```{r}
 res_all %>% 
   # mutate(user_slider = ifelse(!q1_correct, 100-user_slider, user_slider)) %>% 
-  ggplot(mapping = aes(x = factor(round(100*true_ratio,1)), y = user_slider)) + 
+  ggplot(mapping = aes(x = factor(pair_id), y = user_slider)) + 
   # geom_boxplot(aes(fill = q1_correct), width = 2/4) +
   geom_point(aes(color = q1_correct), position = position_jitter(width = 1/10, height = 0),
            alpha = 1/5) +
+  geom_smooth(method = 'lm') +
   facet_grid(set ~ media) + 
   theme(aspect.ratio = 1/2, axis.text.x = element_text(angle = 90, hjust = 1))
 
 ```
+
+
+```{r}
+res <- res_all %>% 
+  filter(pair_id != 5 & q1_correct)
+
+shape_est <- (mean(res$q2_abs_error)^2) / var(res$q2_abs_error)
+rate_est <- mean(res$q2_abs_error) / var(res$q2_abs_error)
+
+res %>% 
+  ggplot(mapping = aes(x = q2_abs_error)) + 
+  geom_histogram(aes(y = after_stat(density)), binwidth = 1, color = 'black', fill = 'skyblue') + 
+  stat_function(fun = dgamma,
+                args = list(shape = shape_est, rate = rate_est),
+                color = 'red') + 
+  facet_wrap(~q1_correct, scales = 'free_y')
+```
+
+```{r}
+res_all %>% 
+  filter(q1_correct & pair_id != 5) %>% 
+  group_by(user_id, block) %>% 
+  filter(mean(q2_abs_error) > 50) %>% 
+  mutate(time = end_time - start_time) %>% 
+  ggplot(mapping = aes(x = time, y = q2_signed_error)) + 
+  geom_point(alpha = 1/7) + 
+  # scale_x_continuous(limits = c(0, 20)) + 
+  scale_y_continuous(limits = c(-100, 100)) + 
+  geom_smooth(method = 'lm')
+```
+
+
+
+
+
+
 
 
 ## Write data

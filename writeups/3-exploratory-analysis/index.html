@@ -6,7 +6,7 @@
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
-<meta name="dcterms.date" content="2025-10-08">
+<meta name="dcterms.date" content="2025-10-09">
 
 <title>Exploratory Data Analysis</title>
 <style>
@@ -57,7 +57,7 @@ ul.task-list li input[type="checkbox"] {
     <div>
     <div class="quarto-title-meta-heading">Published</div>
     <div class="quarto-title-meta-contents">
-      <p class="date">October 8, 2025</p>
+      <p class="date">October 9, 2025</p>
     </div>
   </div>
   
@@ -108,7 +108,7 @@ ul.task-list li input[type="checkbox"] {
     Chi-squared test for given probabilities
 
 data:  blocks_used$n
-X-squared = 6.3617, df = 17, p-value = 0.9904</code></pre>
+X-squared = 7.0518, df = 17, p-value = 0.9829</code></pre>
 </div>
 </div>
 <div class="cell">
@@ -125,6 +125,9 @@ X-squared = 6.3617, df = 17, p-value = 0.9904</code></pre>
 </section>
 <section id="data-explroation" class="level2">
 <h2 class="anchored" data-anchor-id="data-explroation">Data Explroation</h2>
+<section id="question-1-right-or-wrong" class="level3">
+<h3 class="anchored" data-anchor-id="question-1-right-or-wrong">Question 1: Right or Wrong</h3>
+<p>The first question asks participants which value in the pair of stimuli is larger, giving the two labels on the stimuli or specifying that they are the same height.</p>
 <div class="cell">
 <div class="cell-output-display">
 <div>
@@ -143,7 +146,7 @@ X-squared = 6.3617, df = 17, p-value = 0.9904</code></pre>
 </div>
 </div>
 </div>
-<p>An immediate observation is that almost a quarter of responses were incorrect. Further inspection shows that a good majority of the errors occur for <code>pair_id = 5</code>, which is where the two stimuli were the same. The Set 6 also had a large number of incorrect answers, which is where the true percentage is 56.6%. Interestingly, this was mostly for 2dd charts and was not seen for set 1 (same percentage)</p>
+<p>An immediate observation is that almost a quarter of responses were incorrect. Further inspection shows that a good majority of the errors occur for <code>pair_id = 5</code>, which is where the two stimuli were the same. The Set 6 also had a large number of incorrect answers, which is where the true percentage is 56.6%. Interestingly, this was mostly for 2dd charts and was not seen for set 1 (same percentage).</p>
 <div class="cell">
 <div class="cell-output-display">
 <div>
@@ -153,6 +156,25 @@ X-squared = 6.3617, df = 17, p-value = 0.9904</code></pre>
 </div>
 </div>
 </div>
+<div class="cell">
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="index_files/figure-html/unnamed-chunk-12-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<div class="cell">
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="index_files/figure-html/unnamed-chunk-13-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
 </section>
 <section id="write-data" class="level2">
 <h2 class="anchored" data-anchor-id="write-data">Write data</h2>
