@@ -30,7 +30,27 @@
       margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
       vertical-align: middle;
     }
-  </style>
+    /* CSS for citations */
+    div.csl-bib-body { }
+    div.csl-entry {
+      clear: both;
+      margin-bottom: 0em;
+    }
+    .hanging-indent div.csl-entry {
+      margin-left:2em;
+      text-indent:-2em;
+    }
+    div.csl-left-margin {
+      min-width:2em;
+      float:left;
+    }
+    div.csl-right-inline {
+      margin-left:2em;
+      padding-left:1em;
+    }
+    div.csl-indent {
+      margin-left: 2em;
+    }  </style>
   <link rel="stylesheet" href="index_files/libs/revealjs/dist/theme/quarto.css">
   <link href="index_files/libs/revealjs/plugin/quarto-line-highlight/line-highlight.css" rel="stylesheet">
   <link href="index_files/libs/revealjs/plugin/reveal-menu/menu.css" rel="stylesheet">
@@ -380,7 +400,7 @@ Tyler Wiederich
 </section>
 <section id="demographics" class="slide level2">
 <h2>Demographics</h2>
-<p>After data cleaning, a total of 193 Stat 218 students participated in the experiment.</p>
+<p>After data cleaning, a total of 196 Stat 218 students participated in the experiment.</p>
 <ul>
 <li>Participants who met inclusion criteria (19+ and consented)</li>
 <li>Completed the entire experiment</li>
@@ -423,7 +443,7 @@ Figure&nbsp;5: Participation over time.
 </p></section>
 <section id="which-value-represents-a-larger-quantity" class="slide level2">
 <h2>Which value represents a larger quantity?</h2>
-<p>4,772 entries were submitted as of October 10th. Almost a quarter of responses were wrong! (23.3%)</p>
+<p>4,856 entries were submitted as of October 10th. Almost a quarter of responses were wrong! (22.96%)</p>
 
 <img data-src="index_files/figure-revealjs/fig-q1-overall-1.png" width="960" class="r-stretch quarto-figure-center"><p class="caption">
 Figure&nbsp;6: Percentage of correct responses to Question 1.
@@ -470,13 +490,13 @@ Figure&nbsp;10: Percentage of correct answers by all treatment levels.
 <section id="ratio-estimation" class="slide level2">
 <h2>Ratio Estimation</h2>
 <p>Phrasing: “If the larger value you selected above represents 100 units, how many units is the smaller value?”</p>
-<p>Out of 4,772 responses, the 3,347 correct responses are used for ratio estimations.</p>
+<p>Out of 4,856 responses, the 3,422 correct responses are used for ratio estimations.</p>
 <p>Responses</p>
 <ul>
 <li>Directional error: <span class="math inline">\(\text{Estimated Percentage}-\text{True Percentage}\)</span></li>
 <li>Magnitude of error: <span class="math inline">\(|\text{Estimated Percentage}-\text{True Percentage}|\)</span></li>
 <li>Error rate: <span class="math inline">\(\frac{|\text{Estimated Percentage}-\text{True Percentage}|}{\text{True Percentage}}\)</span></li>
-<li><span class="citation" data-cites="cleveland1984">@cleveland1984</span>: <span class="math inline">\(\log_2|\text{Estimated Percentage}-\text{True Percentage}+1/8|\)</span></li>
+<li><span class="citation" data-cites="cleveland1984">Cleveland and McGill (<a href="#/model-for-amount-of-time" role="doc-biblioref" onclick="">1984</a>)</span>: <span class="math inline">\(\log_2|\text{Estimated Percentage}-\text{True Percentage}+1/8|\)</span></li>
 </ul>
 </section>
 <section id="model-for-question-2" class="slide level2">
@@ -495,7 +515,7 @@ Y_{ijklm}=\mu+P_i+S_j+M_k+(PS)_{ij}+(PM)_{ik}+(SM)_{jk} + (PSM)_{ijk}+\gamma_l+\
 <li><span class="math inline">\(\gamma_l,\omega_{lm},\nu_{jklm}, \epsilon_{ijklm}\)</span> are independent</li>
 </ul>
 </section>
-<section id="model-for-amount-of-time" class="slide level2">
+<section id="model-for-amount-of-time" class="slide level2 smaller scrollable">
 <h2>Model for Amount of Time</h2>
 <p><span class="math display">\[
 Y_{ijklm}=\mu+P_i+S_j+M_k+(PS)_{ij}+(PM)_{ik}+(SM)_{jk} + (PSM)_{ijk}+\gamma_l+\omega_{lm} + \nu_{jklm} + \epsilon_{ijklm}
@@ -514,6 +534,11 @@ Y_{ijklm}=\mu+P_i+S_j+M_k+(PS)_{ij}+(PM)_{ik}+(SM)_{jk} + (PSM)_{ijk}+\gamma_l+\
 <p><img src="https://ucomm.unl.edu/sites/unl.edu.university-communication/files/styles/no_crop_960/public/media/image/nebraska-n.jpg?itok=sSPTwnWf" class="slide-logo"></p>
 <div class="footer footer-default">
 
+</div>
+</div>
+<div id="refs" class="references csl-bib-body hanging-indent" data-entry-spacing="0" role="list">
+<div id="ref-cleveland1984" class="csl-entry" role="listitem">
+Cleveland, William S., and Robert McGill. 1984. <span>“Graphical Perception: Theory, Experimentation, and Application to the Development of Graphical Methods.”</span> <em>Journal of the American Statistical Association</em> 79 (387): 531–54. <a href="https://doi.org/10.1080/01621459.1984.10478080">https://doi.org/10.1080/01621459.1984.10478080</a>.
 </div>
 </div>
 </section></section>

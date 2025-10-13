@@ -10,6 +10,7 @@ format:
     smaller: true
     theme: styles.scss
     fig-align: center
+bibliography: references.bib
 ---
 
 ```{r}
@@ -67,7 +68,7 @@ user_in_study <- results %>%
   distinct()
 ```
 
-After data cleaning, a total of `r nrow(user_in_study)` Stat 218 students participated in the experiment. 
+After data cleaning, a total of `r nrow(user_in_study)` Stat 218 students participated in the experiment as of October 13th, 2025. 
 
 - Participants who met inclusion criteria (19+ and consented)
 - Completed the entire experiment
@@ -178,6 +179,8 @@ results %>%
   ggplot(mapping = aes(x = date, y = n)) + 
   geom_col(fill = '#1a80bb', color = 'black') + 
   labs(x = 'Date', y = 'Count') + 
+  scale_x_date(date_breaks = '2 weeks', 
+               date_labels = '%m/%d/%Y') + 
   theme(aspect.ratio = 1/4)
 ```
 
