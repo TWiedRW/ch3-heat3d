@@ -1,0 +1,332 @@
+---
+title: "Physical Heat Maps"
+subtitle: "Some silly little thing here"
+author: "Tyler Wiederich"
+date: "2025-10-16"
+date-format: long
+logo: "https://ucomm.unl.edu/sites/unl.edu.university-communication/files/styles/no_crop_960/public/media/image/nebraska-n.jpg?itok=sSPTwnWf"
+format:
+  revealjs: 
+    smaller: true
+    theme: styles.scss
+    fig-align: center
+bibliography: references.bib
+---
+
+```{r}
+library(tidyverse)
+theme_set(theme_bw() + theme(aspect.ratio = 1))
+```
+
+
+## Overview
+
+- Introduction
+- Methods
+- Results
+- Conclusion
+
+# Methods
+
+## Methods
+
+:::{.columns}
+
+:::{.column width=50%}
+
+**Treatment Design**
+
+- Media (2D digital, 3D digital, 3D printed)
+- Stimuli pair (9)
+- Data set (2)
+
+:::
+
+:::{.column width=50%}
+
+**Experimental Design**
+
+- Balanced incomplete block on stimuli pair (pick 4 from 9)
+- Each participant receives randomized order of $\text{Media}\times \text{Set}$ (whole-plot)
+- Stimuli pairs randomized within $\text{Media}\times \text{Set}$ (split-plot)
+
+:::
+
+:::
+
+# Results
+
+```{r}
+results <- read_csv("../_data/stat218fall2025.csv")
+```
+
+## Demographics
+
+```{r}
+user_in_study <- results %>% 
+  select(user_id, user_age, user_gender, user_education, user_reason) %>% 
+  distinct()
+```
+
+After data cleaning, a total of `r nrow(user_in_study)` Stat 218 students participated in the experiment as of October 13th, 2025. 
+
+- Participants who met inclusion criteria (19+ and consented)
+- Completed the entire experiment
+- In cases of two completions with same user identifier, only the first completion is considered
+
+---
+
+```{r}
+#| label: fig-dem-gender
+#| fig-cap: "Gender of experiment participants."
+
+
+user_in_study %>% 
+  ggplot(mapping = aes(x = user_gender)) + 
+  geom_bar(fill = '#1a80bb', color = 'black', width = 1) + 
+  labs(x = 'Gender', y = 'Count') + 
+  theme(aspect.ratio = 1/3, 
+        axis.text.x = element_text(size = 14),
+        axis.text.y = element_text(size = 14),
+        axis.title = element_text(size = 16),
+        panel.grid.major.x = element_blank())
+```
+
+---
+
+```{r}
+#| label: fig-dem-age
+#| fig-cap: "Age categories of experiment participants."
+user_in_study %>% 
+  ggplot(mapping = aes(x = user_age)) + 
+  geom_bar(fill = '#1a80bb', color = 'black', width = 1) + 
+  labs(x = 'Age category', y = 'Count') + 
+  theme(aspect.ratio = 1/3, 
+        axis.text.x = element_text(size = 14),
+        axis.text.y = element_text(size = 14),
+        axis.title = element_text(size = 16),
+        panel.grid.major.x = element_blank())
+```
+
+---
+
+```{r}
+#| label: fig-dem-education
+#| fig-cap: "Education level of experiment participants."
+user_in_study %>% 
+  ggplot(mapping = aes(x = factor(user_education, levels = c('High School or Less',
+                                                             'Some Undergraduate Courses',
+                                                             'Undergraduate Degree',
+                                                             'Some Graduate Courses',
+                                                             'Graduate Degree',
+                                                             'Prefer not to answer')))) + 
+  geom_bar(fill = '#1a80bb', color = 'black', width = 1) + 
+  labs(x = '', y = 'Count') + 
+  theme(aspect.ratio = 1/3, 
+        axis.text.x = element_text(size = 14, angle = 30, hjust = 1),
+        axis.text.y = element_text(size = 14),
+        axis.title = element_text(size = 16),
+        panel.grid.major.x = element_blank())
+```
+
+---
+
+```{r}
+#| label: fig-dem-reason
+#| fig-cap: "Reason for experiment participants."
+user_in_study %>% 
+  ggplot(mapping = aes(x = factor(user_reason, levels = c('Participation credit','Extra credit','Not applicable','Other')))) + 
+  geom_bar(fill = '#1a80bb', color = 'black', width = 1) + 
+  labs(x = '', y = 'Count') + 
+  theme(aspect.ratio = 1/3, 
+        axis.text.x = element_text(size = 14, angle = 30, hjust = 1),
+        axis.text.y = element_text(size = 14),
+        axis.title = element_text(size = 16),
+        panel.grid.major.x = element_blank())
+```
+
+## Block selection
+
+```{r}
+used_blocks <- results %>% 
+  group_by(block, user_id) %>% 
+  nest() %>% 
+  group_by(block) %>% 
+  count()
+
+used_blocks %>% 
+  ggplot(mapping = aes(x = factor(block), y = n)) + 
+  geom_col(width = 1, fill = '#1a80bb', color = 'black') + 
+  geom_text(aes(label = n, y = n - .5)) + 
+  theme(aspect.ratio = 1/2) + 
+  # scale_x_continuous(breaks = 1:18) + 
+  labs(x = 'Block', y = 'Count') + 
+  theme(panel.grid.major.x = element_blank())
+```
+
+## Daily participation
+
+```{r}
+#| label: fig-overtime
+#| fig-cap: "Participation over time."
+results %>% 
+  mutate(date = as_datetime(start_time),
+         date = as_date(date)) %>% 
+  group_by(user_id, date) %>% 
+  nest() %>% 
+  group_by(date) %>% 
+  count() %>% 
+  ggplot(mapping = aes(x = date, y = n)) + 
+  geom_col(fill = '#1a80bb', color = 'black') + 
+  labs(x = 'Date', y = 'Count') + 
+  scale_x_date(date_breaks = '2 weeks', 
+               date_labels = '%m/%d/%Y') + 
+  theme(aspect.ratio = 1/4)
+```
+
+
+## Which value represents a larger quantity?
+
+`r format(nrow(results), big.mark=",")` entries were submitted as of October 10th. Almost a quarter of responses were wrong! (`r 100- round(100*mean(results$q1_correct),2)`%)
+
+```{r}
+#| label: fig-q1-overall
+#| fig-cap: "Percentage of correct responses to Question 1."
+ggplot(results, mapping = aes(x = '', fill = q1_correct)) + 
+  geom_bar(color = 'black') + 
+  coord_polar('y') + 
+  labs(fill = 'Correct?') + 
+  scale_fill_manual(values = c('TRUE'='#1a80bb',
+                               'FALSE'='#b8b8b8'),
+                    labels = c("No", "Yes")) + 
+  theme_void()
+```
+
+---
+
+```{r}
+#| label: fig-q1-byset
+#| fig-cap: "Percentage of correct answers by heat map dataset."
+ggplot(results, mapping = aes(x = '', fill = q1_correct)) + 
+  geom_bar(color = 'black', position = position_fill()) + 
+  coord_polar('y') + 
+  labs(fill = 'Correct?') + 
+  scale_fill_manual(values = c('TRUE'='#1a80bb',
+                               'FALSE'='#b8b8b8'),
+                    labels = c("No", "Yes")) + 
+  theme_void() + 
+  facet_grid(.~set, scales = 'free')
+```
+
+---
+
+```{r}
+#| label: fig-q1-bymedia
+#| fig-cap: "Percentage of correct answers by media type."
+ggplot(results, mapping = aes(x = '', fill = q1_correct)) + 
+  geom_bar(color = 'black', position = position_fill()) + 
+  coord_polar('y') + 
+  labs(fill = 'Correct?') + 
+  scale_fill_manual(values = c('TRUE'='#1a80bb',
+                               'FALSE'='#b8b8b8'),
+                    labels = c("No", "Yes")) + 
+  theme_void() + 
+  facet_grid(.~media, scales = 'free')
+```
+
+---
+
+```{r}
+#| label: fig-q1-bypairid
+#| fig-cap: "Percentage of correct answers by stimuli pair identifier."
+ggplot(results, mapping = aes(x = '', fill = q1_correct)) + 
+  geom_bar(color = 'black', position = position_fill()) + 
+  coord_polar('y') + 
+  labs(fill = 'Correct?') + 
+  scale_fill_manual(values = c('TRUE'='#1a80bb',
+                               'FALSE'='#b8b8b8'),
+                    labels = c("No", "Yes")) + 
+  theme_void() + 
+  facet_wrap(~pair_id, scales = 'free')
+```
+
+---
+
+```{r}
+#| label: fig-q1-byall
+#| fig-cap: "Percentage of correct answers by all treatment levels."
+ggplot(results, mapping = aes(x = '', fill = q1_correct)) + 
+  geom_bar(color = 'black', position = position_fill()) + 
+  coord_polar('y') + 
+  labs(fill = 'Correct?') + 
+  scale_fill_manual(values = c('TRUE'='#1a80bb',
+                               'FALSE'='#b8b8b8'),
+                    labels = c("No", "Yes")) + 
+  theme_void() + 
+  theme(legend.position = 'bottom') +
+  facet_grid(set + media~pair_id)
+```
+
+## Model for Question 1
+
+$$
+\text{logit}(\pi_{ijklm})=\mu+P_i+S_j+M_k+(PS)_{ij}+(PM)_{ik}+(SM)_{jk} + (PSM)_{ijk}+\gamma_l+\omega_{lm} + \nu_{jklm}
+$$
+
+where
+
+- $\eta$ is the overall intercept on the model scale
+- $P_i, S_j, M_k$ are the effects of stimuli (P)air $i$, data(S)et $j$, and chart (M)edia $k$
+- $\gamma_l\sim N(0,\sigma^2_1)$ is the random effect of block $l$
+- $\omega_{lm}\sim N(0,\sigma^2_2)$ is the random effect of subject $m$ in block $l$
+- $\nu_{jklm}\sim N(0,\sigma^2_3)$ is the random effect of the Set $j$ and Media $k$ ordering for subject $m$ in block $l$
+- $\gamma_l,\omega_{lm},\nu_{jklm}$ are independent
+
+
+
+## Ratio Estimation
+
+Phrasing: "If the larger value you selected above represents 100 units, how many units is the smaller value?"
+
+Out of `r format(nrow(results), big.mark=",")` responses, the `r format(nrow(filter(results, q1_correct & pair_id != 5)), big.mark=",")` correct responses are used for ratio estimations. 
+
+Responses
+
+- Directional error: $\text{Estimated Percentage}-\text{True Percentage}$
+- Magnitude of error: $|\text{Estimated Percentage}-\text{True Percentage}|$
+- Error rate: $\frac{|\text{Estimated Percentage}-\text{True Percentage}|}{\text{True Percentage}}$
+- @cleveland1984: $\log_2|\text{Estimated Percentage}-\text{True Percentage}+1/8|$
+
+## Model for Question 2
+
+$$
+Y_{ijklm}=\mu+P_i+S_j+M_k+(PS)_{ij}+(PM)_{ik}+(SM)_{jk} + (PSM)_{ijk}+\gamma_l+\omega_{lm} + \nu_{jklm} + \epsilon_{ijklm}
+$$
+
+where
+
+- $\mu$ is the overall intercept
+- $P_i, S_j, M_k$ are the effects of stimuli (P)air $i$, data(S)et $j$, and chart (M)edia $k$
+- $\gamma_l\sim N(0,\sigma^2_1)$ is the random effect of block $l$
+- $\omega_{lm}\sim N(0,\sigma^2_2)$ is the random effect of subject $m$ in block $l$
+- $\nu_{jklm}\sim N(0,\sigma^2_3)$ is the random effect of the Set $j$ and Media $k$ ordering for subject $m$ in block $l$
+- $\epsilon_{ijklm}\sim N(0,\sigma^2_4)$ is the residual error
+- $\gamma_l,\omega_{lm},\nu_{jklm}, \epsilon_{ijklm}$ are independent
+
+
+
+## Model for Amount of Time
+
+$$
+Y_{ijklm}=\mu+P_i+S_j+M_k+(PS)_{ij}+(PM)_{ik}+(SM)_{jk} + (PSM)_{ijk}+\gamma_l+\omega_{lm} + \nu_{jklm} + \epsilon_{ijklm}
+$$
+
+where
+
+- $\mu$ is the overall intercept
+- $P_i, S_j, M_k$ are the effects of stimuli (P)air $i$, data(S)et $j$, and chart (M)edia $k$
+- $\gamma_l\sim N(0,\sigma^2_1)$ is the random effect of block $l$
+- $\omega_{lm}\sim N(0,\sigma^2_2)$ is the random effect of subject $m$ in block $l$
+- $\nu_{jklm}\sim N(0,\sigma^2_3)$ is the random effect of the Set $j$ and Media $k$ ordering for subject $m$ in block $l$
+- $\epsilon_{ijklm}\sim N(0,\sigma^2_4)$ is the residual error
+- $\gamma_l,\omega_{lm},\nu_{jklm}, \epsilon_{ijklm}$ are independent
