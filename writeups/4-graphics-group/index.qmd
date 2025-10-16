@@ -1,6 +1,6 @@
 ---
-title: "Physical Heat Maps"
-subtitle: "Some silly little thing here"
+title: "Heat3d"
+subtitle: "A study on the physical dimensionality of heat maps"
 author: "Tyler Wiederich"
 date: "2025-10-16"
 date-format: long
@@ -15,20 +15,93 @@ bibliography: references.bib
 
 ```{r}
 library(tidyverse)
+library(lme4)
+library(lmerTest)
+library(car)
+load('../../data/stimuli.rda')
 theme_set(theme_bw() + theme(aspect.ratio = 1))
 ```
 
+# Introduction
 
-## Overview
+## Heat Maps
 
-- Introduction
-- Methods
-- Results
-- Conclusion
+Heat maps are a popular way to express data with three dimensions. Two variables are designated as predictors for a single responses. 
+
+```{r}
+set.seed(231224)
+expand_grid(
+  x = 1:5,
+  y = 1:5
+) %>% 
+  mutate(z = 2*x + rnorm(nrow(.), 10, 3)) %>% 
+ggplot(mapping = aes(x = x, y = y, fill = z)) + 
+  geom_tile(color = 'black') + 
+  theme(aspect.ratio = 1) + 
+  scale_fill_gradient(low = 'white', high = '#1a80bb')
+```
+
+
+## 3D Heat Maps
+
+:::{#fig-heatmaps layout-ncol=2}
+
+![Figure from @national1977condition](images/heatmap3d.png){#fig-nat77 height=400px}
+
+![Figure from @3DPopulationDensity](images/lincoln-pop.png){#fig-lincoln-pop height=400px}
+
+Examples of 3D heat maps.
+:::
+
+## Background
+
+Studies on direct comparisons of dimensionality are limited when the third dimension coveys information.
+
+::: {.fragment .fade-in}
+-   Accuracy is worse for volumes than for areas [@croxton1932].
+
+    - Also theorized by @cleveland1984
+:::
+
+
+::: {.fragment .fade-in}
+-   3D charts can sometimes better encode information than 2D charts [@barfield1989].
+:::
+
+::: {.fragment .fade-in}
+-   3D heat maps have lower error rates than 2D heat maps in virtual reality [@kraus2020].
+:::
+
+::: {.fragment}
+Arguably, these results may not apply to statistical graphics presented within the physical world.
+:::
+
+::: notes
+-   @kraus2020 talks about more time needed for 3D charts
+-   Also, @kraus2020 mentioned 2D was better for overview tasks
+:::
+
+## Study Overview
+
+Does numerical accuracy of ratio estimations differ between dimensionality and projections of chart types? It is important to note that direct translations of 2D and 3D heat maps require different visual cues.
+
+::: {#fig-color-height layout-ncol="2"}
+![Flatter height scale](images/height-color-0.3.png){#fig-flat3d}
+
+![Stretched height scale](images/height-color-2.png){#fig-tall3d}
+
+Two figures representing the volcano dataset [@volcano] using different height scaling factors. Both figures use the same color scale, but there is no "correct" translation of color into the measurable height.
+:::
+
+::: notes
+2D heat maps use color, 3D heat maps use height and can possibly use color as well.
+:::
+
+
 
 # Methods
 
-## Methods
+## Design of Experiment
 
 :::{.columns}
 
@@ -53,6 +126,166 @@ theme_set(theme_bw() + theme(aspect.ratio = 1))
 :::
 
 :::
+
+## Media Types
+
+:::{#fig-heat3dexamples layout-ncol=3}
+
+![2D heat map](images/examp2dd.png){#fig-2dd height=300px}
+
+![3D Digital heat map](images/examp3dd.png){#fig-3dd height=300px}
+
+![3D-Printed heat map](images/examp3dp.png){#fig-3dp height=300px}
+
+Media types using dataset 1 in the 3D heat map experiment.
+:::
+
+
+## Stimuli Construction
+
+The design of the 3D heat map experiment uses the method of constant stimuli: ratios are estimated with respect to one stimuli height that remains the same.
+
+$$
+S=\text{Stimuli}
+$$
+
+Setting 50 as the constant and 90 as the maximum, a sequence of stimuli are chosen by equally partitioning the ratios between $50/50=1$ and $50/90\approx0.556$. The same ratios are used when setting 50 as the maximum in the stimuli pair.
+
+---
+
+```{r}
+stimuli %>% 
+  mutate(ratio = round(map2_dbl(values, constant, \(x,y)(min(x,y)/max(x,y))), 2)) %>% 
+  select(ratio) %>% 
+  distinct() %>% 
+  ggplot(mapping = aes(x = 1:5, y = ratio)) + 
+  geom_bar(stat = 'identity', color = 'black', fill = '#1a80bb') + 
+  geom_text(aes(label = round(ratio, 2), y = 0.125/2), size = 7) + 
+  annotate('text', x = 5, y = 0.5, label = '*', size = 12) +
+  labs(x = '', y = 'Ratio of Stimuli') +
+  scale_x_continuous(breaks = 1:5) + 
+  scale_y_continuous(limits = c(0, 1)) +
+  theme(panel.grid.major.x = element_blank(),
+        panel.grid.minor.x = element_blank(),
+        # axis.text.x = element_blank(),
+        axis.ticks.x = element_blank(),
+        axis.text = element_text(size = 14),
+        axis.title = element_text(size = 18),
+        aspect.ratio = 1/2)
+```
+
+---
+
+
+```{r}
+load('../../data/stimuli.rda')
+load('../../data/plan.rda')
+theme_set(theme_bw())
+stimuli %>% 
+  rowwise() %>% 
+  mutate(ratio = round(min(values, constant) / max(values, constant), 2)) %>% 
+  ggplot(mapping = aes(x = pair_id, y = values)) + 
+  geom_bar(stat = 'identity', color = 'black', fill = '#1a80bb') +
+  geom_bar(stat = 'identity', mapping = aes(y = 50), fill = '#ea801c', width = 1/2, alpha = 1/2) + 
+  geom_text(aes(x = 5, y = 54), label = 'Constant') +
+  geom_text(aes(x = pair_id, y = min(values)/2, label = ratio)) +
+  scale_y_continuous(limits = c(0, 100)) + 
+  scale_x_continuous(breaks = 1:10) +
+  labs(x = 'Pair ID', y = 'Value') + 
+  theme(panel.grid.major.x = element_blank(),
+        panel.grid.minor.x = element_blank(),
+        # axis.text.x = element_blank(),
+        axis.ticks.x = element_blank(),
+        axis.text = element_text(size = 14),
+        axis.title = element_text(size = 18),
+        aspect.ratio = 1/2)
+```
+
+
+
+## Generating Heat Map Data
+
+The general shape of the heat map is a mixture distribution between mathematical formula and uniform random noise.
+
+$$
+Z=0.3\cdot U(0,100) + 0.7\cdot f(X,Y)
+$$
+
+where $f(X,Y)$ is any given function, scaled between 0 and 100
+
+-   Top half of a sphere centered at 5.5
+-   Lower half of a sphere centered at 5.5
+
+## Stimuli Placement
+
+1)  Data is simulated from previous function to generate grid $(X=1\dots 10, Y=1\dots 10)$
+2)  Non-50 value is placed onto grid coordinate that minimizes $|Z-S|$
+3)  50 is placed similarly, but only on coordinates that have a Manhattan distance of 3 or 4
+
+$$
+|X_1-X_2|+|Y_1-Y_2| = 3 \text{ or } 4
+$$
+
+4)  Repeat process 20 times for a list of heat maps
+5)  Use Chi-squared tests to find heat maps where stimuli are somewhat equally spaced
+
+## Heat map selection
+
+With 9 pairs of values, it is expected to see 1.8 stimuli values in each row/column of the heat map.
+
+|               |       |       |       |       |       |       |       |       |       |       |
+|-------|-------|-------|-------|-------|-------|-------|-------|-------|-------|-------|
+| Grid Position | 1     | 2     | 3     | 4     | 5     | 6     | 7     | 8     | 9     | 10    |
+| Expected      | 1.8   | 1.8   | 1.8   | 1.8   | 1.8   | 1.8   | 1.8   | 1.8   | 1.8   | 1.8   |
+| Observed      | $n_1$ | $n_2$ | $n_3$ | $n_4$ | $n_5$ | $n_6$ | $n_7$ | $n_8$ | $n_9$ | $n_{10}$ |
+
+$$
+\chi^2=\sum\frac{(\text{Observed}-\text{Expected})^2}{\text{Expected}}
+$$
+
+We use the grid with the smallest average $\chi^2$ for the $X$ and $Y$ axes.
+
+
+
+## Study Design
+
+For a full replicate, there are $3\times2\times9=54$ treatment combinations: 
+
+- 3 media types (2dd, 3dd, 3dp)
+- 2 datasets 
+- 9 pairs of stimuli
+
+Way too many trials for a single participant's attention span!
+
+## Incomplete Block
+
+Our main interest is the difference between media types, measured at a given ratio and dataset. To accomplish this and to reduce the number of trials per participant, we use 4 of the 9 possible stimuli pairs to create blocks.
+
+$$
+2\times3\times4=24
+$$
+
+
+```{r}
+#| label: fig-block-design
+#| fig-cap: "Balanced Incomplete Block Design. Each stimuli pair in a block is fully crossed with media type and dataset."
+#| fig-align: center
+plan %>% 
+  ggplot(mapping = aes(x = factor(block), y = factor(pair_id))) + 
+  geom_tile(fill = '#1a80bb', color = 'black') + 
+  scale_y_discrete(limits = rev) +
+  theme(aspect.ratio = 1/2, axis.title = element_text(size = 18),
+        axis.text = element_text(size = 14)) + 
+  labs(y = 'Stimuli Pair Identifier', x = 'Block') 
+```
+
+
+## Experiment
+
+1) Ask participants which value in a stimuli pair is larger
+2) Ask participants to estimate the value of the smaller stimuli
+
+![Screenshot of Shiny app.](images/app-screenshot.png){#fig-screenshot}
 
 # Results
 
@@ -276,46 +509,84 @@ $$
 where
 
 - $\eta$ is the overall intercept on the model scale
-- $P_i, S_j, M_k$ are the effects of stimuli (P)air $i$, data(S)et $j$, and chart (M)edia $k$
+- $P_i, S_j, M_k$ are the effects of stimuli **P**air $i$, data**S**et $j$, and chart **M**edia $k$
 - $\gamma_l\sim N(0,\sigma^2_1)$ is the random effect of block $l$
 - $\omega_{lm}\sim N(0,\sigma^2_2)$ is the random effect of subject $m$ in block $l$
 - $\nu_{jklm}\sim N(0,\sigma^2_3)$ is the random effect of the Set $j$ and Media $k$ ordering for subject $m$ in block $l$
 - $\gamma_l,\omega_{lm},\nu_{jklm}$ are independent
 
+::: {.fragment}
+
+Note: estimation of $\pi_{ijklm}$ is resource extensive. For now, the following results exclude $\nu_{jklm}$, thus assuming that charts were presented in a fully randomized order.
+
+:::
+
+## Results
+
+```{r}
+q1 <- results %>% 
+  filter(set != 'practice')
+```
+
+Excluding practice trials, there were `r format(nrow(q1), big.mark=",")` submissions. There was strong evidence of interaction between dataset, media type, and stimuli pair (p-value < 0.0001).
+
+---
+
+```{r}
+#| label: fig-binom
+#| fig-cap: "LS Means of probabilities for correct answers to question 1."
+q1.ls <- read.csv('../_sas/q1-lsmeans.csv')
+q1.ls %>% 
+  ggplot(mapping = aes(x = factor(pair_id), y = Mu, fill = media)) + 
+  geom_col(position = position_dodge(), width = 1/2) + 
+  facet_wrap(~set) + 
+  scale_fill_manual(values = c(
+    "2dd"="#1a80bb",
+    "3dd"="#ea801c",
+    "3dp"="#5e4c5f"
+  )) +
+  theme(aspect.ratio = 1/2) + 
+  labs(x = 'Stimuli Pair', y = 'Estimated Probability\nof correct answer',
+       fill = 'Media')
+```
 
 
 ## Ratio Estimation
 
 Phrasing: "If the larger value you selected above represents 100 units, how many units is the smaller value?"
 
-Out of `r format(nrow(results), big.mark=",")` responses, the `r format(nrow(filter(results, q1_correct & pair_id != 5)), big.mark=",")` correct responses are used for ratio estimations. 
+Out of `r format(nrow(filter(results, set != 'practice')), big.mark=",")` responses, the `r format(nrow(filter(results, q1_correct & pair_id != 5 & set != 'practice')), big.mark=",")` correct responses are used for ratio estimations. 
 
-Responses
+- Remove practice trials
+- Remove incorrect responses to Question 1
+- Remove stimuli pair where values were the same
+
+
+
+
+::: {.notes}
+
+This excludes practice trials, cases where the stimuli were the same values, and incorrect solutions to the first question.
+
+:::
+
+::: {.fragment}
+
+**Responses**
 
 - Directional error: $\text{Estimated Percentage}-\text{True Percentage}$
 - Magnitude of error: $|\text{Estimated Percentage}-\text{True Percentage}|$
 - Error rate: $\frac{|\text{Estimated Percentage}-\text{True Percentage}|}{\text{True Percentage}}$
-- @cleveland1984: $\log_2|\text{Estimated Percentage}-\text{True Percentage}+1/8|$
 
-## Model for Question 2
+:::
 
-$$
-Y_{ijklm}=\mu+P_i+S_j+M_k+(PS)_{ij}+(PM)_{ik}+(SM)_{jk} + (PSM)_{ijk}+\gamma_l+\omega_{lm} + \nu_{jklm} + \epsilon_{ijklm}
-$$
+::: {.fragment}
 
-where
+Note: estimation of $Y_{ijklm}$ is resource extensive. For now, the following results exclude $\nu_{jklm}$, thus assuming that charts were presented in a fully randomized order.
 
-- $\mu$ is the overall intercept
-- $P_i, S_j, M_k$ are the effects of stimuli (P)air $i$, data(S)et $j$, and chart (M)edia $k$
-- $\gamma_l\sim N(0,\sigma^2_1)$ is the random effect of block $l$
-- $\omega_{lm}\sim N(0,\sigma^2_2)$ is the random effect of subject $m$ in block $l$
-- $\nu_{jklm}\sim N(0,\sigma^2_3)$ is the random effect of the Set $j$ and Media $k$ ordering for subject $m$ in block $l$
-- $\epsilon_{ijklm}\sim N(0,\sigma^2_4)$ is the residual error
-- $\gamma_l,\omega_{lm},\nu_{jklm}, \epsilon_{ijklm}$ are independent
+:::
 
-
-
-## Model for Amount of Time
+## Full Model for Question 2
 
 $$
 Y_{ijklm}=\mu+P_i+S_j+M_k+(PS)_{ij}+(PM)_{ik}+(SM)_{jk} + (PSM)_{ijk}+\gamma_l+\omega_{lm} + \nu_{jklm} + \epsilon_{ijklm}
@@ -324,9 +595,484 @@ $$
 where
 
 - $\mu$ is the overall intercept
-- $P_i, S_j, M_k$ are the effects of stimuli (P)air $i$, data(S)et $j$, and chart (M)edia $k$
+- $P_i, S_j, M_k$ are the effects of stimuli **P**air $i$, data**S**et $j$, and chart **M**edia $k$
 - $\gamma_l\sim N(0,\sigma^2_1)$ is the random effect of block $l$
 - $\omega_{lm}\sim N(0,\sigma^2_2)$ is the random effect of subject $m$ in block $l$
 - $\nu_{jklm}\sim N(0,\sigma^2_3)$ is the random effect of the Set $j$ and Media $k$ ordering for subject $m$ in block $l$
 - $\epsilon_{ijklm}\sim N(0,\sigma^2_4)$ is the residual error
 - $\gamma_l,\omega_{lm},\nu_{jklm}, \epsilon_{ijklm}$ are independent
+
+
+
+::: {.notes}
+
+- Initial model fit in R to obtain covariance estimates
+- Used `PROC GLIMMIX` with starting values obtained in R
+
+:::
+
+
+## Directional Error
+
+$$
+Y=\text{Estimated ratio}-\text{True ratio}
+$$
+
+```{r}
+q2.1.ls <- read.csv('../_data/q2_signed_error_lsmeans.csv')
+q2.1.diff <- read.csv('../_data/q2_signed_error_diffs.csv')
+```
+
+
+
+| Effect       | Num DF | Den DF | F Value | Pr > F |
+| ------------ | ------------ | ------------ | ------------ | ------------ |
+| set          | 1 | 2725 | 1.74 | 0.1869 |
+| media        | 2 | 2725 | 2.77 | 0.0628 |
+| pair_id      | 7 | 2725 | 27.70 | <.0001 |
+| set\*pair_id | 7 | 2725 | 2.48 | 0.0156 |
+:Type III Tests of Fixed Effects
+
+---
+
+```{r}
+#| label: fig-q2-signed-media
+#| layout-ncol: 2
+#| fig-cap: "Least Squares Estimates for signed error."
+#| fig-subcap: 
+#| - "Estimate of LS Means"
+#| - "Differences of LS Means"
+
+q2.1.ls %>% 
+  filter(Effect == 'media') %>%
+  ggplot(mapping = aes(x = media, y = Estimate)) + 
+  geom_point(stat = 'identity', color = 'black', fill = '#1a80bb') + 
+  geom_errorbar(aes(ymin = Lower, ymax = Upper),
+                width = 1/8) +
+  geom_hline(yintercept = 0, linetype = 'dashed') +
+  labs(x = '', y = 'Estimate') +
+  coord_flip()  + 
+  theme(panel.grid.major.y = element_blank(), aspect.ratio = 3/4,
+        axis.text = element_text(size = 14),
+        axis.title = element_text(size = 18))
+  
+  q2.1.diff %>% 
+    filter(Effect == 'media') %>% 
+    mutate(label = paste(media, X_media, sep = ' - ')) %>% 
+    ggplot(mapping = aes(x = Estimate, y = label)) + 
+    geom_point(stat = 'identity', color = 'black', fill = '#1a80bb') + 
+    geom_errorbar(aes(xmin = AdjLower, xmax = AdjUpper), width = 1/8) + 
+    geom_vline(xintercept = 0, linetype = 'dashed') + 
+    labs(x = 'Difference', y = '') + 
+    theme(panel.grid.major.y = element_blank(), aspect.ratio = 3/4,
+        axis.text = element_text(size = 14),
+        axis.title = element_text(size = 18))
+    
+```
+
+
+---
+
+```{r}
+#| label: fig-signed-pair-ls
+#| fig-cap: "LS Means for dataset and stimuli pairs"
+
+
+q2.1.ls %>% 
+  filter(Effect == 'set*pair_id') %>% 
+  mutate(pair_id = as.numeric(pair_id)) %>% 
+  left_join(stimuli, by = 'pair_id') %>% 
+  mutate(true_ratio = map2_dbl(values, constant, \(x,y)(round(100*min(x,y)/max(x,y), 1))),
+         constant_pos = ifelse(values > constant, 'Constant is smaller', 'Constant is larger')) %>% 
+  ggplot(mapping = aes(y = factor(true_ratio), x = Estimate, fill = constant_pos, group = interaction(pair_id, constant_pos))) + 
+  geom_bar(stat = 'identity', position = position_dodge(), width = 1/2, color = 'grey50') + 
+  geom_errorbar(aes(xmin = Lower, xmax = Upper), color = 'grey20',
+                position = position_dodge(width = 1/2), width = 1/4) +
+  labs(x = 'Estimate', y = 'True Ratio', fill = '') +
+  facet_wrap(~set, nrow=1) + 
+  theme(aspect.ratio = 1/2, legend.position = 'bottom', 
+        panel.grid.major.y = element_blank(),
+        axis.title = element_text(size = 18),
+        axis.text = element_text(size = 14)) + 
+  scale_fill_manual(values = c("Constant is larger"="#1a80bb", "Constant is smaller"="#b8b8b8"))
+```
+
+
+
+---
+
+```{r}
+#| label: fig-signed-pval
+#| fig-cap: "P-values of differences of directional error for stimuli pairs. "
+q2.1.diff %>% 
+  filter(Effect == 'set*pair_id', set == X_set) %>% 
+  mutate(pair_id = as.numeric(pair_id),
+         X_pair_id = as.numeric(X_pair_id)) %>% 
+  left_join(stimuli, by = 'pair_id') %>% 
+  left_join(stimuli, by = c('X_pair_id'='pair_id')) %>% 
+  mutate(true_ratio.x = map2_dbl(values.x, constant.x, \(x,y)(round(100*min(x,y)/max(x,y), 1))),
+         constant_pos.x = ifelse(values.x > constant.x, 'Larger difference', 'Smaller difference'),
+         
+         true_ratio.y = map2_dbl(values.y, constant.y, \(x,y)(round(100*min(x,y)/max(x,y), 1))),
+         constant_pos.y = ifelse(values.y > constant.y, 'Larger difference', 'Smaller difference'),
+         Adjp = str_replace(Adjp, '<', '0')) %>% 
+  type_convert() %>% 
+  mutate(xlab = glue::glue("{pair_id}\n({true_ratio.x})"),
+         ylab = glue::glue("{X_pair_id}\n({true_ratio.y})")) %>% 
+  mutate(sig = case_when(
+    Adjp <= 0.1 & Adjp > 0.05 ~ '.',
+    Adjp <= 0.05 & Adjp > 0.01 ~ "*",
+    Adjp <= 0.01 & Adjp > 0.001 ~ "**",
+    Adjp <= 0.001 ~ "***",
+    .default = ''
+  )) %>% 
+  select(set, xlab, ylab, Adjp, sig) %>% 
+  ggplot(mapping = aes(x = xlab, y = ylab, fill = Adjp)) +  
+    geom_tile(color = 'black') + 
+    geom_text(aes(label = sig)) + 
+    scale_fill_gradient(low = '#1a80bb', high = 'white', limits = c(0, 1)) +
+    theme(aspect.ratio = 1, axis.text = element_text(size = 10),
+          axis.title = element_text(size = 18), legend.position = 'bottom') + 
+  labs(x = 'Stimuli Pair', y = 'Stimuli Pair') + 
+  facet_wrap(~set) 
+```
+
+
+## Magnitude of Error
+
+$$
+Y=|\text{Estimated ratio}-\text{True ratio}|
+$$
+
+```{r}
+q2.2.ls <- read.csv('../_data/q2_abs_error_lsmeans.csv')
+q2.2.diff <- read.csv('../_data/q2_abs_error_diffs.csv')
+```
+
+Change to model:
+
+- $y_{ijklm}|\gamma_l,\omega_{lm}\sim \text{Gamma}(\mu_{ijklm},\phi)$
+- $\eta_{ijklm}=\log(\mu_{ijklm})$
+
+
+| Effect       | Num DF | Den DF | F Value | Pr > F |
+| ------------ | ------------ | ------------ | ------------ | ------------ |
+| set                             | 1 | 2732 | 1.62 | 0.2028 |
+| media                           | 2 | 2732 | 18.54 | <.0001 |
+| pair_id                         | 7 | 2732 | 1.55 | 0.1443 |
+:Type III Tests of Fixed Effects
+
+---
+
+```{r}
+#| label: fig-q2-abs
+#| layout-ncol: 2
+#| fig-cap: "Least Squares Estimates for magnitude of error."
+#| fig-subcap: 
+#| - "Estimate of LS Means"
+#| - "Differences of LS Means"
+
+q2.2.ls %>% 
+  filter(Effect == 'media') %>%
+  ggplot(mapping = aes(x = media, y = Mu)) + 
+  geom_point(stat = 'identity', color = 'black', fill = '#1a80bb') + 
+  geom_errorbar(aes(ymin = LowerMu, ymax = UpperMu),
+                width = 1/8) +
+  labs(x = '', y = 'Estimate') +
+  coord_flip()  + 
+  theme(panel.grid.major.y = element_blank(), aspect.ratio = 3/4,
+        axis.text = element_text(size = 14),
+        axis.title = element_text(size = 18))
+  
+  q2.2.diff %>% 
+    filter(Effect == 'media') %>% 
+    mutate(label = paste(media, X_media, sep = ' - ')) %>% 
+    ggplot(mapping = aes(x = Estimate, y = label)) + 
+    geom_point(stat = 'identity', color = 'black', fill = '#1a80bb') + 
+    geom_errorbar(aes(xmin = AdjLower, xmax = AdjUpper), width = 1/8) + 
+    geom_vline(xintercept = 0, linetype = 'dashed') + 
+    labs(x = 'Difference\n(model scale)', y = '') + 
+    theme(panel.grid.major.y = element_blank(), aspect.ratio = 3/4,
+        axis.text = element_text(size = 14),
+        axis.title = element_text(size = 18))
+    
+```
+
+## Error Rate
+
+```{r}
+q2.3.ls <- read.csv('../_data/q2_error_rate_lsmeans.csv')
+q2.3.diff <- read.csv('../_data/q2_error_rate_diffs.csv')
+```
+
+
+$$
+Y=\frac{|\text{Estimated Percentage}-\text{True Percentage}|}{\text{True Percentage}}
+$$
+
+
+Change to model:
+
+- $y_{ijklm}|\gamma_l,\omega_{lm}\sim \text{Gamma}(\mu_{ijklm},\phi)$
+- $\eta_{ijklm}=\log(\mu_{ijklm})$
+
+| Effect       | Num DF | Den DF | F Value | Pr > F |
+| ------------ | ------------ | ------------ | ------------ | ------------ |
+| set                             | 1 | 2732 | 1.62 | 0.2026 |
+| media                           | 2 | 2732 | 18.55 | <.0001 |
+| pair_id                         | 7 | 2732 | 19.93 | <.0001 |
+:Type III Tests of Fixed Effects
+
+
+---
+
+```{r}
+#| label: fig-q2-rate
+#| layout-ncol: 2
+#| fig-cap: "Least Squares Estimates for error rate."
+#| fig-subcap: 
+#| - "Estimate of LS Means"
+#| - "Differences of LS Means"
+
+q2.3.ls %>% 
+  filter(Effect == 'media') %>%
+  ggplot(mapping = aes(x = media, y = Mu)) + 
+  geom_point(stat = 'identity', color = 'black', fill = '#1a80bb') + 
+  geom_errorbar(aes(ymin = LowerMu, ymax = UpperMu),
+                width = 1/8) +
+  labs(x = '', y = 'Estimate') +
+  coord_flip()  + 
+  theme(panel.grid.major.y = element_blank(), aspect.ratio = 3/4,
+        axis.text = element_text(size = 14),
+        axis.title = element_text(size = 18))
+  
+  q2.3.diff %>% 
+    filter(Effect == 'media') %>% 
+    mutate(label = paste(media, X_media, sep = ' - ')) %>% 
+    ggplot(mapping = aes(x = Estimate, y = label)) + 
+    geom_point(stat = 'identity', color = 'black', fill = '#1a80bb') + 
+    geom_errorbar(aes(xmin = AdjLower, xmax = AdjUpper), width = 1/8) + 
+    geom_vline(xintercept = 0, linetype = 'dashed') + 
+    labs(x = 'Difference\n(model scale)', y = '') + 
+    theme(panel.grid.major.y = element_blank(), aspect.ratio = 3/4,
+        axis.text = element_text(size = 14),
+        axis.title = element_text(size = 18))
+    
+```
+
+---
+
+```{r}
+q2.3.ls %>% 
+  filter(Effect == 'pair_id') %>% 
+  type_convert() %>% 
+  left_join(stimuli, by = 'pair_id') %>% 
+  mutate(true_ratio = map2_dbl(values, constant, \(x,y)(round(100*min(x,y)/max(x,y), 2)))) %>% 
+  mutate(label = glue::glue("{true_ratio}\n({pair_id})")) %>% 
+  ggplot(mapping = aes(x = label, y = Mu)) + 
+  geom_col(fill = '#1a80bb', color = 'black') + 
+  geom_errorbar(aes(ymin = LowerMu, ymax = UpperMu), width = 1/4) +
+  labs(x = 'True Ratio\n(Stimuli Pair)', y = 'Estimate')  + 
+  theme(panel.grid.major.x = element_blank())
+```
+
+---
+
+```{r}
+#| label: fig-error-rate-pval
+#| fig-cap: "P-values of differences of directional error for stimuli pairs. "
+q2.3.diff %>% 
+  filter(Effect == 'pair_id', set == X_set) %>% 
+  mutate(pair_id = as.numeric(pair_id),
+         X_pair_id = as.numeric(X_pair_id)) %>% 
+  left_join(stimuli, by = 'pair_id') %>% 
+  left_join(stimuli, by = c('X_pair_id'='pair_id')) %>% 
+  mutate(true_ratio.x = map2_dbl(values.x, constant.x, \(x,y)(round(100*min(x,y)/max(x,y), 1))),
+         constant_pos.x = ifelse(values.x > constant.x, 'Larger difference', 'Smaller difference'),
+         
+         true_ratio.y = map2_dbl(values.y, constant.y, \(x,y)(round(100*min(x,y)/max(x,y), 1))),
+         constant_pos.y = ifelse(values.y > constant.y, 'Larger difference', 'Smaller difference'),
+         Adjp = str_replace(Adjp, '<', '0')) %>% 
+  type_convert() %>% 
+  mutate(xlab = glue::glue("{pair_id}\n({true_ratio.x})"),
+         ylab = glue::glue("{X_pair_id}\n({true_ratio.y})")) %>% 
+  mutate(sig = case_when(
+    Adjp <= 0.1 & Adjp > 0.05 ~ '.',
+    Adjp <= 0.05 & Adjp > 0.01 ~ "*",
+    Adjp <= 0.01 & Adjp > 0.001 ~ "**",
+    Adjp <= 0.001 ~ "***",
+    .default = ''
+  )) %>% 
+  select(set, xlab, ylab, Adjp, sig) %>% 
+  ggplot(mapping = aes(x = xlab, y = ylab, fill = Adjp)) +  
+    geom_tile(color = 'black') + 
+    geom_text(aes(label = sig)) + 
+    scale_fill_gradient(low = '#1a80bb', high = 'white', limits = c(0, 1)) +
+    theme(aspect.ratio = 1, axis.text = element_text(size = 10),
+          axis.title = element_text(size = 18), legend.position = 'bottom') + 
+  labs(x = 'Stimuli Pair', y = 'Stimuli Pair')
+```
+
+## Amount of Time
+
+```{r}
+#| label: fig-time
+#| fig-cap: "Distribution of time spent per question, between 0 and 60 seconds. "
+
+
+results %>% 
+  filter(set != 'practice') %>% 
+  mutate(start_time = as_datetime(start_time),
+         end_time = as_datetime(end_time),
+         time_diff = end_time - start_time) %>%
+  ggplot(mapping = aes(x = factor(pair_id), y = as.numeric(time_diff), fill = media)) + 
+  geom_boxplot(width = 1/2) + 
+  scale_fill_manual(values = c(
+    "2dd"="#1a80bb",
+    "3dd"="#ea801c",
+    "3dp"="#b8b8b8"
+  )) + 
+  scale_y_continuous(limits = c(0, 60)) + 
+  theme(aspect.ratio = 1/3, legend.position = 'bottom') + 
+  labs(x = 'Stimuli Pair', y = 'Amount of Time', fill = 'Chart Type')
+  
+```
+
+## Key Takeaways
+
+1. Metrics of error are larger for 2D heat maps than for 3D heat maps
+
+    - Similar to other studies on informative 3D elements
+
+2. No statistically significant differences between digital and physical 3D heat charts
+
+3. Differences between stimuli pairs with same ratio was not statistically significant
+
+4. 
+
+
+## Future work?
+
+- Determine if some responses could be "flipped" (100-estimate). See @fig-a5 as an example.
+- Use a wider range of ratios (between 0 and 1)
+- Include more traditional 3D heat maps
+- 
+
+
+# Thank you! 
+
+## References 
+
+::: {#refs}
+:::
+
+# Appendix
+
+---
+
+```{r}
+#| label: fig-a1
+#| fig-cap: "Distrubtion of absolute error by stimuli pair."
+results %>% 
+  filter(set != 'practice') %>% 
+  ggplot(mapping = aes(x = factor(pair_id), y = q2_abs_error, fill = media)) + 
+  geom_boxplot() + 
+  labs(x = 'Stimuli Pair', y = 'Abs(Error)') + 
+  scale_fill_manual(values = c(
+    "2dd"="#1a80bb",
+    "3dd"="#ea801c",
+    "3dp"="#b8b8b8"
+  ))
+```
+
+---
+
+```{r}
+#| label: fig-a2
+#| fig-cap: "Effect of slider starting position on abs(Error)"
+results %>% 
+  ggplot(mapping = aes(x = slider_start, y = q2_abs_error)) + 
+  geom_point(alpha =1/10) + 
+  geom_smooth(aes(color = media), se = F) + 
+  scale_color_manual(values = c(
+    "2dd"="#1a80bb",
+    "3dd"="#ea801c",
+    "3dp"="#5e4c5f"
+  )) + 
+  facet_wrap(~pair_id) + 
+  theme(aspect.ratio = 1/2)
+```
+
+---
+
+
+```{r}
+#| label: fig-a3
+#| fig-cap: "Effect of time on abs(Error)"
+results %>% 
+  mutate(start_time = as_datetime(start_time),
+         end_time = as_datetime(end_time),
+         time_diff = end_time - start_time) %>% 
+  ggplot(mapping = aes(x = as.numeric(time_diff), y = q2_abs_error)) + 
+  geom_point(alpha =1/10) + 
+  geom_smooth(aes(color = media), se = F) + 
+  scale_color_manual(values = c(
+    "2dd"="#1a80bb",
+    "3dd"="#ea801c",
+    "3dp"="#5e4c5f"
+  )) + 
+  facet_wrap(~pair_id) + 
+  scale_x_log10() + 
+  labs(x = 'Amount of Time', y = 'Abs(Error)') +
+  theme(aspect.ratio = 1/2)
+```
+
+
+---
+
+```{r}
+#| label: fig-a4
+#| fig-cap: "Number of clicks on 3D digital plots."
+
+results %>% 
+  filter(set != 'practice', media == '3dd') %>% 
+  ggplot(mapping = aes(x = clicks_3dd, y = q2_abs_error)) + 
+  geom_point() + 
+  geom_smooth(se = F) + 
+  labs(x = 'Number of clicks', y = 'Abs(Error)') + 
+  theme(aspect.ratio = 1/2)
+```
+
+---
+
+```{r}
+#| label: fig-a5
+#| fig-cap: "Distribution of correct and incorrect responses for pair_id = 5 (stimuli values are the same)."
+results %>% 
+  filter(pair_id == 5) %>% 
+  ggplot(mapping = aes(x = user_slider, y = q1_correct, color = q1_correct)) + 
+  geom_point(position = position_jitter(width = 0, height = 1/4)) + 
+  scale_color_manual(
+    values = c(
+    "TRUE"="#1a80bb",
+    "FALSE"="#ea801c"
+  )
+  )
+```
+
+---
+
+```{r}
+#| label: fig-a6
+#| fig-cap: "Distribution of correct and incorrect responses for 'both values are the same'."
+results %>% 
+  filter(user_larger == 'Both values are the same') %>% 
+  ggplot(mapping = aes(x = user_slider, y = factor(pair_id), color = q1_correct)) + 
+  geom_point(position = position_jitter(width = 0, height = 1/4)) + 
+  scale_color_manual(
+    values = c(
+    "TRUE"="#1a80bb",
+    "FALSE"="#ea801c"
+  )
+  )
+```

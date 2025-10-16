@@ -12,7 +12,7 @@
 
   <meta name="author" content="Tyler Wiederich">
   <meta name="dcterms.date" content="2025-10-16">
-  <title>Physical Heat Maps</title>
+  <title>Heat3d</title>
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, minimal-ui">
@@ -347,8 +347,8 @@
     <div class="slides">
 
 <section id="title-slide" class="quarto-title-block center">
-  <h1 class="title">Physical Heat Maps</h1>
-  <p class="subtitle">Some silly little thing here</p>
+  <h1 class="title">Heat3d</h1>
+  <p class="subtitle">A study on the physical dimensionality of heat maps</p>
 
 <div class="quarto-title-authors">
 <div class="quarto-title-author">
@@ -360,22 +360,154 @@ Tyler Wiederich
 
   <p class="date">October 16, 2025</p>
 </section>
-<section id="overview" class="slide level2">
-<h2>Overview</h2>
-<ul>
-<li>Introduction</li>
-<li>Methods</li>
-<li>Results</li>
-<li>Conclusion</li>
-</ul>
+<section>
+<section id="introduction" class="title-slide slide level1 center">
+<h1>Introduction</h1>
+
 </section>
+<section id="heat-maps" class="slide level2">
+<h2>Heat Maps</h2>
+<p>Heat maps are a popular way to express data with three dimensions. Two variables are designated as predictors for a single responses.</p>
+
+<img data-src="index_files/figure-revealjs/unnamed-chunk-2-1.png" width="960" class="r-stretch"></section>
+<section id="d-heat-maps" class="slide level2">
+<h2>3D Heat Maps</h2>
+<div id="fig-heatmaps" class="quarto-layout-panel">
+<figure class="quarto-float quarto-float-fig">
+<div aria-describedby="fig-heatmaps-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<div class="quarto-layout-row">
+<div class="quarto-layout-cell-subref quarto-layout-cell" data-ref-parent="fig-heatmaps" style="flex-basis: 50.0%;justify-content: flex-start;">
+<div id="fig-nat77" class="quarto-float quarto-figure quarto-figure-center">
+<figure class="quarto-float quarto-subfloat-fig">
+<div aria-describedby="fig-nat77-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img data-src="images/heatmap3d.png" data-ref-parent="fig-heatmaps" height="400">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-subfloat-caption quarto-subfloat-fig" id="fig-nat77-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+(a) Figure from <span class="citation" data-cites="national1977condition">for Educational Statistics et al. (<a href="#/references" role="doc-biblioref" onclick="">1977</a>)</span>
+</figcaption>
+</figure>
+</div>
+</div>
+<div class="quarto-layout-cell-subref quarto-layout-cell" data-ref-parent="fig-heatmaps" style="flex-basis: 50.0%;justify-content: flex-start;">
+<div id="fig-lincoln-pop" class="quarto-float quarto-figure quarto-figure-center">
+<figure class="quarto-float quarto-subfloat-fig">
+<div aria-describedby="fig-lincoln-pop-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img data-src="images/lincoln-pop.png" data-ref-parent="fig-heatmaps" height="400">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-subfloat-caption quarto-subfloat-fig" id="fig-lincoln-pop-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+(b) Figure from <span class="citation" data-cites="3DPopulationDensity"><span>“<span>3D Population Density</span> of the <span>US</span> - <span>HomeArea</span>.com”</span> (<a href="#/references" role="doc-biblioref" onclick="">n.d.</a>)</span>
+</figcaption>
+</figure>
+</div>
+</div>
+</div>
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-heatmaps-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;1: Examples of 3D heat maps.
+</figcaption>
+</figure>
+</div>
+</section>
+<section id="background" class="slide level2">
+<h2>Background</h2>
+<p>Studies on direct comparisons of dimensionality are limited when the third dimension coveys information.</p>
+<div class="fragment fade-in">
+<ul>
+<li><p>Accuracy is worse for volumes than for areas <span class="citation" data-cites="croxton1932">(<a href="#/references" role="doc-biblioref" onclick="">Croxton and Stein 1932</a>)</span>.</p>
+<ul>
+<li>Also theorized by <span class="citation" data-cites="cleveland1984">Cleveland and McGill (<a href="#/references" role="doc-biblioref" onclick="">1984</a>)</span></li>
+</ul></li>
+</ul>
+</div>
+<div class="fragment fade-in">
+<ul>
+<li>3D charts can sometimes better encode information than 2D charts <span class="citation" data-cites="barfield1989">(<a href="#/references" role="doc-biblioref" onclick="">Barfield and Robless 1989</a>)</span>.</li>
+</ul>
+</div>
+<div class="fragment fade-in">
+<ul>
+<li>3D heat maps have lower error rates than 2D heat maps in virtual reality <span class="citation" data-cites="kraus2020">(<a href="#/references" role="doc-biblioref" onclick="">Kraus et al. 2020</a>)</span>.</li>
+</ul>
+</div>
+<div class="fragment">
+<p>Arguably, these results may not apply to statistical graphics presented within the physical world.</p>
+</div>
+<aside class="notes">
+<ul>
+<li><span class="citation" data-cites="kraus2020">Kraus et al. (<a href="#/references" role="doc-biblioref" onclick="">2020</a>)</span> talks about more time needed for 3D charts</li>
+<li>Also, <span class="citation" data-cites="kraus2020">Kraus et al. (<a href="#/references" role="doc-biblioref" onclick="">2020</a>)</span> mentioned 2D was better for overview tasks</li>
+</ul>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section>
+<section id="study-overview" class="slide level2">
+<h2>Study Overview</h2>
+<p>Does numerical accuracy of ratio estimations differ between dimensionality and projections of chart types? It is important to note that direct translations of 2D and 3D heat maps require different visual cues.</p>
+<div id="fig-color-height" class="quarto-layout-panel">
+<figure class="quarto-float quarto-float-fig">
+<div aria-describedby="fig-color-height-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<div class="quarto-layout-row">
+<div class="quarto-layout-cell-subref quarto-layout-cell" data-ref-parent="fig-color-height" style="flex-basis: 50.0%;justify-content: flex-start;">
+<div id="fig-flat3d" class="quarto-float quarto-figure quarto-figure-center">
+<figure class="quarto-float quarto-subfloat-fig">
+<div aria-describedby="fig-flat3d-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img data-src="images/height-color-0.3.png" data-ref-parent="fig-color-height">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-subfloat-caption quarto-subfloat-fig" id="fig-flat3d-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+(a) Flatter height scale
+</figcaption>
+</figure>
+</div>
+</div>
+<div class="quarto-layout-cell-subref quarto-layout-cell" data-ref-parent="fig-color-height" style="flex-basis: 50.0%;justify-content: flex-start;">
+<div id="fig-tall3d" class="quarto-float quarto-figure quarto-figure-center">
+<figure class="quarto-float quarto-subfloat-fig">
+<div aria-describedby="fig-tall3d-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img data-src="images/height-color-2.png" data-ref-parent="fig-color-height">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-subfloat-caption quarto-subfloat-fig" id="fig-tall3d-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+(b) Stretched height scale
+</figcaption>
+</figure>
+</div>
+</div>
+</div>
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-color-height-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;2: Two figures representing the volcano dataset <span class="citation" data-cites="volcano">(<a href="#/references" role="doc-biblioref" onclick="">R Core Team 2024</a>)</span> using different height scaling factors. Both figures use the same color scale, but there is no “correct” translation of color into the measurable height.
+</figcaption>
+</figure>
+</div>
+<aside class="notes">
+<p>2D heat maps use color, 3D heat maps use height and can possibly use color as well.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section></section>
 <section>
 <section id="methods" class="title-slide slide level1 center">
 <h1>Methods</h1>
 
 </section>
-<section id="methods-1" class="slide level2">
-<h2>Methods</h2>
+<section id="design-of-experiment" class="slide level2">
+<h2>Design of Experiment</h2>
 <div class="columns">
 <div class="column" style="width:50%;">
 <p><strong>Treatment Design</strong></p>
@@ -392,7 +524,194 @@ Tyler Wiederich
 <li>Stimuli pairs randomized within <span class="math inline">\(\text{Media}\times \text{Set}\)</span> (split-plot)</li>
 </ul>
 </div></div>
-</section></section>
+</section>
+<section id="media-types" class="slide level2">
+<h2>Media Types</h2>
+<div id="fig-heat3dexamples" class="quarto-layout-panel">
+<figure class="quarto-float quarto-float-fig">
+<div aria-describedby="fig-heat3dexamples-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<div class="quarto-layout-row">
+<div class="quarto-layout-cell-subref quarto-layout-cell" data-ref-parent="fig-heat3dexamples" style="flex-basis: 33.3%;justify-content: flex-start;">
+<div id="fig-2dd" class="quarto-float quarto-figure quarto-figure-center">
+<figure class="quarto-float quarto-subfloat-fig">
+<div aria-describedby="fig-2dd-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img data-src="images/examp2dd.png" data-ref-parent="fig-heat3dexamples" height="300">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-subfloat-caption quarto-subfloat-fig" id="fig-2dd-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+(a) 2D heat map
+</figcaption>
+</figure>
+</div>
+</div>
+<div class="quarto-layout-cell-subref quarto-layout-cell" data-ref-parent="fig-heat3dexamples" style="flex-basis: 33.3%;justify-content: flex-start;">
+<div id="fig-3dd" class="quarto-float quarto-figure quarto-figure-center">
+<figure class="quarto-float quarto-subfloat-fig">
+<div aria-describedby="fig-3dd-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img data-src="images/examp3dd.png" data-ref-parent="fig-heat3dexamples" height="300">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-subfloat-caption quarto-subfloat-fig" id="fig-3dd-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+(b) 3D Digital heat map
+</figcaption>
+</figure>
+</div>
+</div>
+<div class="quarto-layout-cell-subref quarto-layout-cell" data-ref-parent="fig-heat3dexamples" style="flex-basis: 33.3%;justify-content: flex-start;">
+<div id="fig-3dp" class="quarto-float quarto-figure quarto-figure-center">
+<figure class="quarto-float quarto-subfloat-fig">
+<div aria-describedby="fig-3dp-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img data-src="images/examp3dp.png" data-ref-parent="fig-heat3dexamples" height="300">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-subfloat-caption quarto-subfloat-fig" id="fig-3dp-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+(c) 3D-Printed heat map
+</figcaption>
+</figure>
+</div>
+</div>
+</div>
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-heat3dexamples-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;3: Media types using dataset 1 in the 3D heat map experiment.
+</figcaption>
+</figure>
+</div>
+</section>
+<section id="stimuli-construction" class="slide level2">
+<h2>Stimuli Construction</h2>
+<p>The design of the 3D heat map experiment uses the method of constant stimuli: ratios are estimated with respect to one stimuli height that remains the same.</p>
+<p><span class="math display">\[
+S=\text{Stimuli}
+\]</span></p>
+<p>Setting 50 as the constant and 90 as the maximum, a sequence of stimuli are chosen by equally partitioning the ratios between <span class="math inline">\(50/50=1\)</span> and <span class="math inline">\(50/90\approx0.556\)</span>. The same ratios are used when setting 50 as the maximum in the stimuli pair.</p>
+</section>
+<section class="slide level2">
+
+
+<img data-src="index_files/figure-revealjs/unnamed-chunk-3-1.png" width="960" class="r-stretch"></section>
+<section class="slide level2">
+
+
+<img data-src="index_files/figure-revealjs/unnamed-chunk-4-1.png" width="960" class="r-stretch"></section>
+<section id="generating-heat-map-data" class="slide level2">
+<h2>Generating Heat Map Data</h2>
+<p>The general shape of the heat map is a mixture distribution between mathematical formula and uniform random noise.</p>
+<p><span class="math display">\[
+Z=0.3\cdot U(0,100) + 0.7\cdot f(X,Y)
+\]</span></p>
+<p>where <span class="math inline">\(f(X,Y)\)</span> is any given function, scaled between 0 and 100</p>
+<ul>
+<li>Top half of a sphere centered at 5.5</li>
+<li>Lower half of a sphere centered at 5.5</li>
+</ul>
+</section>
+<section id="stimuli-placement" class="slide level2">
+<h2>Stimuli Placement</h2>
+<ol type="1">
+<li>Data is simulated from previous function to generate grid <span class="math inline">\((X=1\dots 10, Y=1\dots 10)\)</span></li>
+<li>Non-50 value is placed onto grid coordinate that minimizes <span class="math inline">\(|Z-S|\)</span></li>
+<li>50 is placed similarly, but only on coordinates that have a Manhattan distance of 3 or 4</li>
+</ol>
+<p><span class="math display">\[
+|X_1-X_2|+|Y_1-Y_2| = 3 \text{ or } 4
+\]</span></p>
+<ol start="4" type="1">
+<li>Repeat process 20 times for a list of heat maps</li>
+<li>Use Chi-squared tests to find heat maps where stimuli are somewhat equally spaced</li>
+</ol>
+</section>
+<section id="heat-map-selection" class="slide level2">
+<h2>Heat map selection</h2>
+<p>With 9 pairs of values, it is expected to see 1.8 stimuli values in each row/column of the heat map.</p>
+<table class="caption-top">
+<colgroup>
+<col style="width: 9%">
+<col style="width: 9%">
+<col style="width: 9%">
+<col style="width: 9%">
+<col style="width: 9%">
+<col style="width: 9%">
+<col style="width: 9%">
+<col style="width: 9%">
+<col style="width: 9%">
+<col style="width: 9%">
+<col style="width: 9%">
+</colgroup>
+<tbody>
+<tr class="odd">
+<td>Grid Position</td>
+<td>1</td>
+<td>2</td>
+<td>3</td>
+<td>4</td>
+<td>5</td>
+<td>6</td>
+<td>7</td>
+<td>8</td>
+<td>9</td>
+<td>10</td>
+</tr>
+<tr class="even">
+<td>Expected</td>
+<td>1.8</td>
+<td>1.8</td>
+<td>1.8</td>
+<td>1.8</td>
+<td>1.8</td>
+<td>1.8</td>
+<td>1.8</td>
+<td>1.8</td>
+<td>1.8</td>
+<td>1.8</td>
+</tr>
+<tr class="odd">
+<td>Observed</td>
+<td><span class="math inline">\(n_1\)</span></td>
+<td><span class="math inline">\(n_2\)</span></td>
+<td><span class="math inline">\(n_3\)</span></td>
+<td><span class="math inline">\(n_4\)</span></td>
+<td><span class="math inline">\(n_5\)</span></td>
+<td><span class="math inline">\(n_6\)</span></td>
+<td><span class="math inline">\(n_7\)</span></td>
+<td><span class="math inline">\(n_8\)</span></td>
+<td><span class="math inline">\(n_9\)</span></td>
+<td><span class="math inline">\(n_{10}\)</span></td>
+</tr>
+</tbody>
+</table>
+<p><span class="math display">\[
+\chi^2=\sum\frac{(\text{Observed}-\text{Expected})^2}{\text{Expected}}
+\]</span></p>
+<p>We use the grid with the smallest average <span class="math inline">\(\chi^2\)</span> for the <span class="math inline">\(X\)</span> and <span class="math inline">\(Y\)</span> axes.</p>
+</section>
+<section id="study-design" class="slide level2">
+<h2>Study Design</h2>
+<p>For a full replicate, there are <span class="math inline">\(3\times2\times9=54\)</span> treatment combinations:</p>
+<ul>
+<li>3 media types (2dd, 3dd, 3dp)</li>
+<li>2 datasets</li>
+<li>9 pairs of stimuli</li>
+</ul>
+<p>Way too many trials for a single participant’s attention span!</p>
+</section>
+<section id="incomplete-block" class="slide level2">
+<h2>Incomplete Block</h2>
+<p>Our main interest is the difference between media types, measured at a given ratio and dataset. To accomplish this and to reduce the number of trials per participant, we use 4 of the 9 possible stimuli pairs to create blocks.</p>
+<p><span class="math display">\[
+2\times3\times4=24
+\]</span></p>
+
+<img data-src="index_files/figure-revealjs/fig-block-design-1.png" class="quarto-figure quarto-figure-center r-stretch" width="960"><p class="caption">
+Figure&nbsp;4: Balanced Incomplete Block Design. Each stimuli pair in a block is fully crossed with media type and dataset.
+</p></section>
+<section id="experiment" class="slide level2">
+<h2>Experiment</h2>
+<ol type="1">
+<li>Ask participants which value in a stimuli pair is larger</li>
+<li>Ask participants to estimate the value of the smaller stimuli</li>
+</ol>
+
+<img data-src="images/app-screenshot.png" class="r-stretch quarto-figure-center"><p class="caption">
+Figure&nbsp;5: Screenshot of Shiny app.
+</p></section></section>
 <section>
 <section id="results" class="title-slide slide level1 center">
 <h1>Results</h1>
@@ -400,7 +719,7 @@ Tyler Wiederich
 </section>
 <section id="demographics" class="slide level2">
 <h2>Demographics</h2>
-<p>After data cleaning, a total of 196 Stat 218 students participated in the experiment.</p>
+<p>After data cleaning, a total of 196 Stat 218 students participated in the experiment as of October 13th, 2025.</p>
 <ul>
 <li>Participants who met inclusion criteria (19+ and consented)</li>
 <li>Completed the entire experiment</li>
@@ -411,66 +730,66 @@ Tyler Wiederich
 
 
 <img data-src="index_files/figure-revealjs/fig-dem-gender-1.png" width="960" class="r-stretch quarto-figure-center"><p class="caption">
-Figure&nbsp;1: Gender of experiment participants.
+Figure&nbsp;6: Gender of experiment participants.
 </p></section>
 <section class="slide level2">
 
 
 <img data-src="index_files/figure-revealjs/fig-dem-age-1.png" width="960" class="r-stretch quarto-figure-center"><p class="caption">
-Figure&nbsp;2: Age categories of experiment participants.
+Figure&nbsp;7: Age categories of experiment participants.
 </p></section>
 <section class="slide level2">
 
 
 <img data-src="index_files/figure-revealjs/fig-dem-education-1.png" width="960" class="r-stretch quarto-figure-center"><p class="caption">
-Figure&nbsp;3: Education level of experiment participants.
+Figure&nbsp;8: Education level of experiment participants.
 </p></section>
 <section class="slide level2">
 
 
 <img data-src="index_files/figure-revealjs/fig-dem-reason-1.png" width="960" class="r-stretch quarto-figure-center"><p class="caption">
-Figure&nbsp;4: Reason for experiment participants.
+Figure&nbsp;9: Reason for experiment participants.
 </p></section>
 <section id="block-selection" class="slide level2">
 <h2>Block selection</h2>
 
-<img data-src="index_files/figure-revealjs/unnamed-chunk-4-1.png" width="960" class="r-stretch"></section>
+<img data-src="index_files/figure-revealjs/unnamed-chunk-7-1.png" width="960" class="r-stretch"></section>
 <section id="daily-participation" class="slide level2">
 <h2>Daily participation</h2>
 
 <img data-src="index_files/figure-revealjs/fig-overtime-1.png" width="960" class="r-stretch quarto-figure-center"><p class="caption">
-Figure&nbsp;5: Participation over time.
+Figure&nbsp;10: Participation over time.
 </p></section>
 <section id="which-value-represents-a-larger-quantity" class="slide level2">
 <h2>Which value represents a larger quantity?</h2>
 <p>4,856 entries were submitted as of October 10th. Almost a quarter of responses were wrong! (22.96%)</p>
 
 <img data-src="index_files/figure-revealjs/fig-q1-overall-1.png" width="960" class="r-stretch quarto-figure-center"><p class="caption">
-Figure&nbsp;6: Percentage of correct responses to Question 1.
+Figure&nbsp;11: Percentage of correct responses to Question 1.
 </p></section>
 <section class="slide level2">
 
 
 <img data-src="index_files/figure-revealjs/fig-q1-byset-1.png" width="960" class="r-stretch quarto-figure-center"><p class="caption">
-Figure&nbsp;7: Percentage of correct answers by heat map dataset.
+Figure&nbsp;12: Percentage of correct answers by heat map dataset.
 </p></section>
 <section class="slide level2">
 
 
 <img data-src="index_files/figure-revealjs/fig-q1-bymedia-1.png" width="960" class="r-stretch quarto-figure-center"><p class="caption">
-Figure&nbsp;8: Percentage of correct answers by media type.
+Figure&nbsp;13: Percentage of correct answers by media type.
 </p></section>
 <section class="slide level2">
 
 
 <img data-src="index_files/figure-revealjs/fig-q1-bypairid-1.png" width="960" class="r-stretch quarto-figure-center"><p class="caption">
-Figure&nbsp;9: Percentage of correct answers by stimuli pair identifier.
+Figure&nbsp;14: Percentage of correct answers by stimuli pair identifier.
 </p></section>
 <section class="slide level2">
 
 
 <img data-src="index_files/figure-revealjs/fig-q1-byall-1.png" width="960" class="r-stretch quarto-figure-center"><p class="caption">
-Figure&nbsp;10: Percentage of correct answers by all treatment levels.
+Figure&nbsp;15: Percentage of correct answers by all treatment levels.
 </p></section>
 <section id="model-for-question-1" class="slide level2">
 <h2>Model for Question 1</h2>
@@ -480,65 +799,481 @@ Figure&nbsp;10: Percentage of correct answers by all treatment levels.
 <p>where</p>
 <ul>
 <li><span class="math inline">\(\eta\)</span> is the overall intercept on the model scale</li>
-<li><span class="math inline">\(P_i, S_j, M_k\)</span> are the effects of stimuli (P)air <span class="math inline">\(i\)</span>, data(S)et <span class="math inline">\(j\)</span>, and chart (M)edia <span class="math inline">\(k\)</span></li>
+<li><span class="math inline">\(P_i, S_j, M_k\)</span> are the effects of stimuli <strong>P</strong>air <span class="math inline">\(i\)</span>, data<strong>S</strong>et <span class="math inline">\(j\)</span>, and chart <strong>M</strong>edia <span class="math inline">\(k\)</span></li>
 <li><span class="math inline">\(\gamma_l\sim N(0,\sigma^2_1)\)</span> is the random effect of block <span class="math inline">\(l\)</span></li>
 <li><span class="math inline">\(\omega_{lm}\sim N(0,\sigma^2_2)\)</span> is the random effect of subject <span class="math inline">\(m\)</span> in block <span class="math inline">\(l\)</span></li>
 <li><span class="math inline">\(\nu_{jklm}\sim N(0,\sigma^2_3)\)</span> is the random effect of the Set <span class="math inline">\(j\)</span> and Media <span class="math inline">\(k\)</span> ordering for subject <span class="math inline">\(m\)</span> in block <span class="math inline">\(l\)</span></li>
 <li><span class="math inline">\(\gamma_l,\omega_{lm},\nu_{jklm}\)</span> are independent</li>
 </ul>
+<div class="fragment">
+<p>Note: estimation of <span class="math inline">\(\pi_{ijklm}\)</span> is resource extensive. For now, the following results exclude <span class="math inline">\(\nu_{jklm}\)</span>, thus assuming that charts were presented in a fully randomized order.</p>
+</div>
 </section>
+<section id="results-1" class="slide level2">
+<h2>Results</h2>
+<p>Excluding practice trials, there were 4,072 submissions. There was strong evidence of interaction between dataset, media type, and stimuli pair (p-value &lt; 0.0001).</p>
+</section>
+<section class="slide level2">
+
+
+<img data-src="index_files/figure-revealjs/fig-binom-1.png" width="960" class="r-stretch quarto-figure-center"><p class="caption">
+Figure&nbsp;16: LS Means of probabilities for correct answers to question 1.
+</p></section>
 <section id="ratio-estimation" class="slide level2">
 <h2>Ratio Estimation</h2>
 <p>Phrasing: “If the larger value you selected above represents 100 units, how many units is the smaller value?”</p>
-<p>Out of 4,856 responses, the 3,422 correct responses are used for ratio estimations.</p>
-<p>Responses</p>
+<p>Out of 4,072 responses, the 2,938 correct responses are used for ratio estimations.</p>
+<ul>
+<li>Remove practice trials</li>
+<li>Remove incorrect responses to Question 1</li>
+<li>Remove stimuli pair where values were the same</li>
+</ul>
+<aside class="notes">
+<p>This excludes practice trials, cases where the stimuli were the same values, and incorrect solutions to the first question.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+<div class="fragment">
+<p><strong>Responses</strong></p>
 <ul>
 <li>Directional error: <span class="math inline">\(\text{Estimated Percentage}-\text{True Percentage}\)</span></li>
 <li>Magnitude of error: <span class="math inline">\(|\text{Estimated Percentage}-\text{True Percentage}|\)</span></li>
 <li>Error rate: <span class="math inline">\(\frac{|\text{Estimated Percentage}-\text{True Percentage}|}{\text{True Percentage}}\)</span></li>
-<li><span class="citation" data-cites="cleveland1984">Cleveland and McGill (<a href="#/model-for-amount-of-time" role="doc-biblioref" onclick="">1984</a>)</span>: <span class="math inline">\(\log_2|\text{Estimated Percentage}-\text{True Percentage}+1/8|\)</span></li>
 </ul>
+</div>
+<div class="fragment">
+<p>Note: estimation of <span class="math inline">\(Y_{ijklm}\)</span> is resource extensive. For now, the following results exclude <span class="math inline">\(\nu_{jklm}\)</span>, thus assuming that charts were presented in a fully randomized order.</p>
+</div>
 </section>
-<section id="model-for-question-2" class="slide level2">
-<h2>Model for Question 2</h2>
+<section id="full-model-for-question-2" class="slide level2">
+<h2>Full Model for Question 2</h2>
 <p><span class="math display">\[
 Y_{ijklm}=\mu+P_i+S_j+M_k+(PS)_{ij}+(PM)_{ik}+(SM)_{jk} + (PSM)_{ijk}+\gamma_l+\omega_{lm} + \nu_{jklm} + \epsilon_{ijklm}
 \]</span></p>
 <p>where</p>
 <ul>
 <li><span class="math inline">\(\mu\)</span> is the overall intercept</li>
-<li><span class="math inline">\(P_i, S_j, M_k\)</span> are the effects of stimuli (P)air <span class="math inline">\(i\)</span>, data(S)et <span class="math inline">\(j\)</span>, and chart (M)edia <span class="math inline">\(k\)</span></li>
+<li><span class="math inline">\(P_i, S_j, M_k\)</span> are the effects of stimuli <strong>P</strong>air <span class="math inline">\(i\)</span>, data<strong>S</strong>et <span class="math inline">\(j\)</span>, and chart <strong>M</strong>edia <span class="math inline">\(k\)</span></li>
 <li><span class="math inline">\(\gamma_l\sim N(0,\sigma^2_1)\)</span> is the random effect of block <span class="math inline">\(l\)</span></li>
 <li><span class="math inline">\(\omega_{lm}\sim N(0,\sigma^2_2)\)</span> is the random effect of subject <span class="math inline">\(m\)</span> in block <span class="math inline">\(l\)</span></li>
 <li><span class="math inline">\(\nu_{jklm}\sim N(0,\sigma^2_3)\)</span> is the random effect of the Set <span class="math inline">\(j\)</span> and Media <span class="math inline">\(k\)</span> ordering for subject <span class="math inline">\(m\)</span> in block <span class="math inline">\(l\)</span></li>
 <li><span class="math inline">\(\epsilon_{ijklm}\sim N(0,\sigma^2_4)\)</span> is the residual error</li>
 <li><span class="math inline">\(\gamma_l,\omega_{lm},\nu_{jklm}, \epsilon_{ijklm}\)</span> are independent</li>
 </ul>
-</section>
-<section id="model-for-amount-of-time" class="slide level2 smaller scrollable">
-<h2>Model for Amount of Time</h2>
-<p><span class="math display">\[
-Y_{ijklm}=\mu+P_i+S_j+M_k+(PS)_{ij}+(PM)_{ik}+(SM)_{jk} + (PSM)_{ijk}+\gamma_l+\omega_{lm} + \nu_{jklm} + \epsilon_{ijklm}
-\]</span></p>
-<p>where</p>
+<aside class="notes">
 <ul>
-<li><span class="math inline">\(\mu\)</span> is the overall intercept</li>
-<li><span class="math inline">\(P_i, S_j, M_k\)</span> are the effects of stimuli (P)air <span class="math inline">\(i\)</span>, data(S)et <span class="math inline">\(j\)</span>, and chart (M)edia <span class="math inline">\(k\)</span></li>
-<li><span class="math inline">\(\gamma_l\sim N(0,\sigma^2_1)\)</span> is the random effect of block <span class="math inline">\(l\)</span></li>
-<li><span class="math inline">\(\omega_{lm}\sim N(0,\sigma^2_2)\)</span> is the random effect of subject <span class="math inline">\(m\)</span> in block <span class="math inline">\(l\)</span></li>
-<li><span class="math inline">\(\nu_{jklm}\sim N(0,\sigma^2_3)\)</span> is the random effect of the Set <span class="math inline">\(j\)</span> and Media <span class="math inline">\(k\)</span> ordering for subject <span class="math inline">\(m\)</span> in block <span class="math inline">\(l\)</span></li>
-<li><span class="math inline">\(\epsilon_{ijklm}\sim N(0,\sigma^2_4)\)</span> is the residual error</li>
-<li><span class="math inline">\(\gamma_l,\omega_{lm},\nu_{jklm}, \epsilon_{ijklm}\)</span> are independent</li>
+<li>Initial model fit in R to obtain covariance estimates</li>
+<li>Used <code>PROC GLIMMIX</code> with starting values obtained in R</li>
 </ul>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section>
+<section id="directional-error" class="slide level2">
+<h2>Directional Error</h2>
+<p><span class="math display">\[
+Y=\text{Estimated ratio}-\text{True ratio}
+\]</span></p>
+<table class="caption-top">
+<caption>Type III Tests of Fixed Effects</caption>
+<thead>
+<tr class="header">
+<th>Effect</th>
+<th>Num DF</th>
+<th>Den DF</th>
+<th>F Value</th>
+<th>Pr &gt; F</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>set</td>
+<td>1</td>
+<td>2725</td>
+<td>1.74</td>
+<td>0.1869</td>
+</tr>
+<tr class="even">
+<td>media</td>
+<td>2</td>
+<td>2725</td>
+<td>2.77</td>
+<td>0.0628</td>
+</tr>
+<tr class="odd">
+<td>pair_id</td>
+<td>7</td>
+<td>2725</td>
+<td>27.70</td>
+<td>&lt;.0001</td>
+</tr>
+<tr class="even">
+<td>set*pair_id</td>
+<td>7</td>
+<td>2725</td>
+<td>2.48</td>
+<td>0.0156</td>
+</tr>
+</tbody>
+</table>
+</section>
+<section class="slide level2">
+
+<div id="fig-q2-signed-media" class="quarto-layout-panel">
+<figure class="quarto-float quarto-float-fig">
+<div aria-describedby="fig-q2-signed-media-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<div class="quarto-layout-row">
+<div class="cell-output-display quarto-layout-cell-subref quarto-layout-cell" data-ref-parent="fig-q2-signed-media" style="flex-basis: 50.0%;justify-content: flex-start;">
+<div id="fig-q2-signed-media-1" class="quarto-float quarto-figure quarto-figure-center">
+<figure class="quarto-float quarto-subfloat-fig">
+<div aria-describedby="fig-q2-signed-media-1-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img data-src="index_files/figure-revealjs/fig-q2-signed-media-1.png" data-ref-parent="fig-q2-signed-media" width="960">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-subfloat-caption quarto-subfloat-fig" id="fig-q2-signed-media-1-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+(a) Estimate of LS Means
+</figcaption>
+</figure>
+</div>
+</div>
+<div class="cell-output-display quarto-layout-cell-subref quarto-layout-cell" data-ref-parent="fig-q2-signed-media" style="flex-basis: 50.0%;justify-content: flex-start;">
+<div id="fig-q2-signed-media-2" class="quarto-float quarto-figure quarto-figure-center">
+<figure class="quarto-float quarto-subfloat-fig">
+<div aria-describedby="fig-q2-signed-media-2-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img data-src="index_files/figure-revealjs/fig-q2-signed-media-2.png" data-ref-parent="fig-q2-signed-media" width="960">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-subfloat-caption quarto-subfloat-fig" id="fig-q2-signed-media-2-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+(b) Differences of LS Means
+</figcaption>
+</figure>
+</div>
+</div>
+</div>
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-q2-signed-media-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;17: Least Squares Estimates for signed error.
+</figcaption>
+</figure>
+</div>
+</section>
+<section class="slide level2">
+
+
+<img data-src="index_files/figure-revealjs/fig-signed-pair-ls-1.png" width="960" class="r-stretch quarto-figure-center"><p class="caption">
+Figure&nbsp;18: LS Means for dataset and stimuli pairs
+</p></section>
+<section class="slide level2">
+
+
+<img data-src="index_files/figure-revealjs/fig-signed-pval-1.png" width="960" class="r-stretch quarto-figure-center"><p class="caption">
+Figure&nbsp;19: P-values of differences of directional error for stimuli pairs.
+</p></section>
+<section id="magnitude-of-error" class="slide level2">
+<h2>Magnitude of Error</h2>
+<p><span class="math display">\[
+Y=|\text{Estimated ratio}-\text{True ratio}|
+\]</span></p>
+<p>Change to model:</p>
+<ul>
+<li><span class="math inline">\(y_{ijklm}|\gamma_l,\omega_{lm}\sim \text{Gamma}(\mu_{ijklm},\phi)\)</span></li>
+<li><span class="math inline">\(\eta_{ijklm}=\log(\mu_{ijklm})\)</span></li>
+</ul>
+<table class="caption-top">
+<caption>Type III Tests of Fixed Effects</caption>
+<thead>
+<tr class="header">
+<th>Effect</th>
+<th>Num DF</th>
+<th>Den DF</th>
+<th>F Value</th>
+<th>Pr &gt; F</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>set</td>
+<td>1</td>
+<td>2732</td>
+<td>1.62</td>
+<td>0.2028</td>
+</tr>
+<tr class="even">
+<td>media</td>
+<td>2</td>
+<td>2732</td>
+<td>18.54</td>
+<td>&lt;.0001</td>
+</tr>
+<tr class="odd">
+<td>pair_id</td>
+<td>7</td>
+<td>2732</td>
+<td>1.55</td>
+<td>0.1443</td>
+</tr>
+</tbody>
+</table>
+</section>
+<section class="slide level2">
+
+<div id="fig-q2-abs" class="quarto-layout-panel">
+<figure class="quarto-float quarto-float-fig">
+<div aria-describedby="fig-q2-abs-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<div class="quarto-layout-row">
+<div class="cell-output-display quarto-layout-cell-subref quarto-layout-cell" data-ref-parent="fig-q2-abs" style="flex-basis: 50.0%;justify-content: flex-start;">
+<div id="fig-q2-abs-1" class="quarto-float quarto-figure quarto-figure-center">
+<figure class="quarto-float quarto-subfloat-fig">
+<div aria-describedby="fig-q2-abs-1-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img data-src="index_files/figure-revealjs/fig-q2-abs-1.png" data-ref-parent="fig-q2-abs" width="960">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-subfloat-caption quarto-subfloat-fig" id="fig-q2-abs-1-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+(a) Estimate of LS Means
+</figcaption>
+</figure>
+</div>
+</div>
+<div class="cell-output-display quarto-layout-cell-subref quarto-layout-cell" data-ref-parent="fig-q2-abs" style="flex-basis: 50.0%;justify-content: flex-start;">
+<div id="fig-q2-abs-2" class="quarto-float quarto-figure quarto-figure-center">
+<figure class="quarto-float quarto-subfloat-fig">
+<div aria-describedby="fig-q2-abs-2-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img data-src="index_files/figure-revealjs/fig-q2-abs-2.png" data-ref-parent="fig-q2-abs" width="960">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-subfloat-caption quarto-subfloat-fig" id="fig-q2-abs-2-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+(b) Differences of LS Means
+</figcaption>
+</figure>
+</div>
+</div>
+</div>
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-q2-abs-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;20: Least Squares Estimates for magnitude of error.
+</figcaption>
+</figure>
+</div>
+</section>
+<section id="error-rate" class="slide level2">
+<h2>Error Rate</h2>
+<p><span class="math display">\[
+Y=\frac{|\text{Estimated Percentage}-\text{True Percentage}|}{\text{True Percentage}}
+\]</span></p>
+<p>Change to model:</p>
+<ul>
+<li><span class="math inline">\(y_{ijklm}|\gamma_l,\omega_{lm}\sim \text{Gamma}(\mu_{ijklm},\phi)\)</span></li>
+<li><span class="math inline">\(\eta_{ijklm}=\log(\mu_{ijklm})\)</span></li>
+</ul>
+<table class="caption-top">
+<caption>Type III Tests of Fixed Effects</caption>
+<thead>
+<tr class="header">
+<th>Effect</th>
+<th>Num DF</th>
+<th>Den DF</th>
+<th>F Value</th>
+<th>Pr &gt; F</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>set</td>
+<td>1</td>
+<td>2732</td>
+<td>1.62</td>
+<td>0.2026</td>
+</tr>
+<tr class="even">
+<td>media</td>
+<td>2</td>
+<td>2732</td>
+<td>18.55</td>
+<td>&lt;.0001</td>
+</tr>
+<tr class="odd">
+<td>pair_id</td>
+<td>7</td>
+<td>2732</td>
+<td>19.93</td>
+<td>&lt;.0001</td>
+</tr>
+</tbody>
+</table>
+</section>
+<section class="slide level2">
+
+<div id="fig-q2-rate" class="quarto-layout-panel">
+<figure class="quarto-float quarto-float-fig">
+<div aria-describedby="fig-q2-rate-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<div class="quarto-layout-row">
+<div class="cell-output-display quarto-layout-cell-subref quarto-layout-cell" data-ref-parent="fig-q2-rate" style="flex-basis: 50.0%;justify-content: flex-start;">
+<div id="fig-q2-rate-1" class="quarto-float quarto-figure quarto-figure-center">
+<figure class="quarto-float quarto-subfloat-fig">
+<div aria-describedby="fig-q2-rate-1-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img data-src="index_files/figure-revealjs/fig-q2-rate-1.png" data-ref-parent="fig-q2-rate" width="960">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-subfloat-caption quarto-subfloat-fig" id="fig-q2-rate-1-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+(a) Estimate of LS Means
+</figcaption>
+</figure>
+</div>
+</div>
+<div class="cell-output-display quarto-layout-cell-subref quarto-layout-cell" data-ref-parent="fig-q2-rate" style="flex-basis: 50.0%;justify-content: flex-start;">
+<div id="fig-q2-rate-2" class="quarto-float quarto-figure quarto-figure-center">
+<figure class="quarto-float quarto-subfloat-fig">
+<div aria-describedby="fig-q2-rate-2-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img data-src="index_files/figure-revealjs/fig-q2-rate-2.png" data-ref-parent="fig-q2-rate" width="960">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-subfloat-caption quarto-subfloat-fig" id="fig-q2-rate-2-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+(b) Differences of LS Means
+</figcaption>
+</figure>
+</div>
+</div>
+</div>
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-q2-rate-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;21: Least Squares Estimates for error rate.
+</figcaption>
+</figure>
+</div>
+</section>
+<section class="slide level2">
+
+
+<img data-src="index_files/figure-revealjs/unnamed-chunk-12-1.png" width="960" class="r-stretch"></section>
+<section class="slide level2">
+
+
+<img data-src="index_files/figure-revealjs/fig-error-rate-pval-1.png" width="960" class="r-stretch quarto-figure-center"><p class="caption">
+Figure&nbsp;22: P-values of differences of directional error for stimuli pairs.
+</p></section>
+<section id="amount-of-time" class="slide level2">
+<h2>Amount of Time</h2>
+
+<img data-src="index_files/figure-revealjs/fig-time-1.png" width="960" class="r-stretch quarto-figure-center"><p class="caption">
+Figure&nbsp;23: Distribution of time spent per question, between 0 and 60 seconds.
+</p></section>
+<section id="key-takeaways" class="slide level2">
+<h2>Key Takeaways</h2>
+<ol type="1">
+<li><p>Metrics of error are larger for 2D heat maps than for 3D heat maps</p>
+<ul>
+<li>Similar to other studies on informative 3D elements</li>
+</ul></li>
+<li><p>No statistically significant differences between digital and physical 3D heat charts</p></li>
+<li><p>Differences between stimuli pairs with same ratio was not statistically significant</p></li>
+<li></li>
+</ol>
+</section>
+<section id="future-work" class="slide level2">
+<h2>Future work?</h2>
+<ul>
+<li>Determine if some responses could be “flipped” (100-estimate). See <a href="#/fig-a5" class="quarto-xref">Figure&nbsp;28</a> as an example.</li>
+<li>Use a wider range of ratios (between 0 and 1)</li>
+<li>Include more traditional 3D heat maps</li>
+<li></li>
+</ul>
+</section></section>
+<section>
+<section id="thank-you" class="title-slide slide level1 center">
+<h1>Thank you!</h1>
+
+</section>
+<section id="references" class="slide level2 smaller scrollable">
+<h2>References</h2>
+<div id="refs" class="references csl-bib-body hanging-indent" data-entry-spacing="0" role="list">
+<div id="ref-3DPopulationDensity" class="csl-entry" role="listitem">
+<span>“<span>3D Population Density</span> of the <span>US</span> - <span>HomeArea</span>.com.”</span> n.d. https://www.homearea.com/featured/3d-population-density/#3128000. Accessed September 17, 2025.
+</div>
+<div id="ref-barfield1989" class="csl-entry" role="listitem">
+Barfield, Woodrow, and Robert Robless. 1989. <span>“The Effects of Two- or Three-Dimensional Graphics on the Problem-Solving Performance of Experienced and Novice Decision Makers.”</span> <em>Behaviour &amp; Information Technology</em> 8 (5): 369–85. <a href="https://doi.org/10.1080/01449298908914567">https://doi.org/10.1080/01449298908914567</a>.
+</div>
+<div id="ref-cleveland1984" class="csl-entry" role="listitem">
+Cleveland, William S., and Robert McGill. 1984. <span>“Graphical Perception: Theory, Experimentation, and Application to the Development of Graphical Methods.”</span> <em>Journal of the American Statistical Association</em> 79 (387): 531–54. <a href="https://doi.org/10.1080/01621459.1984.10478080">https://doi.org/10.1080/01621459.1984.10478080</a>.
+</div>
+<div id="ref-croxton1932" class="csl-entry" role="listitem">
+Croxton, Frederick E., and Harold Stein. 1932. <span>“Graphic Comparisons by Bars, Squares, Circles, and Cubes.”</span> <em>Journal of the American Statistical Association</em> 27 (177): 54–60. <a href="https://doi.org/10.1080/01621459.1932.10503227">https://doi.org/10.1080/01621459.1932.10503227</a>.
+</div>
+<div id="ref-national1977condition" class="csl-entry" role="listitem">
+for Educational Statistics, National Center, National Center for Education Statistics, United States. Office of Educational Research, Improvement. Center for Education Statistics, and Institute of Education Sciences (U.S.). 1977. <em>The Condition of Education</em>. 1975-1979: <span>DHEW</span> Publication. <span>U.S. Department of Education, Office of Educational Research and Improvement, National Center for Education Statistics</span>.
+</div>
+<div id="ref-kraus2020" class="csl-entry" role="listitem">
+Kraus, Matthias, Katrin Angerbauer, Juri Buchmüller, Daniel Schweitzer, Daniel A. Keim, Michael Sedlmair, and Johannes Fuchs. 2020. <span>“CHI ’20: CHI Conference on Human Factors in Computing Systems.”</span> In, 1–14. Honolulu HI USA: ACM. <a href="https://doi.org/10.1145/3313831.3376675">https://doi.org/10.1145/3313831.3376675</a>.
+</div>
+<div id="ref-volcano" class="csl-entry" role="listitem">
+R Core Team. 2024. <em>R: A Language and Environment for Statistical Computing</em>. Vienna, Austria: R Foundation for Statistical Computing. <a href="https://www.R-project.org/">https://www.R-project.org/</a>.
+</div>
+</div>
+</section></section>
+<section>
+<section id="appendix" class="title-slide slide level1 center">
+<h1>Appendix</h1>
+
+</section>
+<section class="slide level2">
+
+
+<img data-src="index_files/figure-revealjs/fig-a1-1.png" width="960" class="r-stretch quarto-figure-center"><p class="caption">
+Figure&nbsp;24: Distrubtion of absolute error by stimuli pair.
+</p></section>
+<section class="slide level2">
+
+
+<img data-src="index_files/figure-revealjs/fig-a2-1.png" width="960" class="r-stretch quarto-figure-center"><p class="caption">
+Figure&nbsp;25: Effect of slider starting position on abs(Error)
+</p></section>
+<section class="slide level2">
+
+
+<img data-src="index_files/figure-revealjs/fig-a3-1.png" width="960" class="r-stretch quarto-figure-center"><p class="caption">
+Figure&nbsp;26: Effect of time on abs(Error)
+</p></section>
+<section class="slide level2">
+
+
+<img data-src="index_files/figure-revealjs/fig-a4-1.png" width="960" class="r-stretch quarto-figure-center"><p class="caption">
+Figure&nbsp;27: Number of clicks on 3D digital plots.
+</p></section>
+<section class="slide level2">
+
+
+<img data-src="index_files/figure-revealjs/fig-a5-1.png" width="960" class="r-stretch quarto-figure-center"><p class="caption">
+Figure&nbsp;28: Distribution of correct and incorrect responses for pair_id = 5 (stimuli values are the same).
+</p></section>
+<section class="slide level2">
+
+<div class="cell">
+<div class="cell-output-display">
+<div id="fig-a6" class="quarto-float quarto-figure quarto-figure-center">
+<figure class="quarto-float quarto-float-fig">
+<div aria-describedby="fig-a6-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img data-src="index_files/figure-revealjs/fig-a6-1.png" width="960">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-a6-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;29: Distribution of correct and incorrect responses for ‘both values are the same’.
+</figcaption>
+</figure>
+</div>
+</div>
+</div>
 <div class="quarto-auto-generated-content">
 <p><img src="https://ucomm.unl.edu/sites/unl.edu.university-communication/files/styles/no_crop_960/public/media/image/nebraska-n.jpg?itok=sSPTwnWf" class="slide-logo"></p>
 <div class="footer footer-default">
 
-</div>
-</div>
-<div id="refs" class="references csl-bib-body hanging-indent" data-entry-spacing="0" role="list">
-<div id="ref-cleveland1984" class="csl-entry" role="listitem">
-Cleveland, William S., and Robert McGill. 1984. <span>“Graphical Perception: Theory, Experimentation, and Application to the Development of Graphical Methods.”</span> <em>Journal of the American Statistical Association</em> 79 (387): 531–54. <a href="https://doi.org/10.1080/01621459.1984.10478080">https://doi.org/10.1080/01621459.1984.10478080</a>.
 </div>
 </div>
 </section></section>
