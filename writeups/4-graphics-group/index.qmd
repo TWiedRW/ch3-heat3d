@@ -530,7 +530,6 @@ q1 <- results %>%
 
 Excluding practice trials, there were `r format(nrow(q1), big.mark=",")` submissions. There was strong evidence of interaction between dataset, media type, and stimuli pair (p-value < 0.0001).
 
----
 
 ```{r}
 #| label: fig-binom
@@ -580,11 +579,7 @@ This excludes practice trials, cases where the stimuli were the same values, and
 
 :::
 
-::: {.fragment}
 
-Note: estimation of $Y_{ijklm}$ is resource extensive. For now, the following results exclude $\nu_{jklm}$, thus assuming that charts were presented in a fully randomized order.
-
-:::
 
 ## Full Model for Question 2
 
@@ -602,6 +597,12 @@ where
 - $\epsilon_{ijklm}\sim N(0,\sigma^2_4)$ is the residual error
 - $\gamma_l,\omega_{lm},\nu_{jklm}, \epsilon_{ijklm}$ are independent
 
+
+::: {.fragment}
+
+Note: estimation of $Y_{ijklm}$ is resource extensive. For now, the following results exclude $\nu_{jklm}$, thus assuming that charts were presented in a fully randomized order.
+
+:::
 
 
 ::: {.notes}
@@ -938,7 +939,9 @@ results %>%
   
 ```
 
-## Key Takeaways
+## Conclusion
+
+### Key takeaways
 
 1. Metrics of error are larger for 2D heat maps than for 3D heat maps
 
@@ -948,15 +951,15 @@ results %>%
 
 3. Differences between stimuli pairs with same ratio was not statistically significant
 
-4. 
+:::{.fragment}
 
+### Future work?
 
-## Future work?
-
-- Determine if some responses could be "flipped" (100-estimate). See @fig-a5 as an example.
+- Determine if some responses could be "flipped" (100 - estimate). See @fig-a5 as an example.
 - Use a wider range of ratios (between 0 and 1)
 - Include more traditional 3D heat maps
-- 
+
+:::
 
 
 # Thank you! 

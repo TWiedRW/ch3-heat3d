@@ -812,9 +812,6 @@ Figure&nbsp;15: Percentage of correct answers by all treatment levels.
 <section id="results-1" class="slide level2">
 <h2>Results</h2>
 <p>Excluding practice trials, there were 4,072 submissions. There was strong evidence of interaction between dataset, media type, and stimuli pair (p-value &lt; 0.0001).</p>
-</section>
-<section class="slide level2">
-
 
 <img data-src="index_files/figure-revealjs/fig-binom-1.png" width="960" class="r-stretch quarto-figure-center"><p class="caption">
 Figure&nbsp;16: LS Means of probabilities for correct answers to question 1.
@@ -849,9 +846,6 @@ Figure&nbsp;16: LS Means of probabilities for correct answers to question 1.
 <li>Error rate: <span class="math inline">\(\frac{|\text{Estimated Percentage}-\text{True Percentage}|}{\text{True Percentage}}\)</span></li>
 </ul>
 </div>
-<div class="fragment">
-<p>Note: estimation of <span class="math inline">\(Y_{ijklm}\)</span> is resource extensive. For now, the following results exclude <span class="math inline">\(\nu_{jklm}\)</span>, thus assuming that charts were presented in a fully randomized order.</p>
-</div>
 </section>
 <section id="full-model-for-question-2" class="slide level2">
 <h2>Full Model for Question 2</h2>
@@ -868,6 +862,9 @@ Y_{ijklm}=\mu+P_i+S_j+M_k+(PS)_{ij}+(PM)_{ik}+(SM)_{jk} + (PSM)_{ijk}+\gamma_l+\
 <li><span class="math inline">\(\epsilon_{ijklm}\sim N(0,\sigma^2_4)\)</span> is the residual error</li>
 <li><span class="math inline">\(\gamma_l,\omega_{lm},\nu_{jklm}, \epsilon_{ijklm}\)</span> are independent</li>
 </ul>
+<div class="fragment">
+<p>Note: estimation of <span class="math inline">\(Y_{ijklm}\)</span> is resource extensive. For now, the following results exclude <span class="math inline">\(\nu_{jklm}\)</span>, thus assuming that charts were presented in a fully randomized order.</p>
+</div>
 <aside class="notes">
 <ul>
 <li>Initial model fit in R to obtain covariance estimates</li>
@@ -1167,8 +1164,9 @@ Figure&nbsp;22: P-values of differences of directional error for stimuli pairs.
 <img data-src="index_files/figure-revealjs/fig-time-1.png" width="960" class="r-stretch quarto-figure-center"><p class="caption">
 Figure&nbsp;23: Distribution of time spent per question, between 0 and 60 seconds.
 </p></section>
-<section id="key-takeaways" class="slide level2">
-<h2>Key Takeaways</h2>
+<section id="conclusion" class="slide level2">
+<h2>Conclusion</h2>
+<h3 id="key-takeaways">Key takeaways</h3>
 <ol type="1">
 <li><p>Metrics of error are larger for 2D heat maps than for 3D heat maps</p>
 <ul>
@@ -1176,17 +1174,16 @@ Figure&nbsp;23: Distribution of time spent per question, between 0 and 60 second
 </ul></li>
 <li><p>No statistically significant differences between digital and physical 3D heat charts</p></li>
 <li><p>Differences between stimuli pairs with same ratio was not statistically significant</p></li>
-<li></li>
 </ol>
-</section>
-<section id="future-work" class="slide level2">
-<h2>Future work?</h2>
+<div class="fragment">
+<!-- -->
+<h3 id="future-work">Future work?</h3>
 <ul>
-<li>Determine if some responses could be “flipped” (100-estimate). See <a href="#/fig-a5" class="quarto-xref">Figure&nbsp;28</a> as an example.</li>
+<li>Determine if some responses could be “flipped” (100 - estimate). See <a href="#/fig-a5" class="quarto-xref">Figure&nbsp;28</a> as an example.</li>
 <li>Use a wider range of ratios (between 0 and 1)</li>
 <li>Include more traditional 3D heat maps</li>
-<li></li>
 </ul>
+</div>
 </section></section>
 <section>
 <section id="thank-you" class="title-slide slide level1 center">
