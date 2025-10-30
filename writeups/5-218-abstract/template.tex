@@ -1,0 +1,63 @@
+% File SDSS2020_SampleExtendedAbstract.tex
+\documentclass[
+$for(classoption)$
+  $classoption$$sep$,
+$endfor$
+]{article}
+
+\usepackage{sdss2020} % Uses Times Roman font (either newtx or times package)
+\usepackage{url}
+\usepackage{latexsym}
+\usepackage{amsmath, amsthm, amsfonts}
+\usepackage{algorithm, algorithmic}
+\usepackage{graphicx}
+\usepackage{hyperref}
+
+\title{$title$ \\ \Large $subtitle$}
+
+\date{}
+
+\author{
+$for(author)$
+  $if(author.affiliation)$
+  $author.name$ \\
+  $for(author.affiliation)$
+    $author.affiliation$ \\
+  $endfor$
+  $if(author.email)$$author.email$\\$endif$
+  $endif$
+  $sep$\\\And
+$endfor$
+}
+
+$for(header-includes)$
+  $header-includes$
+$endfor$
+
+\begin{document}
+\maketitle
+
+\begin{abstract}
+$abstract$
+\end{abstract}
+$if(keywords)$
+  {\bf Keywords:} $keywords$
+$endif$
+
+
+$for(include-before)$
+$include-before$
+
+$endfor$
+
+$body$
+
+$for(include-after)$
+$include-after$
+
+$endfor$
+
+\bibliographystyle{sdss2020}
+\bibliography{$bibliography$}
+
+\end{document}
