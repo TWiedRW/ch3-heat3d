@@ -1,0 +1,436 @@
+% Options for packages loaded elsewhere
+\PassOptionsToPackage{unicode}{hyperref}
+\PassOptionsToPackage{hyphens}{url}
+\PassOptionsToPackage{dvipsnames,svgnames,x11names}{xcolor}
+%
+\documentclass[
+  10,
+  twocolumn]{article}
+
+\usepackage{amsmath,amssymb}
+\usepackage{iftex}
+\ifPDFTeX
+  \usepackage[T1]{fontenc}
+  \usepackage[utf8]{inputenc}
+  \usepackage{textcomp} % provide euro and other symbols
+\else % if luatex or xetex
+  \usepackage{unicode-math}
+  \defaultfontfeatures{Scale=MatchLowercase}
+  \defaultfontfeatures[\rmfamily]{Ligatures=TeX,Scale=1}
+\fi
+\usepackage{lmodern}
+\ifPDFTeX\else  
+    % xetex/luatex font selection
+\fi
+% Use upquote if available, for straight quotes in verbatim environments
+\IfFileExists{upquote.sty}{\usepackage{upquote}}{}
+\IfFileExists{microtype.sty}{% use microtype if available
+  \usepackage[]{microtype}
+  \UseMicrotypeSet[protrusion]{basicmath} % disable protrusion for tt fonts
+}{}
+\makeatletter
+\@ifundefined{KOMAClassName}{% if non-KOMA class
+  \IfFileExists{parskip.sty}{%
+    \usepackage{parskip}
+  }{% else
+    \setlength{\parindent}{0pt}
+    \setlength{\parskip}{6pt plus 2pt minus 1pt}}
+}{% if KOMA class
+  \KOMAoptions{parskip=half}}
+\makeatother
+\usepackage{xcolor}
+\setlength{\emergencystretch}{3em} % prevent overfull lines
+\setcounter{secnumdepth}{-\maxdimen} % remove section numbering
+% Make \paragraph and \subparagraph free-standing
+\makeatletter
+\ifx\paragraph\undefined\else
+  \let\oldparagraph\paragraph
+  \renewcommand{\paragraph}{
+    \@ifstar
+      \xxxParagraphStar
+      \xxxParagraphNoStar
+  }
+  \newcommand{\xxxParagraphStar}[1]{\oldparagraph*{#1}\mbox{}}
+  \newcommand{\xxxParagraphNoStar}[1]{\oldparagraph{#1}\mbox{}}
+\fi
+\ifx\subparagraph\undefined\else
+  \let\oldsubparagraph\subparagraph
+  \renewcommand{\subparagraph}{
+    \@ifstar
+      \xxxSubParagraphStar
+      \xxxSubParagraphNoStar
+  }
+  \newcommand{\xxxSubParagraphStar}[1]{\oldsubparagraph*{#1}\mbox{}}
+  \newcommand{\xxxSubParagraphNoStar}[1]{\oldsubparagraph{#1}\mbox{}}
+\fi
+\makeatother
+
+
+\providecommand{\tightlist}{%
+  \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}\usepackage{longtable,booktabs,array}
+\usepackage{calc} % for calculating minipage widths
+% Correct order of tables after \paragraph or \subparagraph
+\usepackage{etoolbox}
+\makeatletter
+\patchcmd\longtable{\par}{\if@noskipsec\mbox{}\fi\par}{}{}
+\makeatother
+% Allow footnotes in longtable head/foot
+\IfFileExists{footnotehyper.sty}{\usepackage{footnotehyper}}{\usepackage{footnote}}
+\makesavenoteenv{longtable}
+\usepackage{graphicx}
+\makeatletter
+\def\maxwidth{\ifdim\Gin@nat@width>\linewidth\linewidth\else\Gin@nat@width\fi}
+\def\maxheight{\ifdim\Gin@nat@height>\textheight\textheight\else\Gin@nat@height\fi}
+\makeatother
+% Scale images if necessary, so that they will not overflow the page
+% margins by default, and it is still possible to overwrite the defaults
+% using explicit options in \includegraphics[width, height, ...]{}
+\setkeys{Gin}{width=\maxwidth,height=\maxheight,keepaspectratio}
+% Set default figure placement to htbp
+\makeatletter
+\def\fps@figure{htbp}
+\makeatother
+% definitions for citeproc citations
+\NewDocumentCommand\citeproctext{}{}
+\NewDocumentCommand\citeproc{mm}{%
+  \begingroup\def\citeproctext{#2}\cite{#1}\endgroup}
+\makeatletter
+ % allow citations to break across lines
+ \let\@cite@ofmt\@firstofone
+ % avoid brackets around text for \cite:
+ \def\@biblabel#1{}
+ \def\@cite#1#2{{#1\if@tempswa , #2\fi}}
+\makeatother
+\newlength{\cslhangindent}
+\setlength{\cslhangindent}{1.5em}
+\newlength{\csllabelwidth}
+\setlength{\csllabelwidth}{3em}
+\newenvironment{CSLReferences}[2] % #1 hanging-indent, #2 entry-spacing
+ {\begin{list}{}{%
+  \setlength{\itemindent}{0pt}
+  \setlength{\leftmargin}{0pt}
+  \setlength{\parsep}{0pt}
+  % turn on hanging indent if param 1 is 1
+  \ifodd #1
+   \setlength{\leftmargin}{\cslhangindent}
+   \setlength{\itemindent}{-1\cslhangindent}
+  \fi
+  % set entry spacing
+  \setlength{\itemsep}{#2\baselineskip}}}
+ {\end{list}}
+\usepackage{calc}
+\newcommand{\CSLBlock}[1]{\hfill\break\parbox[t]{\linewidth}{\strut\ignorespaces#1\strut}}
+\newcommand{\CSLLeftMargin}[1]{\parbox[t]{\csllabelwidth}{\strut#1\strut}}
+\newcommand{\CSLRightInline}[1]{\parbox[t]{\linewidth - \csllabelwidth}{\strut#1\strut}}
+\newcommand{\CSLIndent}[1]{\hspace{\cslhangindent}#1}
+
+\makeatletter
+\@ifpackageloaded{caption}{}{\usepackage{caption}}
+\AtBeginDocument{%
+\ifdefined\contentsname
+  \renewcommand*\contentsname{Table of contents}
+\else
+  \newcommand\contentsname{Table of contents}
+\fi
+\ifdefined\listfigurename
+  \renewcommand*\listfigurename{List of Figures}
+\else
+  \newcommand\listfigurename{List of Figures}
+\fi
+\ifdefined\listtablename
+  \renewcommand*\listtablename{List of Tables}
+\else
+  \newcommand\listtablename{List of Tables}
+\fi
+\ifdefined\figurename
+  \renewcommand*\figurename{Figure}
+\else
+  \newcommand\figurename{Figure}
+\fi
+\ifdefined\tablename
+  \renewcommand*\tablename{Table}
+\else
+  \newcommand\tablename{Table}
+\fi
+}
+\@ifpackageloaded{float}{}{\usepackage{float}}
+\floatstyle{ruled}
+\@ifundefined{c@chapter}{\newfloat{codelisting}{h}{lop}}{\newfloat{codelisting}{h}{lop}[chapter]}
+\floatname{codelisting}{Listing}
+\newcommand*\listoflistings{\listof{codelisting}{List of Listings}}
+\makeatother
+\makeatletter
+\makeatother
+\makeatletter
+\@ifpackageloaded{caption}{}{\usepackage{caption}}
+\@ifpackageloaded{subcaption}{}{\usepackage{subcaption}}
+\makeatother
+
+\ifLuaTeX
+  \usepackage{selnolig}  % disable illegal ligatures
+\fi
+\usepackage{bookmark}
+
+\IfFileExists{xurl.sty}{\usepackage{xurl}}{} % add URL line breaks if available
+\urlstyle{same} % disable monospaced font for URLs
+\hypersetup{
+  pdftitle={This is the title},
+  colorlinks=true,
+  linkcolor={blue},
+  filecolor={Maroon},
+  citecolor={Blue},
+  urlcolor={Blue},
+  pdfcreator={LaTeX via pandoc}}
+
+
+\title{This is the title}
+\author{}
+\date{}
+
+\begin{document}
+\maketitle
+\begin{abstract}
+Heat maps are a common data visualization display when evaluating a
+continuous response across two predictor variables. Typical
+presentations of heat maps are in two-dimensional formats, relying on
+color to convey the response. With advances in computer graphics and
+physical renderings, we are able to convert heat maps into three
+dimensional representations, using height to represent the response
+variable. However, the dimensionality of heat maps for the use of
+conveying statistical information has not been widely studied. In this
+paper, we outline an experiment for comparing the digital and physical
+dimensionality of heat maps using 2D and 3D representations, using
+3D-printed heat maps to evaluate
+\end{abstract}
+
+
+\textbf{Keywords:} graphics, heat maps, 3D-printed charts
+
+\section{Introduction}\label{introduction}
+
+In the 20th century, advancements in technology made data visualizations
+increasingly more affordable and accessible to a broader population. The
+primary change in formal data visualizations was from hand-crafted
+charts to computer-rendered charts (Tukey 1965), yet other technological
+advances have allowed for data visualizations to enter other mediums.
+These include the ability to effectively use the 3-dimensional (3D)
+world around us with the novel use of 3D-printed charts. This newer type
+of visualization has gained a small amount of traction in recent years
+as a method of producing tangible charts.
+
+Current literature is mainly limited to 2D projections of 3D charts,
+comparisons of 2D and 3D charts show mixed results. In 2D projections,
+this is mainly attributed to the purpose of the depth cues in 3D charts.
+When the increased dimensionality does not include additional
+information, information extraction tends to be worse for 3D charts than
+2D charts (Zacks et al. 1998). However, the inclusion of information in
+the depth axis tends to lower error rates of numerical estimations and
+increase memorability of results (Barfield and Robless 1989; Jeong et
+al. 2025). These discrepancies suggest that 3D charts have situational
+use cases where they can outperform the delivery of statistical
+information of other types of charts.
+
+When depth is used for conveying information, we hypothesize that the
+benefits observed from 2D displays of 3D charts will increase for charts
+rendered in our 3D world. Our study partially replicates the proceedure
+of well-known statistical studies in data visualizations and is designed
+to provide some of the initial insights on 3D-printing for visualizing
+data.
+
+\section{Methods}\label{methods}
+
+Our study is designed to evaluate and expand the literature on numerical
+estimation of ratios for 3D charts. To accommodate discrepancies with
+perceived magnitudes of heights and volumes (Stevens and Stevens 1986;
+Cleveland and McGill 1984), we use the method of constant stimuli for
+selecting values to be used for ratio estimations. All stimuli pairs are
+placed onto a single heat maps to reduce the number of 3D-printed charts
+required.
+
+\subsection{Selection of Stimuli
+Values}\label{selection-of-stimuli-values}
+
+Stimuli values are chosen so that the constant stimuli is at 50 units.
+We set the maximum stimuli at 90 units and equally partition the ratios
+between \(50/90\approx 0.56\) and \(50/50=1\) to get stimuli values
+between 50 units and 90 units, giving ratios of 0.56, 0.67, 0.78, and
+0.89. We then set 50 units as the maximum value and use the same ratios
+to obtain stimuli values that are less than 50 units. Additionally, we
+include a stimuli pair where both values are the same, resulting in 9
+total pairs of stimuli.
+
+The heat map was controlled to be a square grid across \(X\) and \(Y\)
+coordinates, where \(X=1,2,\dots,10\) and \(Y=1,2,\dots 10\). Randomized
+values are generated using a mixture distribution of a uniform
+distribution and the formula of a half-sphere centered on the heat map
+coordinate grid, given by:
+
+\[
+Z=c\cdot U(0, 100)+(1-c)\cdot g(f_i(X,Y))
+\]
+
+where
+
+\begin{itemize}
+\tightlist
+\item
+  \(g(Z)=100\cdot\frac{Z-\min(Z)}{\max(Z)-\min(Z)}\)
+\item
+  \(f_1(X,Y)=\sqrt{7^2-(X-\bar{X})-(Y-\bar{Y})}\)
+\item
+  \(f_2(X,Y)=\sqrt{7^2-(X-\bar{X})+(Y-\bar{Y})}\)
+\item
+  \(c=0.3\)
+\end{itemize}
+
+Placement of the controlled stimuli values was performed via simulation
+to try and make their placement look as natural as possible. The
+non-constant stimuli is initially placed on the coordinate that
+minimizes the difference between the randomly generated value and the
+stimuli. Then the constant stimuli is placed on a coordinate within 3 or
+4 grid units away from the non-constant stimuli that minimizes the
+difference between the randomized value and the constant stimuli. Twenty
+heat maps were generated for each \(f_i\) and Chi-squared tests were
+used to select the heat map where stimuli values were reasonably
+distributed across the coordinate grid.
+
+\subsection{Chart types}\label{chart-types}
+
+We considered three types of charts in our experiment: 2D-digital (2dd),
+3D-digital (3dd), and 3D-printed (3dp). We used the 3dp chart as a
+baseline for the construction of 2dd and 3dd charts. The 3dp chart was
+designed so that each tile is 1 centimeter\textsuperscript{2} with a
+maximum height of 10-centimeters. We printed these charts with either
+solid or gradient filaments. The print files for 3dp charts were
+converted into WebGL displays (Murdoch and Adler 2023), creating exact
+one-to-one digital displays of the 3dp charts. Without a direct mapping
+of color to height, we designed the 2dd chart to have a gradient fill
+that mirrored the lighting conditions of our initial 3dp charts,
+interpolated with the \texttt{scale\_fill\_gradient()} function from the
+ggplot2 package (Wickham 2016) using \#0C2841 and \#66D9FF as the color
+range.
+
+\begin{figure}
+
+\begin{minipage}{0.33\linewidth}
+
+\centering{
+
+\includegraphics{images/examp2dd.png}
+
+}
+
+\subcaption{\label{fig-2dd}2dd}
+
+\end{minipage}%
+%
+\begin{minipage}{0.33\linewidth}
+
+\centering{
+
+\includegraphics{images/examp3dd.png}
+
+}
+
+\subcaption{\label{fig-2dd}3dd}
+
+\end{minipage}%
+%
+\begin{minipage}{0.33\linewidth}
+
+\centering{
+
+\includegraphics{images/examp3dp.png}
+
+}
+
+\subcaption{\label{fig-2dd}3dp}
+
+\end{minipage}%
+
+\caption{\label{fig-charts}Chart types representing data set 1.}
+
+\end{figure}%
+
+\subsection{Experimental Design}\label{experimental-design}
+
+With a completely randomized design, participants would complete 54
+trials (3 chart types × 9 stimuli pairs × 2 data sets). Instead, we
+opted for a balanced incomplete block design to hopefully reduce the
+effects contributed by fatigue, using 4 of the 9 stimuli pairs for each
+participant to construct the blocks. This results in 24 trials per
+participant, which hopefully improved the overall quality of the
+responses. Trials were presented in a randomized order of chart type ×
+data set, where all four stimuli pairs were presented in a randomized
+order before moving onto the next chart type × data set.
+
+Following the seminal work of Cleveland and McGill (1984) in data
+visualization practices, we asked participants two modified questions
+for each trial. The first question asked participants which value in the
+identified stimuli pair is larger. This question served as an attention
+check to determine if the participant was correctly following the
+instructions for their ratio estimation. The second question asked
+participants to use a slider to estimate the quantity of the smaller
+value if the larger value in the stimuli pair represented 100 units.
+Ratio estimations take the form of \(A/B\), where \(A\leq B\).
+
+\section{Discussion}\label{discussion}
+
+In this paper, we described an experiment that explores the relationship
+of the physical dimensionality in renderings of heat maps. While 2D
+displays of 2D and 3D data visualizations have been widely explored, our
+work contributes to the broader understanding of physical dimensionality
+of 2D and 3D charts. At the conclusion of the study, we will release a
+repository to encourage replication and sharing of experimental results.
+
+\phantomsection\label{refs}
+\begin{CSLReferences}{1}{0}
+\bibitem[\citeproctext]{ref-barfieldEffectsTwoThreedimensional1989}
+Barfield, Woodrow, and Robert Robless. 1989. {``The Effects of Two- or
+Three-Dimensional Graphics on the Problem-Solving Performance of
+Experienced and Novice Decision Makers.''} \emph{Behaviour \&
+Information Technology} 8 (5): 369--85.
+\url{https://doi.org/10.1080/01449298908914567}.
+
+\bibitem[\citeproctext]{ref-cleveland1984}
+Cleveland, William S., and Robert McGill. 1984. {``Graphical Perception:
+Theory, Experimentation, and Application to the Development of Graphical
+Methods.''} \emph{Journal of the American Statistical Association} 79
+(387): 531--54. \url{https://doi.org/10.1080/01621459.1984.10478080}.
+
+\bibitem[\citeproctext]{ref-jeongComparativeStudy2D2025}
+Jeong, Jongwook, Ayoung Choi, Dongwoo Kang, and Youn Kyu Lee. 2025. {``A
+Comparative Study of {2D} Vs. {3D} Chart Visualizations in Virtual
+Reality.''} \emph{Journal of Visualization} 28 (1): 239--53.
+\url{https://doi.org/10.1007/s12650-024-01033-6}.
+
+\bibitem[\citeproctext]{ref-rgl}
+Murdoch, Duncan, and Daniel Adler. 2023. \emph{Rgl: 3D Visualization
+Using OpenGL}.
+
+\bibitem[\citeproctext]{ref-stevens1986}
+Stevens, S. S., and Geraldine Stevens. 1986. \emph{Psychophysics:
+Introduction to Its Perceptual, Neural, and Social Prospects}. New
+Brunswick, U.S.A: Transaction Books.
+
+\bibitem[\citeproctext]{ref-tukey1965}
+Tukey, John W. 1965. {``The Technical Tools of Statistics.''} \emph{The
+American Statistician} 19 (2): 23--28.
+\url{https://doi.org/10.2307/2682374}.
+
+\bibitem[\citeproctext]{ref-ggplot2}
+Wickham, Hadley. 2016. {``Ggplot2: Elegant Graphics for Data
+Analysis.''} \url{https://ggplot2.tidyverse.org}.
+
+\bibitem[\citeproctext]{ref-zacks1998}
+Zacks, Jeff, Ellen Levy, Barbara Tversky, and Diane J. Schiano. 1998.
+{``Reading Bar Graphs: Effects of Extraneous Depth Cues and Graphical
+Context.''} \emph{Journal of Experimental Psychology: Applied} 4 (2):
+119--38. \url{https://doi.org/10.1037/1076-898X.4.2.119}.
+
+\end{CSLReferences}
+
+
+
+
+\end{document}

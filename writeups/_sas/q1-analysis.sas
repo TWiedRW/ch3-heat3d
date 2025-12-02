@@ -1,6 +1,6 @@
 /* Import CSV (DBMS=CSV). Use GETNAMES= to read header row; GUESSINGROWS to improve type detection */
 proc import
-     datafile="C:\Users\twied\Documents\R Directory\dissertation\ch3-heat3d\writeups\_data\stat218fall2025.csv"
+     datafile="C:\Users\cwied\OneDrive - University of Nebraska-Lincoln\4 - Obsidian Vault\Research\dissertation\ch3-heat3d\writeups\_data\stat218fall2025.csv"
      out= work.results
      dbms=csv
      replace;
@@ -19,29 +19,26 @@ run;
 *proc print data=work.results (obs=10); run;  /* Print first 10 observations to verify data */
 
 /* Right or wrong */
-ods word file="C:\Users\twied\Documents\R Directory\dissertation\ch3-heat3d\writeups\_sas\q1-analysis.docx";
-proc glimmix data=work.results pconv=1e-6 method=laplace nobound;
+ods pdf file="C:\Users\cwied\OneDrive - University of Nebraska-Lincoln\4 - Obsidian Vault\Research\dissertation\ch3-heat3d\writeups\_sas\q1-analysis-all-fixed.pdf";
+proc glimmix data=work.results pconv=1e-6 method=laplace;
     where set ^= "practice";
     class block user_id set media pair_id;
-    model q1 = set|media|pair_id  / solution dist=binomial link=logit;
-    random block;
-    random block*user_id;
-    random block*user_id*set*media;
-    lsmeans set*media*pair_id  / diff adjust=tukey cl;
-    parms (0)(3.1)(0.91);
+    model q1 = set|media|pair_id  / solution dist=binomial link=logit; 
+    *random intercept user_id  / subject=block;
+    lsmeans set*media*pair_id / diff slicediff=(pair_id*set) adjust=tukey cl ilink;
     nloptions gconv=1e-6 maxiter=100;
     ods output lsmeans=lsmeans diffs=diffs;
 run;
-ods word close;
+ods pdf close;
 
 proc export data=lsmeans
-    outfile="C:\Users\twied\Documents\R Directory\dissertation\ch3-heat3d\writeups\_sas\q1-lsmeans.csv"
+    outfile="C:\Users\cwied\OneDrive - University of Nebraska-Lincoln\4 - Obsidian Vault\Research\dissertation\ch3-heat3d\writeups\_sas\q1-lsmeans-all-fixed.csv"
     dbms=csv
     replace;
 run;
 
 proc export data=diffs
-    outfile="C:\Users\twied\Documents\R Directory\dissertation\ch3-heat3d\writeups\_sas\q1-diffs.csv"
+    outfile="C:\Users\cwied\OneDrive - University of Nebraska-Lincoln\4 - Obsidian Vault\Research\dissertation\ch3-heat3d\writeups\_sas\q1-diffs-all-fixed.csv"
     dbms=csv
     replace;
 run;    

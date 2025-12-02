@@ -1,7 +1,5 @@
 ---
-title: "This is the title"
-abstract: |
-  Heat maps are a common data visualization technique for evaluating a continuous response across two predictor variables. Typical presentations of heat maps are in two-dimensional formats, relying on color to convey the response. With advances in computer graphics and physical renderings, we are able to convert heat maps into three-dimensional representations, using height to represent the response variable. However, the dimensionality of heat maps for conveying statistical information has not been widely studied. In this paper, we outline an experiment for comparing the digital and physical dimensionality of heat maps using 2D and 3D representations. 
+title: "Heat to Height: A study on the physical dimensionality of heat maps"
 format:
   typst: 
     columns: 2
@@ -12,6 +10,8 @@ bibliography: references.bib
 bibliographystyle: apa
 execute: 
   echo: false
+  warning: false
+  message: false
 ---
 
 ```{r}
@@ -23,23 +23,112 @@ library(tidyverse)
 
 # Introduction
 
-In the 20th century, advancements in technology made data visualizations increasingly more affordable and accessible to a broader population. The primary change in formal data visualizations was from hand-crafted charts to computer-rendered charts [@tukey1965], yet other technological advances have allowed data visualizations to enter other mediums. These include the ability to effectively use the three-dimensional (3D) world around us with the novel use of 3D-printed charts. This newer type of visualization has gained traction in recent years as a method of producing tangible charts.
+In the 20th century, advancements in technology made data visualizations increasingly more affordable and accessible to a broader population. The primary change in the construction of data visualizations was from hand-crafted charts to computer-rendered charts [@tukey1965], yet other technological advances have allowed data visualizations to enter other mediums. These include the ability to effectively use the three-dimensional (3D) world around us with the novel use of 3D-printed charts. This newer type of visualization has gained traction in recent years as a method of producing tangible charts.
 
-Current literature on data visualization practices is mainly limited to 2D projections of 3D charts, where comparisons of 2D and 3D charts show mixed results. In 2D projections, this is mainly attributed to the purpose of the depth cues in 3D charts. When the increased dimensionality does not include additional information, information extraction tends to be worse for 3D charts than for 2D charts [@zacks1998]. However, the inclusion of information in the depth axis tends to lower error rates in numerical estimations and increase memorability of results [@barfieldEffectsTwoThreedimensional1989; @jeongComparativeStudy2D2025]. These discrepancies suggest that 3D charts have situational use cases where they can outperform other types of charts in delivering statistical information.
+Current literature on data visualization practices is mainly limited to 2D projections of charts, where comparisons of 2D and 3D charts show mixed results. In 2D projections, this is mainly attributed to the purpose of the depth cues in 3D charts. When the increased dimensionality does not include additional information, information extraction tends to be worse for 3D charts than for 2D charts [@zacks1998]. However, the inclusion of information in the depth axis tends to lower error rates in numerical estimations and increase memorability of results [@barfieldEffectsTwoThreedimensional1989; @jeongComparativeStudy2D2025]. These discrepancies suggest that 3D charts have situational use cases where they can outperform other types of charts in delivering statistical information.
 
-Using 3D printing, we are able to explore how the physical dimensionality of charts affects the extraction of numerical information from statistical graphics. We hypothesize that 3D-printed heat maps will outperform 2D and digitally rendered 3D heat maps in numerical estimations of stimuli ratios. 
+For continuous responses with two predictor variables, heat maps are a common type of data visualization display. Typical presentations of heat maps are in two-dimensional formats, relying on color to convey the response variable. When presented in three dimensions, heat maps use height to map the response, sometimes with the inclusion of color. Using 3D printing, we are able to explore how the physical dimensionality of charts affects the extraction of numerical information from statistical graphics. We hypothesize that 3D-printed heat maps will outperform 2D and digitally rendered 3D heat maps in numerical estimations of stimuli ratios. 
 
 # Methods
 
-Our study is designed to evaluate and expand the literature on numerical estimation of ratios for 3D charts. To accommodate discrepancies with perceived magnitudes of heights and volumes [@stevens1986; @cleveland1984], we use the method of constant stimuli for selecting values to be used for ratio estimations. All stimuli pairs are placed onto a single heat maps to reduce the number of 3D-printed charts required in the study.
+Our study is designed to evaluate and expand the literature on numerical estimation of ratios for 3D charts. To accommodate discrepancies with perceived magnitudes of heights and volumes [@stevens1986; @cleveland1984], we used the method of constant stimuli for selecting values to be used for ratio estimations. All stimuli pairs are placed onto a single heat maps to reduce the number of 3D-printed charts required in the study.
 
 ## Selection of Stimuli Values
 
-Stimuli values are chosen so that the constant stimulus is at 50 units. We set the maximum stimulus at 90 units and equally partition the ratios between $50/90\approx 0.56$ and $50/50=1$ to get stimuli values between 50 units and 90 units, giving ratios of 0.56, 0.67, 0.78, and 0.89. We then set 50 units as the maximum value and use the same ratios to obtain stimuli values that are less than 50 units. Additionally, we include a stimulus pair where both values are the same, resulting in 9 total pairs of stimuli.
+Stimuli values are chosen so that the constant stimuli is at 50 units. We set the maximum stimuli at 90 units and equally partition the ratios between $50/90\approx 0.56$ and $50/50=1$ to get stimuli values between 50 units and 90 units, giving ratios of 0.56, 0.67, 0.78, and 0.89. We then set 50 units as the maximum value and use the same ratios to obtain stimuli values that are less than 50 units. Additionally, we include a stimuli pair where both values are the same, resulting in 9 total pairs of stimuli.
 
-The heat map was controlled to be a square grid across $X$ and $Y$ coordinates, where $X=1,2,\dots,10$ and $Y=1,2,\dots,10$. We initially randomized all values in the heat map using a mixture distribution of a uniform distribution and a specified function. Two heat maps data sets were created using this mixture distribution. The first data set used the formula for the top half of a sphere that was centered on the heat map coordinate grid. The second data set is similarly defined using the function for the bottom half of a sphere. 
+Each heat map consists of a 10×10 grid with values generated from the mixture of a uniform distribution and spherical functions. Two data sets were created to representing the top and bottom halves of a sphere centered on the coordinate grid. Stimuli pairs were placed via simulation to appear natural while maintaining appropriate spacing and distribution across the grid.
 
-Placement of the controlled stimuli values was performed via simulation to make their appearance look as natural as possible. For each stimuli pair, the non-constant stimuli was placed on the coordinate that minimized the difference between the randomly generated value and the non-constant stimuli value. Then the constant stimuli was placed on a coordinate within 3 or 4 grid units away from the non-constant stimuli that minimized the difference between the constant stimuli value and the randomly generated value. Twenty heat maps were generated for each heat map data set, and Chi-squared tests were used to select the heat map where stimuli values were reasonably distributed across the coordinate grid.
+```{r}
+#| echo: false
+#| eval: false
+#| include: false
+load('../../data/data1.rda')
+load('../../data/data2.rda')
+
+data1 <- data1 %>% mutate(show = ifelse(!is.na(pair_id), 1, 0))
+data2 <- data2 %>% mutate(show = ifelse(!is.na(pair_id), 1, 0))
+
+```
+
+```{python}
+#| eval: false
+#| include: false
+#| echo: false
+
+import numpy as np
+import matplotlib.pyplot as plt
+from mpl_toolkits.mplot3d import Axes3D
+
+# Data
+x = r.data1['x']
+y = r.data1['y']
+z = np.zeros_like(x)
+dz = r.data1['z']
+
+# Suppose this determines transparency (1 = visible, 0 = transparent)
+show = r.data1['show']
+
+# Base color (e.g., blue) with varying alpha
+colors = [(26/256, 128/256, 187/256, 1.0 if s else 0.1) for s in show]
+
+fig = plt.figure(figsize=(6, 6))
+ax = fig.add_subplot(111, projection='3d')
+
+ax.bar3d(x, y, z, dx=0.8, dy=0.8, dz=dz, color=colors, shade=True)
+ax.set_xlabel('X')
+ax.set_ylabel('Y')
+ax.set_zlabel('Z')
+ax.set_zlim(0,100)
+
+plt.tight_layout()
+plt.savefig("images/stimuli-set1.png")  # PDF-friendly export
+plt.show()
+```
+
+```{python}
+#| eval: false
+#| include: false
+#| echo: false
+
+import numpy as np
+import matplotlib.pyplot as plt
+from mpl_toolkits.mplot3d import Axes3D
+
+# Data
+x = r.data2['x']
+y = r.data2['y']
+z = np.zeros_like(x)
+dz = r.data2['z']
+
+# Suppose this determines transparency (1 = visible, 0 = transparent)
+show = r.data2['show']
+
+# Base color (e.g., blue) with varying alpha
+colors = [(26/256, 128/256, 187/256, 1.0 if s else 0.1) for s in show]
+
+fig = plt.figure(figsize=(6, 6))
+ax = fig.add_subplot(111, projection='3d')
+
+ax.bar3d(x, y, z, dx=0.8, dy=0.8, dz=dz, color=colors, shade=True)
+ax.set_xlabel('X')
+ax.set_ylabel('Y')
+ax.set_zlabel('Z')
+ax.set_zlim(0,100)
+
+plt.tight_layout()
+plt.savefig("images/stimuli-set2.png")  # PDF-friendly export
+plt.show()
+```
+
+:::{#fig-stimuli-placement layout-ncol=2}
+
+![Data set 1](images/stimuli-set1.png){#fig-set1}
+
+![Data set 2](images/stimuli-set2.png){#fig-set2}
+
+Placement of stimuli in the heat map data sets. Transparent bars represent randomized values.
+:::
 
 ## Chart types
 
@@ -47,23 +136,67 @@ We considered three types of charts in our experiment: 2D-digital (2dd), 3D-digi
 
 :::{#fig-charts layout-ncol=3}
 
-![2dd](images/examp2dd.png){#fig-2dd height=1in}
+![2D Digital](images/examp2dd.png){#fig-2dd height=1in}
 
-![3dd](images/examp3dd.png){#fig-3dd height=1in}
+![3D Digital](images/examp3dd.png){#fig-3dd height=1in}
 
-![3dp](images/examp3dp.png){#fig-3dp height=1in}
+![3D Printed](images/examp3dp.png){#fig-3dp height=1in}
 
 Chart types representing heat map data set 1.
 :::
-
-
 
 ## Experimental Design
 
 With a completely randomized design, participants would need to complete 54 trials (3 chart types × 9 stimuli pairs × 2 data sets). Instead, we opted for a balanced incomplete block design to reduce the effects contributed by fatigue, using 4 of the 9 stimuli pairs for each participant to construct the blocks. This results in 24 trials per participant, which should improve the overall quality of the responses. Trials were presented in a randomized order of chart type × data set, where all four stimuli pairs were presented in a randomized order before moving to the next chart type × data set combination.
 
-Following the seminal work of @cleveland1984 in data visualization practices, we asked participants two modified questions for each trial. The first question asked participants which value in the identified stimuli pair is larger. This question served as a basic attention check to determine whether the participant was correctly following the instructions for their ratio estimation. The second question asked participants to use a slider to estimate the quantity of the smaller value if the larger value in the stimulus pair represented 100 units. For the second question, the phrasing is designed to have participants estimate $A/B$, where $A\leq B$
+Following the seminal work of @cleveland1984 in data visualization practices, we asked participants two modified questions for each trial. The first question asked participants which value in the identified stimuli pair is larger. This question served as a basic attention check to determine whether the participant was correctly following the instructions for their ratio estimation. The second question asked participants to use a slider to estimate the quantity of the smaller value if the larger value in the stimuli pair represented 100 units. For the second question, the phrasing is designed to have participants estimate $A/B$, where $A\leq B$.
+
+# Results
+
+```{r}
+dat <- read.csv('../_data/stat218fall2025.csv')
+```
+
+`r length(unique(dat$user_id))` students completed the experiment as part of a project in the curriculum of an introductory statistics course. Of `r nrow(filter(dat, set != 'practice'))` submitted entries, `r nrow(filter(dat, set != 'practice', q1_correct))` were correct in identifying the larger value in a given stimuli pair (79%). 
+
+Similar to @cleveland1984, we compute error as follows: 
+
+$$
+\log_2(|\text{judged percent}-\text{true percent}|)
+$$
+
+```{r}
+#| eval: false
+library(lme4)
+library(lmerTest)
+library(emmeans)
+emm_options(pbkrtest.limit = 5000)
+mod.q2 <- lmer(log2(q2_abs_error) ~ set*media*factor(pair_id) + 
+                 (1|user_id/set:media),
+     data = filter(dat, set != 'practice', pair_id != 5))
+anova(mod.q2)
+em.media <- emmeans(mod.q2, specs = ~media)
+em.pair <- emmeans(mod.q2, specs = ~pair_id)
+pairs(em.pair) %>%
+  data.frame() %>%
+  arrange(p.value)
+  left_join(stimuli) %>%
+  mutate(ratio = map_dbl(values, \(x)(min(c(x/50, 50/x))))) %>% arrange(ratio) %>%
+  select(values, ratio, pair_id, emmean) %>%
+  arrange(emmean)
+```
+
+Excluding the stimuli pair where both values were the same, a linear mixed model was fit to the log error, accounting for random participant and set $\times$ media ordering. The effect of chart type (p-value < .001) and stimuli pair (p-value = 0.0434) had evidence of a statistically significant effect. For chart types, 2dd charts had larger errors than 3dd and 3dp charts, where no difference was detected between 3dd and 3dp charts. Only one difference of errors between stimuli pairs was statistically significant (p-value = 0.009), which was the difference between the ratios of (33.3, 50) and (50, 56.2). 
+
+
+
+
+
+
+
+
+
 
 # Discussion
 
-In this abstract, we described an experiment that explores the relationship between physical dimensionality and the rendering of heat maps. While 2D displays of 2D and 3D data visualizations have been widely explored, our work contributes to the broader understanding of the physical dimensionality of 2D and 3D charts. Our goal is to provide recommendations for better practices in designing statistical graphs, while also introducing initial empirical work into 3D-printed graphics. At the conclusion of the study, we will release a repository to encourage replication and sharing of experimental results.
+In this abstract, we described an experiment that explored the relationship between physical dimensionality and the rendering of heat maps. While 2D displays of 2D and 3D data visualizations have been widely explored, our work contributes to the broader understanding of the physical dimensionality of 2D and 3D charts. We found that 3D heat maps are better than 2D heat maps for ratio estimations, but we did not detect a difference between digital and physical 3D heat maps. At the conclusion of the study, we will release a repository to encourage replication and sharing of experimental results.
