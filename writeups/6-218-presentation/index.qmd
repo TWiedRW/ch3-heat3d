@@ -1,16 +1,17 @@
 ---
 title: "Heat to Height"
 subtitle: "A study comparing the physical dimensionlity of heat maps"
-authors: 
-  - "Tyler Wiederich"
+author: "Tyler Wiederich"
+institute: "University of Nebraska, Lincoln"
 format:
   revealjs: 
+    template-partials:
+      - title-slide.html
     smaller: true
     df-print: kable
     fig-align: center
     logo: https://ucomm.unl.edu/sites/unl.edu.university-communication/files/styles/no_crop_720/public/media/image/nebraska-n.jpg?itok=4Vj3-oUs
-bibliograph: references.bib
-
+bibliography: references.bib
 ---
 
 # Introduction
@@ -29,28 +30,23 @@ theme_set(theme_bw() + theme(aspect.ratio = 1))
 
 Consider the following examples:
 
+-   Observing the relationship between mileage and age for the percentage of car engine malfunctions
+-   Average student grade measured by number of hours spent studying and number of hours spent sleeping
+-   Count of beetles caught in sticky traps across the coordinates of a field
 
+What do these all have in common?
 
-- Percentage of car engine malfunctions measured across mileage and age of car
-- Average student grade measured by number of hours spent studying and hours spent sleeping
-- Count of beetles caught in sticky traps across the coordinates of a field
-
-
-
-
-What do these all have in common? 
-
-:::{.fragment}
-
-They all report a summary statistic across two explanatory variables. 
-
+::: fragment
+They all report a summary statistic across two explanatory variables.
 :::
 
 ## Heat Maps
 
-When two explanatory variables represent quantitative or ordinal qualitative variables, heat maps are a popular choice in displaying summary statistics. 
+When two explanatory variables represent quantitative or ordinal qualitative variables, heat maps are a popular choice in displaying summary statistics.
 
 ```{r}
+#| label: fig-heat2d-examp
+#| fig-cap: "Example of a 2D heat map"
 set.seed(231224)
 expand_grid(
   x = 1:5,
@@ -63,32 +59,27 @@ ggplot(mapping = aes(x = x, y = y, fill = z)) +
   scale_fill_gradient(low = 'white', high = '#1a80bb')
 ```
 
-
 ## 3D Heat Maps
 
 Given the three-dimensional nature of the data, heat maps are sometimes represented in three-dimensions, using height to convey the summary statistic.
 
+::: {#fig-heatmaps layout-ncol="2"}
+![Figure from @national1977condition](../_images/heatmap3d.png){#fig-nat77 height="400px"}
 
-
-:::{#fig-heatmaps layout-ncol=2}
-
-![Figure from @national1977condition](../_images/heatmap3d.png){#fig-nat77 height=400px}
-
-![Figure from @3DPopulationDensity](../_images/lincoln-pop.png){#fig-lincoln-pop height=400px}
+![Figure from @3DPopulationDensity](../_images/lincoln-pop.png){#fig-lincoln-pop height="400px"}
 
 Examples of 3D heat maps.
 :::
 
 ## Which chart to use?
 
-Few studies have evaluated the effectiveness in extracting information from 2D and 3D heat maps. 
+Few studies have evaluated the effectiveness in extracting information from 2D and 3D heat maps.
 
 ::: {.fragment .fade-in}
 -   Accuracy in estimations is worse for volumes than for areas [@croxton1932].
 
-    - Also theorized by @cleveland1984
+    -   Also theorized by @cleveland1984
 :::
-
 
 ::: {.fragment .fade-in}
 -   3D charts can sometimes better encode information than 2D charts [@barfield1989].
@@ -98,8 +89,8 @@ Few studies have evaluated the effectiveness in extracting information from 2D a
 -   3D heat maps have lower error rates than 2D heat maps in virtual reality [@kraus2020].
 :::
 
-::: {.fragment}
-One common limitation of these studies is that they are generalized to two-dimensional displays of the heat maps, either via paper or digital renderings. These 3D charts are not truly 3D. 
+::: fragment
+One common limitation of these studies is that they are generalized to two-dimensional displays of the heat maps, either via paper or digital renderings. These 3D charts are not truly 3D.
 :::
 
 ::: notes
@@ -111,20 +102,16 @@ One common limitation of these studies is that they are generalized to two-dimen
 
 Data physicalization is the process of converting data into three-dimensional objects. While typically used for artistic representations of data, statistical graphics can also take advantage of this process. Some immediate benefits include:
 
-:::{.fragment}
-
-- Increased accessibility of data for users with vision impairments
-- Educational tools for explaining data structures
-- More intuitive interactions
-- Potential for increased memorability (CITE 2016 PAPER) and/or engagement
-
+::: fragment
+-   Increased accessibility of data for users with vision impairments
+-   Educational tools for explaining data structures
+-   More intuitive interactions
+-   Potential for increased memorability and/or engagement
 :::
-
-(Images of existing examples)
 
 ## Study Overview
 
-While there are many methods of evaluating the qualities of a "good" chart [@vanderplas], we focus on 
+While there are many methods of evaluating the qualities of a "good" chart [@vanderplas2020], we focus on the accuracy of numerical extractions from the chart. This is a common technique used in data visualization studies.
 
 Does numerical accuracy of ratio estimations differ between dimensionality and projections of chart types? It is important to note that direct translations of 2D and 3D heat maps require different visual cues.
 
@@ -140,8 +127,6 @@ Two figures representing the volcano dataset [@volcano] using different height s
 2D heat maps use color, 3D heat maps use height and can possibly use color as well.
 :::
 
-
-
 # Methods
 
 ## Stimuli
@@ -154,7 +139,7 @@ $$
 
 Setting 50 as the constant and 90 as the maximum, a sequence of stimuli are chosen by equally partitioning the ratios between $50/50=1$ and $50/90\approx0.556$. The same ratios are used when setting 50 as the maximum in the stimuli pair.
 
----
+------------------------------------------------------------------------
 
 ```{r}
 load('../../data/stimuli.rda')
@@ -180,10 +165,9 @@ stimuli %>%
         aspect.ratio = 1/2)
 ```
 
----
+------------------------------------------------------------------------
 
-:::{#fig-stimuli-placement layout-ncol=2}
-
+::: {#fig-stimuli-placement layout-ncol="2"}
 ![Data set 1](../_images/stimuli-set1.png){#fig-set1}
 
 ![Data set 2](../_images/stimuli-set2.png){#fig-set2}
@@ -193,8 +177,7 @@ Placement of stimuli in the heat map data sets. Transparent bars represent rando
 
 ## Chart Types
 
-:::{#fig-charts layout-ncol=3}
-
+::: {#fig-charts layout-ncol="3"}
 ![2D Digital](../_images/examp2dd.png){#fig-2dd}
 
 ![3D Digital](../_images/examp3dd.png){#fig-3dd}
@@ -206,26 +189,23 @@ Chart types representing heat map data set 1.
 
 ## Experimental Design
 
-For a full replicate, there are $3\times2\times9=54$ treatment combinations: 
+For a full replicate, there are $3\times2\times9=54$ treatment combinations:
 
-- 3 media types (2dd, 3dd, 3dp)
-- 2 datasets 
-- 9 pairs of stimuli
+-   3 media types (2dd, 3dd, 3dp)
+-   2 datasets
+-   9 pairs of stimuli
 
 Way too many trials for a single participant's attention span!
 
-:::{.fragment}
-
+::: fragment
 Our main interest is the difference between media types, measured at a given ratio and dataset. To accomplish this and to reduce the number of trials per participant, we use 4 of the 9 possible stimuli pairs to create blocks.
 
 $$
 2\times3\times4=24
 $$
-
 :::
 
----
-
+------------------------------------------------------------------------
 
 ```{r}
 #| label: fig-block-design
@@ -241,29 +221,26 @@ plan %>%
   labs(y = 'Stimuli Pair Identifier', x = 'Block') 
 ```
 
-
 ## Hypotheses
 
-For each trial in the experiment, we ask two question adapted from @cleveland 1984. 
+For each trial in the experiment, we ask two question adapted from @cleveland1984.
 
-1. Which value in a stimuli pair represents a larger quantity?
-2. If the larger value in the stimuli pair represents 100 units, how many units is the smaller value?
+1.  Which value in a stimuli pair represents a larger quantity?
+2.  If the larger value in the stimuli pair represents 100 units, how many units is the smaller value?
 
-From these questions, we hypothesize the following: 
+From these questions, we hypothesize the following:
 
-H1) Do differences exist in identifying the larger value in a stimuli pair across different ratios, chart types, and underlying data sets?
+H1: Do differences exist in identifying the larger value in a stimuli pair across different ratios, chart types, and underlying data sets?
 
-H2) Does numerical accuracy of ratio estimates differ across ratios, chart types, and underlying data sets?
+H2: Does numerical accuracy of ratio estimates differ across ratios, chart types, and underlying data sets?
 
 ## Statistical Methods
 
 We use (Generalized) Linear Mixed Models to account for the type of distributions for the responses and allocations of variation among participants and the ordering of charts. These are extensions of the methods presented in Stat 218.
 
-**Question 1: ** With a binary response, a binomial distribution is chosen to model the proportion of successfully identifying the larger value in a stimuli pair. 
+**Question 1:** With a binary response, a binomial distribution is chosen to model the proportion of successfully identifying the larger value in a stimuli pair.
 
-**Question 2: ** Since estimates of the ratio take a continuous response, we model the average error metric using normal distributions.
-
-
+**Question 2:** Since estimates of the ratio take a continuous response, we model the average error metric using normal distributions.
 
 # Results
 
@@ -276,7 +253,6 @@ res.q2 <- res.all %>%
   filter(set != 'practice' & pair_id != 5) %>% 
   mutate(q2 = log2(q2_abs_error))
 ```
-
 
 ## Demographics
 
@@ -320,7 +296,6 @@ users %>%
   knitr::kable()
 ```
 
-
 ## Question 1
 
 **Which value represents a larger quantity?**
@@ -346,11 +321,9 @@ res.q1 %>%
   labs(x = 'Pair ID', y = "Media Type", fill = "Proportion\nCorrect")
 ```
 
-
 ## Question 1
 
 There were 12 combinations of data sets and stimuli pairs where there was evidence that the odds of successfully identifying the larger stimuli value were larger than for 3D charts than for 2D charts. This was particularly prevalent when the stimuli pairs were approximately the same size.
-
 
 ```{r}
 #| label: fig-q1-plot
@@ -391,7 +364,6 @@ em1 %>%
 
 ```
 
-
 ## Question 2
 
 **If the larger value you selected above represents 100 units, how many units is the smaller value?**
@@ -413,7 +385,6 @@ res.q2 %>%
   theme(aspect.ratio = 1/2) + 
   labs(x = 'Pair ID', y = 'Log Absolute Error')
 ```
-
 
 ## Question 2
 
@@ -470,22 +441,17 @@ em2.media %>%
 
 ## Discussion
 
-:::{.columns}
-
-:::{.column width=50%}
-
+:::::: columns
+::: {.column width="50%"}
 **Conclusions**
 
-1. In certain situations, there is evidence to suggest that 2D heat maps are harder to identify larger values in a pair than for 3D heat maps. However, digital and physical 3D heat maps did not exhibit differences in identifying larger values.
+1.  In certain situations, there is evidence to suggest that 2D heat maps are harder to identify larger values in a pair than for 3D heat maps. However, digital and physical 3D heat maps did not exhibit differences in identifying larger values.
 
-2. Estimations of ratios were worse for 2D charts than for 3D charts. There were no detectable difference between the digital and phyiscal 3D heat maps. 
-
+2.  Estimations of ratios were worse for 2D charts than for 3D charts. There were no detectable difference between the digital and phyiscal 3D heat maps.
 :::
 
-:::{.column width=50%}
-
-:::{layout-nrow=3}
-
+:::: {.column width="50%"}
+::: {layout-nrow="3"}
 ![](../_images/examp2dd.png)
 
 ![](../_images/examp3dd.png)
@@ -494,23 +460,15 @@ em2.media %>%
 
 Chart types representing heat map data set 1.
 :::
-
-
-:::
-
-:::
-
-
-
+::::
+::::::
 
 ## Future work
 
-1. It was sometimes observed that participants would estimate values that were not the ratio of the stimuli pair. A more sophisticated model could account for this discrepancy.
+1.  It was sometimes observed that participants would estimate values that were not the ratio of the stimuli pair. A more sophisticated model could account for this discrepancy.
 
-2. Very few options exist for creating 3D printed charts. In R, an open-source statistical software package, the `rayshader` and `rgl` packages only provide limited support. Creating software that produces 3D-print files for these types charts would allow for broader implementation of physical statistical graphics. This could be helpful for increasing accessibility for people with low vision or as educational tools in explaining statistical concepts.
+2.  Very few options exist for creating 3D printed charts. In R, an open-source statistical software package, the `rayshader` and `rgl` packages only provide limited support. Creating software that produces 3D-print files for these types charts would allow for broader implementation of physical statistical graphics. This could be helpful for increasing accessibility for people with low vision or as educational tools in explaining statistical concepts.
 
-If you are interested in following the progress of this study, you can visit [https://github.com/TWiedRW/ch3-heat3d](https://github.com/TWiedRW/ch3-heat3d) for data and write-ups of the experiment. 
+If you are interested in following the progress of this study, you can visit <https://github.com/TWiedRW/ch3-heat3d> for data and write-ups of the experiment.
 
 # Thank you!
-
-
