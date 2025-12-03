@@ -1,0 +1,474 @@
+---
+title: "Heat to Height"
+subtitle: "A study comparing the physical dimensionlity of heat maps"
+author: "Tyler Wiederich"
+institute: "University of Nebraska, Lincoln"
+format:
+  revealjs: 
+    template-partials:
+      - title-slide.html
+    smaller: true
+    df-print: kable
+    fig-align: center
+    logo: https://ucomm.unl.edu/sites/unl.edu.university-communication/files/styles/no_crop_720/public/media/image/nebraska-n.jpg?itok=4Vj3-oUs
+bibliography: references.bib
+---
+
+# Introduction
+
+```{r}
+library(tidyverse)
+library(lme4)
+library(lmerTest)
+library(car)
+load('../../data/stimuli.rda')
+solutions <- readRDS('../../data/solutions.rda')
+theme_set(theme_bw() + theme(aspect.ratio = 1))
+```
+
+## Introduction
+
+Consider the following examples:
+
+-   Observing the relationship between mileage and age for the percentage of car engine malfunctions
+-   Average student grade measured by number of hours spent studying and number of hours spent sleeping
+-   Count of beetles caught in sticky traps across the coordinates of a field
+
+What do these all have in common?
+
+::: fragment
+They all report a summary statistic across two explanatory variables.
+:::
+
+## Heat Maps
+
+When two explanatory variables represent quantitative or ordinal qualitative variables, heat maps are a popular choice in displaying summary statistics.
+
+```{r}
+#| label: fig-heat2d-examp
+#| fig-cap: "Example of a 2D heat map"
+set.seed(231224)
+expand_grid(
+  x = 1:5,
+  y = 1:5
+) %>% 
+  mutate(z = 2*x + rnorm(nrow(.), 10, 3)) %>% 
+ggplot(mapping = aes(x = x, y = y, fill = z)) + 
+  geom_tile(color = 'black') + 
+  theme(aspect.ratio = 1) + 
+  scale_fill_gradient(low = 'white', high = '#1a80bb')
+```
+
+## 3D Heat Maps
+
+Given the three-dimensional nature of the data, heat maps are sometimes represented in three-dimensions, using height to convey the summary statistic.
+
+::: {#fig-heatmaps layout-ncol="2"}
+![Figure from @national1977condition](../_images/heatmap3d.png){#fig-nat77 height="400px"}
+
+![Figure from @3DPopulationDensity](../_images/lincoln-pop.png){#fig-lincoln-pop height="400px"}
+
+Examples of 3D heat maps.
+:::
+
+## Which chart to use?
+
+Few studies have evaluated the effectiveness in extracting information from 2D and 3D heat maps.
+
+::: {.fragment .fade-in}
+-   Accuracy in estimations is worse for volumes than for areas [@croxton1932].
+
+    -   Also theorized by @cleveland1984
+:::
+
+::: {.fragment .fade-in}
+-   3D charts can sometimes better encode information than 2D charts [@barfield1989].
+:::
+
+::: {.fragment .fade-in}
+-   3D heat maps have lower error rates than 2D heat maps in virtual reality [@kraus2020].
+:::
+
+::: fragment
+One common limitation of these studies is that they are generalized to two-dimensional displays of the heat maps, either via paper or digital renderings. These 3D charts are not truly 3D.
+:::
+
+::: notes
+-   @kraus2020 talks about more time needed for 3D charts
+-   Also, @kraus2020 mentioned 2D was better for overview tasks
+:::
+
+## Motivation
+
+Data physicalization is the process of converting data into three-dimensional objects. While typically used for artistic representations of data, statistical graphics can also take advantage of this process. Some immediate benefits include:
+
+::: fragment
+-   Increased accessibility of data for users with vision impairments
+-   Educational tools for explaining data structures
+-   More intuitive interactions
+-   Potential for increased memorability and/or engagement
+:::
+
+## Study Overview
+
+While there are many methods of evaluating the qualities of a "good" chart [@vanderplas2020], we focus on the accuracy of numerical extractions from the chart. This is a common technique used in data visualization studies.
+
+Does numerical accuracy of ratio estimations differ between dimensionality and projections of chart types? It is important to note that direct translations of 2D and 3D heat maps require different visual cues.
+
+::: {#fig-color-height layout-ncol="2"}
+![Flatter height scale](../_images/height-color-0.3.png){#fig-flat3d}
+
+![Stretched height scale](../_images/height-color-2.png){#fig-tall3d}
+
+Two figures representing the volcano dataset [@volcano] using different height scaling factors. Both figures use the same color scale, but there is no "correct" translation of color into the measurable height.
+:::
+
+::: notes
+2D heat maps use color, 3D heat maps use height and can possibly use color as well.
+:::
+
+# Methods
+
+## Stimuli
+
+The design of the 3D heat map experiment uses the method of constant stimuli: ratios are estimated with respect to one stimuli height that remains the same.
+
+$$
+S=\text{Stimuli}
+$$
+
+Setting 50 as the constant and 90 as the maximum, a sequence of stimuli are chosen by equally partitioning the ratios between $50/50=1$ and $50/90\approx0.556$. The same ratios are used when setting 50 as the maximum in the stimuli pair.
+
+------------------------------------------------------------------------
+
+```{r}
+load('../../data/stimuli.rda')
+load('../../data/plan.rda')
+theme_set(theme_bw())
+stimuli %>% 
+  rowwise() %>% 
+  mutate(ratio = round(min(values, constant) / max(values, constant), 2)) %>% 
+  ggplot(mapping = aes(x = pair_id, y = values)) + 
+  geom_bar(stat = 'identity', color = 'black', fill = '#1a80bb') +
+  geom_bar(stat = 'identity', mapping = aes(y = 50), fill = '#ea801c', width = 1/2, alpha = 1/2) + 
+  geom_text(aes(x = 5, y = 54), label = 'Constant') +
+  geom_text(aes(x = pair_id, y = min(values)/2, label = ratio)) +
+  scale_y_continuous(limits = c(0, 100)) + 
+  scale_x_continuous(breaks = 1:10) +
+  labs(x = 'Pair ID', y = 'Value') + 
+  theme(panel.grid.major.x = element_blank(),
+        panel.grid.minor.x = element_blank(),
+        # axis.text.x = element_blank(),
+        axis.ticks.x = element_blank(),
+        axis.text = element_text(size = 14),
+        axis.title = element_text(size = 18),
+        aspect.ratio = 1/2)
+```
+
+------------------------------------------------------------------------
+
+::: {#fig-stimuli-placement layout-ncol="2"}
+![Data set 1](../_images/stimuli-set1.png){#fig-set1}
+
+![Data set 2](../_images/stimuli-set2.png){#fig-set2}
+
+Placement of stimuli in the heat map data sets. Transparent bars represent randomized values.
+:::
+
+## Chart Types
+
+::: {#fig-charts layout-ncol="3"}
+![2D Digital](../_images/examp2dd.png){#fig-2dd}
+
+![3D Digital](../_images/examp3dd.png){#fig-3dd}
+
+![3D Printed](../_images/examp3dp.png){#fig-3dp}
+
+Chart types representing heat map data set 1.
+:::
+
+## Experimental Design
+
+For a full replicate, there are $3\times2\times9=54$ treatment combinations:
+
+-   3 media types (2dd, 3dd, 3dp)
+-   2 datasets
+-   9 pairs of stimuli
+
+Way too many trials for a single participant's attention span!
+
+::: fragment
+Our main interest is the difference between media types, measured at a given ratio and dataset. To accomplish this and to reduce the number of trials per participant, we use 4 of the 9 possible stimuli pairs to create blocks.
+
+$$
+2\times3\times4=24
+$$
+:::
+
+------------------------------------------------------------------------
+
+```{r}
+#| label: fig-block-design
+#| fig-cap: "Balanced Incomplete Block Design. Each stimuli pair in a block is fully crossed with media type and dataset."
+#| fig-align: center
+
+plan %>% 
+  ggplot(mapping = aes(x = factor(block), y = factor(pair_id))) + 
+  geom_tile(fill = '#1a80bb', color = 'black') + 
+  scale_y_discrete(limits = rev) +
+  theme(aspect.ratio = 1/2, axis.title = element_text(size = 18),
+        axis.text = element_text(size = 14)) + 
+  labs(y = 'Stimuli Pair Identifier', x = 'Block') 
+```
+
+## Hypotheses
+
+For each trial in the experiment, we ask two question adapted from @cleveland1984.
+
+1.  Which value in a stimuli pair represents a larger quantity?
+2.  If the larger value in the stimuli pair represents 100 units, how many units is the smaller value?
+
+From these questions, we hypothesize the following:
+
+H1: Do differences exist in identifying the larger value in a stimuli pair across different ratios, chart types, and underlying data sets?
+
+H2: Does numerical accuracy of ratio estimates differ across ratios, chart types, and underlying data sets?
+
+## Statistical Methods
+
+We use (Generalized) Linear Mixed Models to account for the type of distributions for the responses and allocations of variation among participants and the ordering of charts. These are extensions of the methods presented in Stat 218.
+
+**Question 1:** With a binary response, a binomial distribution is chosen to model the proportion of successfully identifying the larger value in a stimuli pair.
+
+**Question 2:** Since estimates of the ratio take a continuous response, we model the average error metric using normal distributions.
+
+# Results
+
+```{r}
+library(tidyverse)
+res.all <- read.csv('../_data/stat218fall2025.csv')
+res.q1 <- res.all %>% 
+  filter(set != 'practice')
+res.q2 <- res.all %>% 
+  filter(set != 'practice' & pair_id != 5) %>% 
+  mutate(q2 = log2(q2_abs_error))
+```
+
+## Demographics
+
+```{r}
+users <- res.all %>% 
+  group_by(user_id, block) %>% 
+  select(user_id, is_218_student:user_unique) %>% 
+  unique() 
+```
+
+`r nrow(users)` participants completed the experiment as part of a project in the curriculum of Stat 218. Demographic information is provided below.
+
+```{r}
+users %>% 
+  group_by(user_age) %>% 
+  count() %>% 
+  pivot_wider(names_from = user_age, values_from = n) %>% 
+  mutate(`31-35` = 0, `46 and over` = 0) %>% 
+  select(`19-25`, `26-30`, `31-35`, `36-40`, `41-45`, `46 and over`) %>% 
+  knitr::kable()
+```
+
+<br>
+
+```{r}
+users %>% 
+  group_by(user_gender) %>% 
+  count() %>% 
+  pivot_wider(names_from = user_gender, values_from = n) %>% 
+  knitr::kable()
+```
+
+<br>
+
+```{r}
+users %>% 
+  group_by(user_education) %>% 
+  count() %>% 
+  pivot_wider(names_from = user_education, values_from = n) %>% 
+  select(2,5,6,4,1,3) %>% 
+  knitr::kable()
+```
+
+## Question 1
+
+**Which value represents a larger quantity?**
+
+There were `r nrow(res.q1)` trials completed. From these, `r sum(res.q1$q1_correct)` responses were correct in identifying the larger quantity in the pair of stimuli (`r round(100*mean(res.q1$q1_correct),2)`%).
+
+```{r}
+#| fig-align: center
+#| label: fig-q1-eda
+#| fig-cap: "Proportion of correct responses to Question 1"
+
+
+res.q1 %>% 
+  group_by(set, media, pair_id) %>% 
+  summarize(correct = mean(q1_correct)) %>% 
+  ggplot(mapping = aes(x = factor(pair_id), y = media, fill = correct)) + 
+  geom_tile(color = 'black') + 
+  geom_text(aes(label = round(correct,2)), size = 3) + 
+  facet_wrap(~set, nrow = 2) + 
+  scale_fill_gradient(low = 'white', high = '#384860', limits = c(0,1)) +
+  theme_bw() + 
+  theme(aspect.ratio = 1/3, legend.position = 'bottom') + 
+  labs(x = 'Pair ID', y = "Media Type", fill = "Proportion\nCorrect")
+```
+
+## Question 1
+
+There were 12 combinations of data sets and stimuli pairs where there was evidence that the odds of successfully identifying the larger stimuli value were larger than for 3D charts than for 2D charts. This was particularly prevalent when the stimuli pairs were approximately the same size.
+
+```{r}
+#| label: fig-q1-plot
+#| fig-cap: "Estimated probability of success"
+library(glmmTMB)
+modq1 <- glmmTMB(
+  q1_correct ~ set*media*factor(pair_id) + (1 | user_id/set:media),
+  data = res.q1,
+  family = binomial()
+)
+
+mycols <- c(
+  '2dd' = '#ffbb6f',
+  '3dd' = '#5e4c5f',
+  '3dp' = '#999999'
+)
+
+library(emmeans)
+em1 <- emmeans(modq1, ~media | set + pair_id, type = 'response')
+em1 %>% 
+  data.frame() %>% 
+  left_join(solutions) %>% 
+  mutate(label = paste(round(1*true_ratio, 2), pair_id, sep = '-')) %>% 
+  ggplot(mapping = aes(x = label, y = prob, color = media, shape = media)) + 
+  geom_point() + 
+  labs(x = 'Ratio-Pair Id', y = 'Estimated probability of\ncorrect solution') + 
+  facet_wrap(~set, nrow = 1) + 
+  scale_color_manual(values = mycols) +
+  scale_y_continuous(limits = c(0,1)) +
+  theme_bw() + 
+  theme(aspect.ratio = 1,
+        axis.text.x = element_text(angle = 30, hjust = 1))
+# pairs(em1) %>% 
+#   data.frame() %>% 
+#   filter(p.value < 0.05) %>% 
+#   filter(str_detect(contrast, '2dd')) %>% 
+#   arrange(pair_id, set, contrast)
+
+```
+
+## Question 2
+
+**If the larger value you selected above represents 100 units, how many units is the smaller value?**
+
+When excluding incorrect responses to Question 1 and when the stimuli were the same value, there were `r nrow(res.q2)` responses. Error is measured as follows:
+
+$$
+\text{Error}=\log_2(|\text{judged percent}-\text{true percent})
+$$
+
+```{r}
+#| label: fig-q2-eda
+#| fig-cap: "Boxplots of responses to Question 2"
+res.q2 %>% 
+  ggplot(mapping = aes(x = factor(pair_id), y = q2, fill = media)) + 
+  geom_boxplot(width = 1/2) + 
+  scale_fill_manual(values = mycols) + 
+  theme_bw() + 
+  theme(aspect.ratio = 1/2) + 
+  labs(x = 'Pair ID', y = 'Log Absolute Error')
+```
+
+## Question 2
+
+```{r}
+#| label: fig-q2-pair
+#| fig-cap: "Estimated log absolute error for stimuli pairs."
+#| fig-align: center
+library(ggsignif)
+mod.q2 <- lmer(q2 ~ set*media*factor(pair_id) + (1|user_id/set:media),
+        data = res.q2)
+em2.pair <- emmeans(mod.q2, ~pair_id, pbkrtest.limit = 100000)
+# pairs(em2.pair)
+em2.pair %>% 
+  data.frame() %>% 
+  ggplot(mapping = aes(x = factor(pair_id), y = emmean)) + 
+  geom_col(color = 'black', fill = '#1a80bb') + 
+  geom_errorbar(aes(ymin = lower.CL, ymax = upper.CL),
+                width = 1/2) + 
+  scale_y_continuous(limits = c(0, 4.5)) + 
+  geom_signif(comparisons = list(
+    c('2', '6')
+  ), y_position = 4.2, annotations = 'p-value = 0.0087') + 
+  theme_bw() + 
+  theme(aspect.ratio = 1/2) + 
+  labs(x = 'Pair ID', y = 'Estimate for log error')
+```
+
+## Question 2
+
+```{r}
+#| label: fig-q2-media
+#| fig-cap: "Estimated log absolute error for chart media types."
+#| fig-align: center
+em2.media <- emmeans(mod.q2, ~media, pbkrtest.limit = 100000)
+# pairs(em2.media)
+em2.media %>% 
+  data.frame() %>% 
+  ggplot(mapping = aes(x = media, y = emmean)) + 
+  geom_col(color = 'black', fill = '#1a80bb', width = 1/2) + 
+  geom_errorbar(aes(ymin = lower.CL, ymax = upper.CL),
+                width = 1/4) + 
+  scale_y_continuous(limits = c(0, 4.7)) + 
+  geom_signif(comparisons = list(
+    c('2dd', '3dd'),
+    c('2dd', '3dp')
+  ), y_position = c(4.1, 4.5), annotations = c('< .0001', 'p-value < .0001')) +
+  theme_bw() + 
+  theme(aspect.ratio = 1/2) + 
+  labs(x = 'Media', y = 'Estimate for log error')
+
+```
+
+# Dicussion
+
+## Discussion
+
+:::::: columns
+::: {.column width="50%"}
+**Conclusions**
+
+1.  In certain situations, there is evidence to suggest that 2D heat maps are harder to identify larger values in a pair than for 3D heat maps. However, digital and physical 3D heat maps did not exhibit differences in identifying larger values.
+
+2.  Estimations of ratios were worse for 2D charts than for 3D charts. There were no detectable difference between the digital and phyiscal 3D heat maps.
+:::
+
+:::: {.column width="50%"}
+::: {layout-nrow="3"}
+![](../_images/examp2dd.png)
+
+![](../_images/examp3dd.png)
+
+![](../_images/examp3dp.png)
+
+Chart types representing heat map data set 1.
+:::
+::::
+::::::
+
+## Future work
+
+1.  It was sometimes observed that participants would estimate values that were not the ratio of the stimuli pair. A more sophisticated model could account for this discrepancy.
+
+2.  Very few options exist for creating 3D printed charts. In R, an open-source statistical software package, the `rayshader` and `rgl` packages only provide limited support. Creating software that produces 3D-print files for these types charts would allow for broader implementation of physical statistical graphics. This could be helpful for increasing accessibility for people with low vision or as educational tools in explaining statistical concepts.
+
+If you are interested in following the progress of this study, you can visit <https://github.com/TWiedRW/ch3-heat3d> for data and write-ups of the experiment.
+
+# Thank you!
