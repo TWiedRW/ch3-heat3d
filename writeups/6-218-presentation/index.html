@@ -370,8 +370,8 @@ Tyler Wiederich
 <h2>Introduction</h2>
 <p>Consider the following examples:</p>
 <ul>
-<li>Percentage of car engine malfunctions measured across mileage and age of car</li>
-<li>Average student grade measured by number of hours spent studying and hours spent sleeping</li>
+<li>Observing the relationship between mileage and age for the percentage of car engine malfunctions</li>
+<li>Average student grade measured by number of hours spent studying and number of hours spent sleeping</li>
 <li>Count of beetles caught in sticky traps across the coordinates of a field</li>
 </ul>
 <p>What do these all have in common?</p>
@@ -383,7 +383,9 @@ Tyler Wiederich
 <h2>Heat Maps</h2>
 <p>When two explanatory variables represent quantitative or ordinal qualitative variables, heat maps are a popular choice in displaying summary statistics.</p>
 
-<img data-src="index_files/figure-revealjs/unnamed-chunk-2-1.png" width="960" class="r-stretch"></section>
+<img data-src="index_files/figure-revealjs/fig-heat2d-examp-1.png" width="960" class="r-stretch quarto-figure-center"><p class="caption">
+Figure&nbsp;1: Example of a 2D heat map
+</p></section>
 <section id="d-heat-maps" class="slide level2">
 <h2>3D Heat Maps</h2>
 <p>Given the three-dimensional nature of the data, heat maps are sometimes represented in three-dimensions, using height to convey the summary statistic.</p>
@@ -398,7 +400,7 @@ Tyler Wiederich
 <img data-src="../_images/heatmap3d.png" data-ref-parent="fig-heatmaps" height="400">
 </div>
 <figcaption class="quarto-float-caption-bottom quarto-subfloat-caption quarto-subfloat-fig" id="fig-nat77-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-(a) Figure from <span class="citation" data-cites="national1977condition">Golladay (<a href="#/thank-you" role="doc-biblioref" onclick="">1977</a>)</span>
+(a) Figure from <span class="citation" data-cites="national1977condition">Golladay (<a href="#/references" role="doc-biblioref" onclick="">1977</a>)</span>
 </figcaption>
 </figure>
 </div>
@@ -410,7 +412,7 @@ Tyler Wiederich
 <img data-src="../_images/lincoln-pop.png" data-ref-parent="fig-heatmaps" height="400">
 </div>
 <figcaption class="quarto-float-caption-bottom quarto-subfloat-caption quarto-subfloat-fig" id="fig-lincoln-pop-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-(b) Figure from <span class="citation" data-cites="3DPopulationDensity"><span>“<span>3D Population Density</span> of the <span>US</span> - <span>HomeArea</span>.com”</span> (<a href="#/thank-you" role="doc-biblioref" onclick="">n.d.</a>)</span>
+(b) Figure from <span class="citation" data-cites="3DPopulationDensity"><span>“<span>3D Population Density</span> of the <span>US</span> - <span>HomeArea</span>.com”</span> (<a href="#/references" role="doc-biblioref" onclick="">n.d.</a>)</span>
 </figcaption>
 </figure>
 </div>
@@ -418,7 +420,7 @@ Tyler Wiederich
 </div>
 </div>
 <figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-heatmaps-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-Figure&nbsp;1: Examples of 3D heat maps.
+Figure&nbsp;2: Examples of 3D heat maps.
 </figcaption>
 </figure>
 </div>
@@ -428,20 +430,20 @@ Figure&nbsp;1: Examples of 3D heat maps.
 <p>Few studies have evaluated the effectiveness in extracting information from 2D and 3D heat maps.</p>
 <div class="fragment fade-in">
 <ul>
-<li><p>Accuracy in estimations is worse for volumes than for areas <span class="citation" data-cites="croxton1932">(<a href="#/thank-you" role="doc-biblioref" onclick="">Croxton and Stein 1932</a>)</span>.</p>
+<li><p>Accuracy in estimations is worse for volumes than for areas <span class="citation" data-cites="croxton1932">(<a href="#/references" role="doc-biblioref" onclick="">Croxton and Stein 1932</a>)</span>.</p>
 <ul>
-<li>Also theorized by <span class="citation" data-cites="cleveland1984">Cleveland and McGill (<a href="#/thank-you" role="doc-biblioref" onclick="">1984</a>)</span></li>
+<li>Also theorized by <span class="citation" data-cites="cleveland1984">Cleveland and McGill (<a href="#/references" role="doc-biblioref" onclick="">1984</a>)</span></li>
 </ul></li>
 </ul>
 </div>
 <div class="fragment fade-in">
 <ul>
-<li>3D charts can sometimes better encode information than 2D charts <span class="citation" data-cites="barfield1989">(<a href="#/thank-you" role="doc-biblioref" onclick="">Barfield and Robless 1989</a>)</span>.</li>
+<li>3D charts can sometimes better encode information than 2D charts <span class="citation" data-cites="barfield1989">(<a href="#/references" role="doc-biblioref" onclick="">Barfield and Robless 1989</a>)</span>.</li>
 </ul>
 </div>
 <div class="fragment fade-in">
 <ul>
-<li>3D heat maps have lower error rates than 2D heat maps in virtual reality <span class="citation" data-cites="kraus2020">(<a href="#/thank-you" role="doc-biblioref" onclick="">Kraus et al. 2020</a>)</span>.</li>
+<li>3D heat maps have lower error rates than 2D heat maps in virtual reality <span class="citation" data-cites="kraus2020">(<a href="#/references" role="doc-biblioref" onclick="">Kraus et al. 2020</a>)</span>.</li>
 </ul>
 </div>
 <div class="fragment">
@@ -449,8 +451,8 @@ Figure&nbsp;1: Examples of 3D heat maps.
 </div>
 <aside class="notes">
 <ul>
-<li><span class="citation" data-cites="kraus2020">Kraus et al. (<a href="#/thank-you" role="doc-biblioref" onclick="">2020</a>)</span> talks about more time needed for 3D charts</li>
-<li>Also, <span class="citation" data-cites="kraus2020">Kraus et al. (<a href="#/thank-you" role="doc-biblioref" onclick="">2020</a>)</span> mentioned 2D was better for overview tasks</li>
+<li><span class="citation" data-cites="kraus2020">Kraus et al. (<a href="#/references" role="doc-biblioref" onclick="">2020</a>)</span> talks about more time needed for 3D charts</li>
+<li>Also, <span class="citation" data-cites="kraus2020">Kraus et al. (<a href="#/references" role="doc-biblioref" onclick="">2020</a>)</span> mentioned 2D was better for overview tasks</li>
 </ul>
 <style type="text/css">
         span.MJX_Assistive_MathML {
@@ -469,16 +471,16 @@ Figure&nbsp;1: Examples of 3D heat maps.
 <p>Data physicalization is the process of converting data into three-dimensional objects. While typically used for artistic representations of data, statistical graphics can also take advantage of this process. Some immediate benefits include:</p>
 <div class="fragment">
 <ul>
-<li>Increased accessibility of data for users with vision impairments</li>
+<li>Increased accessibility of data for users with low vision</li>
 <li>Educational tools for explaining data structures</li>
 <li>More intuitive interactions</li>
-<li>Potential for increased memorability (CITE 2016 PAPER) and/or engagement</li>
+<li>Potential for increased memorability and/or engagement</li>
 </ul>
 </div>
 </section>
 <section id="study-overview" class="slide level2">
 <h2>Study Overview</h2>
-<p>While there are many methods of evaluating the qualities of a “good” chart <span class="citation" data-cites="vanderplas2020">(<a href="#/thank-you" role="doc-biblioref" onclick="">Vanderplas, Cook, and Hofmann 2020</a>)</span>, we focus on the accuracy of numerical extractions from the chart. This is a common technique used in data visualization studies.</p>
+<p>While there are many methods of evaluating the qualities of a “good” chart <span class="citation" data-cites="vanderplas2020">(<a href="#/references" role="doc-biblioref" onclick="">Vanderplas, Cook, and Hofmann 2020</a>)</span>, we focus on the accuracy of numerical extractions from the chart. This is a common technique used in data visualization studies.</p>
 <p>Does numerical accuracy of ratio estimations differ between dimensionality and projections of chart types? It is important to note that direct translations of 2D and 3D heat maps require different visual cues.</p>
 <div id="fig-color-height" class="quarto-layout-panel">
 <figure class="quarto-float quarto-float-fig">
@@ -511,7 +513,7 @@ Figure&nbsp;1: Examples of 3D heat maps.
 </div>
 </div>
 <figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-color-height-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-Figure&nbsp;2: Two figures representing the volcano dataset <span class="citation" data-cites="volcano">(<a href="#/thank-you" role="doc-biblioref" onclick="">R Core Team 2024</a>)</span> using different height scaling factors. Both figures use the same color scale, but there is no “correct” translation of color into the measurable height.
+Figure&nbsp;3: Two figures representing the volcano dataset <span class="citation" data-cites="volcano">(<a href="#/references" role="doc-biblioref" onclick="">R Core Team 2024</a>)</span> using different height scaling factors. Both figures use the same color scale, but there is no “correct” translation of color into the measurable height.
 </figcaption>
 </figure>
 </div>
@@ -545,7 +547,7 @@ S=\text{Stimuli}
 <section class="slide level2">
 
 
-<img data-src="index_files/figure-revealjs/unnamed-chunk-3-1.png" width="960" class="r-stretch"></section>
+<img data-src="index_files/figure-revealjs/unnamed-chunk-2-1.png" width="960" class="r-stretch"></section>
 <section class="slide level2">
 
 <div id="fig-stimuli-placement" class="quarto-layout-panel">
@@ -579,7 +581,7 @@ S=\text{Stimuli}
 </div>
 </div>
 <figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-stimuli-placement-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-Figure&nbsp;3: Placement of stimuli in the heat map data sets. Transparent bars represent randomized values.
+Figure&nbsp;4: Placement of stimuli in the heat map data sets. Transparent bars represent randomized values.
 </figcaption>
 </figure>
 </div>
@@ -629,7 +631,7 @@ Figure&nbsp;3: Placement of stimuli in the heat map data sets. Transparent bars 
 </div>
 </div>
 <figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-charts-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-Figure&nbsp;4: Chart types representing heat map data set 1.
+Figure&nbsp;5: Chart types representing heat map data set 1.
 </figcaption>
 </figure>
 </div>
@@ -654,18 +656,18 @@ Figure&nbsp;4: Chart types representing heat map data set 1.
 
 
 <img data-src="index_files/figure-revealjs/fig-block-design-1.png" class="quarto-figure quarto-figure-center r-stretch" width="960"><p class="caption">
-Figure&nbsp;5: Balanced Incomplete Block Design. Each stimuli pair in a block is fully crossed with media type and dataset.
+Figure&nbsp;6: Balanced Incomplete Block Design. Each stimuli pair in a block is fully crossed with media type and dataset.
 </p></section>
 <section id="hypotheses" class="slide level2">
 <h2>Hypotheses</h2>
-<p>For each trial in the experiment, we ask two question adapted from <span class="citation" data-cites="cleveland">(<a href="#/thank-you" role="doc-biblioref" onclick=""><strong>cleveland?</strong></a>)</span> 1984.</p>
+<p>For each trial in the experiment, we ask two question adapted from <span class="citation" data-cites="cleveland1984">Cleveland and McGill (<a href="#/references" role="doc-biblioref" onclick="">1984</a>)</span>.</p>
 <ol type="1">
 <li>Which value in a stimuli pair represents a larger quantity?</li>
 <li>If the larger value in the stimuli pair represents 100 units, how many units is the smaller value?</li>
 </ol>
-<p>From these questions, we hypothesize the following:</p>
-<p>H1) Do differences exist in identifying the larger value in a stimuli pair across different ratios, chart types, and underlying data sets?</p>
-<p>H2) Does numerical accuracy of ratio estimates differ across ratios, chart types, and underlying data sets?</p>
+<p>From these questions, test the following hypotheses:</p>
+<p>H1: Do differences exist in identifying the larger value in a stimuli pair across different stimuli pairs, chart types, and underlying data sets?</p>
+<p>H2: Does numerical accuracy of ratio estimations differ across stimuli pairs, chart types, and underlying data sets?</p>
 </section>
 <section id="statistical-methods" class="slide level2">
 <h2>Statistical Methods</h2>
@@ -770,48 +772,48 @@ Figure&nbsp;5: Balanced Incomplete Block Design. Each stimuli pair in a block is
 <p>There were 4072 trials completed. From these, 3218 responses were correct in identifying the larger quantity in the pair of stimuli (79.03%).</p>
 
 <img data-src="index_files/figure-revealjs/fig-q1-eda-1.png" class="quarto-figure quarto-figure-center r-stretch" width="960"><p class="caption">
-Figure&nbsp;6: Proportion of correct responses to Question 1
+Figure&nbsp;7: Proportion of correct responses to Question 1
 </p></section>
 <section id="question-1-1" class="slide level2">
 <h2>Question 1</h2>
 <p>There were 12 combinations of data sets and stimuli pairs where there was evidence that the odds of successfully identifying the larger stimuli value were larger than for 3D charts than for 2D charts. This was particularly prevalent when the stimuli pairs were approximately the same size.</p>
 
 <img data-src="index_files/figure-revealjs/fig-q1-plot-1.png" width="960" class="r-stretch quarto-figure-center"><p class="caption">
-Figure&nbsp;7: Estimated probability of success
+Figure&nbsp;8: Estimated probability of success
 </p></section>
 <section id="question-2" class="slide level2">
 <h2>Question 2</h2>
 <p><strong>If the larger value you selected above represents 100 units, how many units is the smaller value?</strong></p>
 <p>When excluding incorrect responses to Question 1 and when the stimuli were the same value, there were 3602 responses. Error is measured as follows:</p>
 <p><span class="math display">\[
-\text{Error}=\log_2(|\text{judged percent}-\text{true percent})
+\text{Error}=\log_2(|\text{judged percent}-\text{true percent}|)
 \]</span></p>
 
 <img data-src="index_files/figure-revealjs/fig-q2-eda-1.png" width="960" class="r-stretch quarto-figure-center"><p class="caption">
-Figure&nbsp;8: Boxplots of responses to Question 2
+Figure&nbsp;9: Boxplots of responses to Question 2
 </p></section>
 <section id="question-2-1" class="slide level2">
 <h2>Question 2</h2>
+<p>Unlike Question 1, there were no significant interactions between the stimuli pairs, datasets, or media types. This means that estimated errors can be calculated separately for each treatment factor. We observed that the effect of stimuli pair was significant (p-value = 0.04335) and the effect of media type was significant (p-value &lt; .0001).</p>
 
 <img data-src="index_files/figure-revealjs/fig-q2-pair-1.png" class="quarto-figure quarto-figure-center r-stretch" width="960"><p class="caption">
-Figure&nbsp;9: Estimated log absolute error for stimuli pairs.
+Figure&nbsp;10: Estimated log absolute error for stimuli pairs.
 </p></section>
 <section id="question-2-2" class="slide level2">
 <h2>Question 2</h2>
 
 <img data-src="index_files/figure-revealjs/fig-q2-media-1.png" class="quarto-figure quarto-figure-center r-stretch" width="960"><p class="caption">
-Figure&nbsp;10: Estimated log absolute error for chart media types.
+Figure&nbsp;11: Estimated log absolute error for chart media types.
 </p></section></section>
 <section>
 <section id="dicussion" class="title-slide slide level1 center">
 <h1>Dicussion</h1>
 
 </section>
-<section id="discussion" class="slide level2">
-<h2>Discussion</h2>
+<section id="conclusion" class="slide level2">
+<h2>Conclusion</h2>
 <div class="columns">
 <div class="column" style="width:50%;">
-<p><strong>Conclusions</strong></p>
 <ol type="1">
 <li><p>In certain situations, there is evidence to suggest that 2D heat maps are harder to identify larger values in a pair than for 3D heat maps. However, digital and physical 3D heat maps did not exhibit differences in identifying larger values.</p></li>
 <li><p>Estimations of ratios were worse for 2D charts than for 3D charts. There were no detectable difference between the digital and phyiscal 3D heat maps.</p></li>
@@ -820,7 +822,7 @@ Figure&nbsp;10: Estimated log absolute error for chart media types.
 <div>
 
 </div>
-<div class="quarto-layout-panel" data-layout-nrow="3">
+<div class="quarto-layout-panel" data-layout-nrow="2">
 <div class="quarto-layout-row">
 <div class="quarto-layout-cell" style="flex-basis: 50.0%;justify-content: center;">
 <p><img data-src="../_images/examp2dd.png"></p>
@@ -832,9 +834,6 @@ Figure&nbsp;10: Estimated log absolute error for chart media types.
 <div class="quarto-layout-row">
 <div class="quarto-layout-cell" style="flex-basis: 50.0%;justify-content: center;">
 <p><img data-src="../_images/examp3dp.png"></p>
-</div>
-<div class="quarto-layout-cell" style="flex-basis: 50.0%;justify-content: flex-start;">
-<p>Chart types representing heat map data set 1.</p>
 </div>
 </div>
 </div>
@@ -848,8 +847,13 @@ Figure&nbsp;10: Estimated log absolute error for chart media types.
 </ol>
 <p>If you are interested in following the progress of this study, you can visit <a href="https://github.com/TWiedRW/ch3-heat3d" class="uri">https://github.com/TWiedRW/ch3-heat3d</a> for data and write-ups of the experiment.</p>
 </section></section>
-<section id="thank-you" class="title-slide slide level1 smaller scrollable">
+<section>
+<section id="thank-you" class="title-slide slide level1 center">
 <h1>Thank you!</h1>
+
+</section>
+<section id="references" class="slide level2 smaller scrollable">
+<h2>References</h2>
 <div class="quarto-auto-generated-content">
 <p><img src="https://ucomm.unl.edu/sites/unl.edu.university-communication/files/styles/no_crop_720/public/media/image/nebraska-n.jpg?itok=4Vj3-oUs" class="slide-logo"></p>
 <div class="footer footer-default">
@@ -882,7 +886,7 @@ R Core Team. 2024. <em>R: A Language and Environment for Statistical Computing</
 Vanderplas, Susan, Dianne Cook, and Heike Hofmann. 2020. <span>“Testing Statistical Charts: What Makes a Good Graph?”</span> <em>Annual Review of Statistics and Its Application</em> 7 (1): 61–88. <a href="https://doi.org/10.1146/annurev-statistics-031219-041252">https://doi.org/10.1146/annurev-statistics-031219-041252</a>.
 </div>
 </div>
-</section>
+</section></section>
     </div>
   </div>
 

@@ -103,7 +103,7 @@ One common limitation of these studies is that they are generalized to two-dimen
 Data physicalization is the process of converting data into three-dimensional objects. While typically used for artistic representations of data, statistical graphics can also take advantage of this process. Some immediate benefits include:
 
 ::: fragment
--   Increased accessibility of data for users with vision impairments
+-   Increased accessibility of data for users with low vision
 -   Educational tools for explaining data structures
 -   More intuitive interactions
 -   Potential for increased memorability and/or engagement
@@ -228,11 +228,11 @@ For each trial in the experiment, we ask two question adapted from @cleveland198
 1.  Which value in a stimuli pair represents a larger quantity?
 2.  If the larger value in the stimuli pair represents 100 units, how many units is the smaller value?
 
-From these questions, we hypothesize the following:
+From these questions, test the following hypotheses:
 
-H1: Do differences exist in identifying the larger value in a stimuli pair across different ratios, chart types, and underlying data sets?
+H1: Do differences exist in identifying the larger value in a stimuli pair across different stimuli pairs, chart types, and underlying data sets?
 
-H2: Does numerical accuracy of ratio estimates differ across ratios, chart types, and underlying data sets?
+H2: Does numerical accuracy of ratio estimations differ across stimuli pairs, chart types, and underlying data sets?
 
 ## Statistical Methods
 
@@ -342,25 +342,39 @@ mycols <- c(
 )
 
 library(emmeans)
+library(ggsignif)
 em1 <- emmeans(modq1, ~media | set + pair_id, type = 'response')
+sig.pairs <- pairs(em1) %>%
+  data.frame() %>%
+  filter(p.value < 0.05) %>%
+  filter(str_detect(contrast, '2dd')) %>%
+  arrange(pair_id, set, contrast) %>% 
+  mutate(d2comp = str_extract(contrast, '3d.$'),
+         d2symb = ifelse(d2comp == '3dd', '†', '‡')) %>% 
+  group_by(set, pair_id) %>% 
+  mutate(text = paste(d2symb, collapse = ''),
+         pair_id = as.numeric(pair_id),
+         media = '2dd') %>% 
+  select(media, set, pair_id, text) %>% 
+  distinct()
 em1 %>% 
   data.frame() %>% 
   left_join(solutions) %>% 
-  mutate(label = paste(round(1*true_ratio, 2), pair_id, sep = '-')) %>% 
-  ggplot(mapping = aes(x = label, y = prob, color = media, shape = media)) + 
-  geom_point() + 
-  labs(x = 'Ratio-Pair Id', y = 'Estimated probability of\ncorrect solution') + 
-  facet_wrap(~set, nrow = 1) + 
+  left_join(sig.pairs) %>% 
+  ggplot(mapping = aes(x = media, y = prob)) + 
+  geom_col(aes(fill = media), position = position_dodge(), width = 3/4) + 
+  geom_text(aes(label = text, y = 0.1), size = 3) + 
+  scale_fill_manual(values = mycols) +
+  labs(x = 'Pair Id', y = 'Estimated probability of\ncorrect solution',
+       caption = '† = sig. smaller odds than 3dd\n‡ = sig. smaller odds than 3dp') + 
+  facet_grid(set~pair_id) + 
   scale_color_manual(values = mycols) +
   scale_y_continuous(limits = c(0,1)) +
   theme_bw() + 
-  theme(aspect.ratio = 1,
-        axis.text.x = element_text(angle = 30, hjust = 1))
-# pairs(em1) %>% 
-#   data.frame() %>% 
-#   filter(p.value < 0.05) %>% 
-#   filter(str_detect(contrast, '2dd')) %>% 
-#   arrange(pair_id, set, contrast)
+  theme(aspect.ratio = 2,
+        axis.text.x = element_text(angle = 90, hjust = 1),
+        panel.grid.major.x = element_blank())
+
 
 ```
 
@@ -371,7 +385,7 @@ em1 %>%
 When excluding incorrect responses to Question 1 and when the stimuli were the same value, there were `r nrow(res.q2)` responses. Error is measured as follows:
 
 $$
-\text{Error}=\log_2(|\text{judged percent}-\text{true percent})
+\text{Error}=\log_2(|\text{judged percent}-\text{true percent}|)
 $$
 
 ```{r}
@@ -386,7 +400,11 @@ res.q2 %>%
   labs(x = 'Pair ID', y = 'Log Absolute Error')
 ```
 
+
 ## Question 2
+
+Unlike Question 1, there were no significant interactions between the stimuli pairs, datasets, or media types. This means that estimated errors can be calculated separately for each treatment factor. We observed that the effect of stimuli pair was significant (p-value = 0.04335) and the effect of media type was significant (p-value < .0001).
+
 
 ```{r}
 #| label: fig-q2-pair
@@ -394,7 +412,8 @@ res.q2 %>%
 #| fig-align: center
 library(ggsignif)
 mod.q2 <- lmer(q2 ~ set*media*factor(pair_id) + (1|user_id/set:media),
-        data = res.q2)
+                  data = res.q2)
+# anova(mod.q2)
 em2.pair <- emmeans(mod.q2, ~pair_id, pbkrtest.limit = 100000)
 # pairs(em2.pair)
 em2.pair %>% 
@@ -439,11 +458,11 @@ em2.media %>%
 
 # Dicussion
 
-## Discussion
+## Conclusion
 
 :::::: columns
 ::: {.column width="50%"}
-**Conclusions**
+
 
 1.  In certain situations, there is evidence to suggest that 2D heat maps are harder to identify larger values in a pair than for 3D heat maps. However, digital and physical 3D heat maps did not exhibit differences in identifying larger values.
 
@@ -451,14 +470,13 @@ em2.media %>%
 :::
 
 :::: {.column width="50%"}
-::: {layout-nrow="3"}
+::: {layout-nrow="2"}
 ![](../_images/examp2dd.png)
 
 ![](../_images/examp3dd.png)
 
 ![](../_images/examp3dp.png)
 
-Chart types representing heat map data set 1.
 :::
 ::::
 ::::::
@@ -472,3 +490,5 @@ Chart types representing heat map data set 1.
 If you are interested in following the progress of this study, you can visit <https://github.com/TWiedRW/ch3-heat3d> for data and write-ups of the experiment.
 
 # Thank you!
+
+## References
