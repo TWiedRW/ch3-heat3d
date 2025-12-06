@@ -1,0 +1,296 @@
+---
+title: "Heat to Height"
+subtitle: "Comparing the projected and physical dimensionality of 2-dimensional and 3-dimensional heat maps"
+date: today
+date-format: long
+format: 
+  ieee-pdf:
+    abstract: "The display of 3-dimensional (3D) data is often limited by how it can be rendered. These renderings are typically presented as charts on 2-dimensional (2D) computer screens using 2D or 3D chart styles. However, computer renderings do not provide the level of interactivity of 3D charts that we experience in a 3D world, something which can be accomplished through the use of 3D printing. In this paper, we describe a study to compare 2D and 3D heatmaps rendered digitally or via 3D printing and assess the findings of 3D printed charts for the use of displaying statistical information."
+execute:
+  echo: false
+  warning: false
+  message: false
+bibliography: references.bib
+---
+
+```{r}
+#| message: false
+#| warning: false
+#| echo: false
+library(tidyverse)
+```
+
+# Introduction
+
+```{r}
+library(tidyverse)
+library(lme4)
+library(lmerTest)
+library(car)
+library(emmeans)
+load('../../data/stimuli.rda')
+solutions <- readRDS('../../data/solutions.rda')
+theme_set(theme_bw() + theme(aspect.ratio = 1))
+load('../../data/stimuli.rda')
+load('../../data/plan.rda')
+library(tidyverse)
+res.all <- read.csv('../_data/stat218fall2025.csv')
+res.q1 <- res.all %>% 
+  filter(set != 'practice')
+res.q2 <- res.all %>% 
+  filter(set != 'practice' & pair_id != 5 & q1_correct) %>% 
+  mutate(q2 = log2(q2_abs_error))
+```
+
+
+In the 20th century, advancements in technology made data visualizations increasingly more affordable and accessible to a broader population. The primary change in formal data visualizations was from hand-crafted charts to computer-rendered charts [@tukey1965], yet other technological advances have allowed for data visualizations to enter other mediums. These include the ability to effectively use the 3-dimensional (3D) world around us with the novel use of 3D-printed charts. This newer type of visualization has gained a small amount of traction in recent years as a method of producing tangible charts.
+
+At this time, there are few, if any, studies that evaluate 3D-printed charts for the purpose of displaying statistical information. This may in part be due to the cost of materials and rendering times as compared to charts produced on a computer. A single chart can take up to a day to print, limiting the ability to quickly produce visualizations. Given the nature of 3-dimensional data, viewing a 3D realization of statistical information in a 3D environment is a realistic scenario that could increase the ability for information extraction. However, the process of converting data into tangible objects remains mostly as an artistic representation [@huronMakingDataPhysical2023], with few empirical studies evaluating their effectiveness for statistical information extraction.
+
+3D-printed visualizations have shown mixed or promising results across other disciplines. @katsioloudis2018 showed no evidence of a statistical difference in the method of 3D renderings when tasked with drawing a cross-sectional of a dodecahedron. This demonstrated that spatial awareness between computer-rendered and 3D-printed shapes was not largely different among engineering students. The use of 3D-printed maps for navigation for people with low vision showed positive feedback by @holloway2019, increasing the accessibility of navigation. In the clinical setting, 3D-printed anatomy structures were well accepted along with VR-glasses and 3D computer renderings [@muff2022]. With the rise of 3D-printed visualizations in scientific fields, we turn our attention to their use for statistical graphics.
+
+## Literature Review
+
+An identical dataset across multiple chart types does not ensure that the data is perceived in the same way [@cleveland1984; @hofmann2012; @vanderplas2020]. One of the main factors contributing to this phenomenon is how data is encoded into the chart. These encodings include, but are not limited to, placement along axes, lengths, areas, volumes, and color scales. For example, bar charts and pie charts are two common visualizations that have long since been the topic of debate [@eells1926; @croxton1927; @cleveland1984]. In the case of bar charts and pie charts, encodings are represented by lengths and angles, respectively. Inherently, the comparison of different chart types is a comparison of encodings due to the changes in how data is being displayed.
+
+@cleveland1984 noted that estimates involving numerical accuracy may decrease when increasing dimensionality of the encoding, although this was not formally tested in their experiments. The reasoning is possibly due to Stevens' power law, a mathematical formulation of how magnitudes are perceived given different stimuli sources [@stevens1986]. The general form of the law is $\psi(I)=kI^\alpha$, where $I$ is the magnitude of a stimulus, $\psi(I)$ is the perceived magnitude, $k$ is a proportionality constant from the unit of the stimulus, and $\alpha$ is the exponent from the type of stimuli used. Studies have estimated that lengths are perceived without bias (i.e., $\alpha=1$), but areas and volumes tend to have skewed perceptions [@cleveland1984]. This indicates that lower-dimensional charts might perform better when readers are tasked with extracting numerical estimates from the chart.
+
+There are mixed results in regard to the use of 3D charts, mostly attributing to the purpose of third dimension. When the extra dimension does not convey meaningful information, estimates of accuracy decrease and solution times increase as compared to equivalent 2D charts [@fisher1997; @zacks1998; @fischer2000]. The same increase in solution time is seen when the third dimension is utilized for displaying data, but can sometimes produce better error rates than 2D charts [@barfield1989; @kraus2020]. Additionally, when given the option of 2D or 3D charts for extracting numerical information, the 2D charts showed increased preference and confidence than their 3D counterparts [@barfield1989; @fisher1997]. It is worth noting that all of the studies listed use renderings of 3D charts and not physical 3D charts.
+
+Formal studies involving true 3D charts are limited, and it is unclear if they follow the framework of existing theories on data visualizations. Unlike paper and computer rendered charts, constructing true 3D charts inherently contains many additional factors that could affect perception, such as chart materials, natural lighting, interactivity, and viewing distance. Some of these factors have already been shown to have an effect on computer renderings [@tarr2001; @wang2022]. However, we aim to provide some of the initial findings on the use of 3D-printing for the creation of statistical graphics.
+
+We hypothesize that 3D charts in 3D environments will produce better information extraction than their computer rendered counterparts. Specifically, we will compare 3D-printed charts to digital 2D and 3D renderings. We suspect that this difference will hold across multiple data sets and different magnitudes of stimuli. In this paper, we evaluate the accuracy of numerical estimations on true 3D charts by conducting a factorial experiment that assessed chart types and ratios of pairs of stimuli. We discuss the construction of the stimuli and how we closely matched the charts to compare 2D, 3D-digital, and 3D-printed renderings of heatmap data.
+
+# Methods
+
+Our study was designed to evaluate and expand the literature on numerical estimation of 3D charts. One chart type that is typically presented in both 2D and 3D renderings is the heatmap. These charts consist of a grid coordinate system across two explanatory variables and encode a response variable using either color (in 2D) or height (in 3D). Inherently, the differences between 2D and 3D heatmaps require careful consideration in their construction to allow for direct comparisons of dimensionality. All data and methods will be publicly available at the conclusion of the study to promote open science and reproducibility. In this section, we describe the design of our experiment and methods of analysis.
+
+
+## Stimuli
+
+We denote "stimuli" to represent the magnitude of our chosen values. In a 3D Cartesian space, the X and Y axes represent the coordinates of the stimuli, and the Z-axis represents the value for the stimuli. Each X and Y coordinate is represented by a square tile with a 1:1 aspect ratio. The Z-axis is denoted by a color gradient scale for 2D charts and by height in 3D charts. All stimuli and remaining randomly generated values range between 0 and 100 units. In this experiment, $X=1, 2, \dots,10$ and $Y=1, 2,\dots,10$.
+
+
+The design of our experiment made use of the method of constant stimuli, where comparisons between stimuli are with respect to a stimuli that remains the same magnitude [@kingdom2016]. We set the constant stimuli at 50 units. For stimuli between 50 and 100, we set the maximum stimuli value at 90 and equally partitioned the ratios of stimuli with the constant stimuli, $\frac{50}{90}=0.556$ to $\frac{50}{50}=1.0$, resulting in four varying stimuli values where 50 is the smallest value. The same ratios obtained with stimuli between 50 and 90 were used to create 4 stimuli varying between 0 and 50, where 50 is the largest value. Additionally, we also included a stimuli pair where both values are 50, resulting in nine total pairs of stimuli. We note that while most ratios occur twice, the physical differences in heights of different stimuli pairs for identical ratios are different. This is to account for the different scaling factors of mapping color to height since no one-to-one relationship between color and height exist. All stimuli values can be found in @fig-stimuli-values.
+
+```{r}
+#| fig-cap: "Values for stimuli in the heatmap experiment. All values are paired with the constant stimuli of 50 units, creating nine pairs of stimuli."
+#| label: fig-stimuli-values
+load('../../data/stimuli.rda')
+stimuli %>% 
+  ggplot(mapping = aes(x = pair_id, y = values)) + 
+  geom_bar(stat = 'identity', width = 1, color = 'black', fill = '#1a80bb') + 
+  geom_col(aes(y = 50), alpha = 1/2, width = 1/2, fill = '#ea801c') + 
+  geom_text(aes(label = round(values, 1), y = 5)) + 
+  theme_minimal() + 
+  annotate('text', x = 5, y = 25, label = 'Constant', size = 2.5) +
+  labs(x = 'Pair Label', y = 'Stimuli Magnitude') +
+  scale_x_continuous(breaks = 1:9) + 
+  scale_y_continuous(limits = c(0, 100)) +
+  theme(panel.grid.major.x = element_blank(),
+        panel.grid.minor.x = element_blank(),
+        aspect.ratio = 1/2,
+        panel.grid.major.y = element_line(color = 'grey70'),
+        panel.grid.minor.y = element_line(color = 'grey80', linetype = 'dashed'))
+```
+
+To generate non-stimuli random values, we used a mixture distribution of random uniform noise and mathematical functions to populate our coordinate grid. The mathematical functions are scaled between 0 and 100, $g(Z)=100\cdot\frac{Z-\min(Z)}{\max(Z)-min(Z)}$. Two datasets were created for the experiment. The first dataset, called Set 1, used the formula for the top half of sphere that is centered within our X and Y coordinate grid, $f_1(X,Y)=\sqrt{7^2-(X-\bar{X})^2-(Y-\bar{Y})^2}$, where $\bar{X}$ and $\bar{Y}$ are the averages of the $X$ and $Y$ coordinate ranges. The second dataset, called Set 2, is calculated similarly using the formula for the bottom half of sphere, $f_2(X,Y)=\sqrt{7^2-(X-\bar{X})^2+(Y-\bar{Y})^2}$. Denoting $Z$ as the random values, $U(0,100)$ as a random variable drawn from a continuous uniform distribution, and $X,Y$ as heatmap coordinates, our random heatmap data is calculated as $Z=c\cdot U(0,100)+(1-c)\cdot g(f_i(X,Y))$, where $c=0.3$. An example of varying $c$ values is presented in @fig-random-z.
+
+::: {#fig-random-z layout-ncol="5"}
+![$c=0$](plots/z100.png){#fig-z100}
+
+![$c=0.25$](plots/z75.png){#fig-z75}
+
+![$c=0.5$](plots/z50.png){#fig-z50}
+
+![$c=0.75$](plots/z25.png){#fig-z25}
+
+![$c=1$](plots/z0.png){#fig-z0}
+
+Mixture distribution using random uniform noise and formula for the top half of a sphere. As $c$ approaches 1, the distribution resembles uniform random noise. Similarly, as $c$ approaches 0, the distribution becomes the underlying mathematical function.
+:::
+
+The placement of chosen stimuli values onto the randomly generated heatmap data was done via simulation to try to make their placement look as natural as possible. Twenty random heatmaps were generated for each dataset. For each heatmap, the non-constant stimuli was placed onto the coordinate such that the difference between the stimuli and randomly generated value is minimized. The constant stimuli was then placed onto a coordinate with a Manhattan distance of three or four that minimizes the difference between the constant stimuli and randomly generated values, where the Manhattan distance is given by $|X_i - X_j| + |Y_i - Y_j|$ for stimuli $i$ and $j$. To ensure that stimuli placement is evenly position across the heatmap, the count of stimuli was computed separately across the X and Y axes. For example, in Data Set 1, the X-axis has four stimuli in $X=1$, three stimuli in $X=2$, and so forth. Chi-squared statistics were calculated for each axis and the heatmap with the smallest average Chi-squared statistic was selected as the final dataset. A visual inspection of this process showed that the stimuli were not clustered in any one area of the chart and that the stimuli look natural with respect to the random mixture distribution.
+
+:::{#fig-stim-placement layout-ncol=2}
+
+![Set 1](../_images/stimuli-set1.png)
+
+![Set 1](../_images/stimuli-set1.png)
+
+: Placement of stimuli on data sets. 
+:::
+
+## Charts
+
+Three types of charts were considered for this study: 2D-digital (2dd), 3D-digital (3dd), and 3D-printed (3dp). We constructed these charts so that they are as similar as possible, but inherent differences in dimensionality led to artistic decisions that attempt to focus solely on the dimensionality of the charts. The process of creating the charts is discussed in this section.
+
+The 3D-printed charts were rendered with OpenSCAD [@kintelOpenSCADDocumentation2023]. To include plot text, a 120mm by 120mm by 10mm base was created with a solid color that was either white or black. Cells of the heatmap measured 10mm by 10mm, resulting in a heatmap that is 100mm by 100mm and is centered on the base. The upper bound of the height of heatmap values is 100mm, where 1-unit in the heatmap data is represented by 1mm of height on the heatmap. Once rendered, the heatmap was saved to 3D Manufacturing Format (3mf) and Standard Triangle Language (stl) files. A variety of solid and gradient filaments were used to print the output files from OpenSCAD. An example of the 3D-printed chart is shown in @fig-3dp.
+
+::: {#fig-3dp layout-ncol="2" fig-cap="3D printed heatmaps."}
+![Solid filament of Data Set 1](images/3dp-gradient.JPG){#fig-3dp-gradient}
+
+![Solid filament of Data Set 2](images/3dp-solid.JPG){#fig-3dp-solid}
+:::
+
+To closely match the 3D-digital chart to the 3D-printed chart, multiple stl files were created for each colored component and combined with the RGL package [@rgl]. The base was rendered with white smoke (#F5F5F5) to slightly contrast with the default white background color (#FFFFFF). Heatmap tiles were rendered with cyan (#74CCFF) and text labels were rendered with black (#000000). Lighting was fixed at 45 degree angles at two opposite corners of the chart. The end result was a near perfect replica of the 3D-printed charts, with the exception of different heatmap tile colors, where an example is given in @fig-3dd.
+
+![RGL rendering of Data Set 2 for 3dd charts.](images/chart-3dd.png){#fig-3dd fig-height="3in"}
+
+Unlike the 3D charts, the 2D charts needed a different encoding to convey heatmap values. The 2D heatmaps were created with `ggplot2` [@ggplot2] using `geom_tile()`. Fill colors for the cells use a color gradient from Blue Zodiac (#0C2841) to Malibu (#66D9FF), which were selected from a color picker using shadows on our initial 3D-printed charts. The color interpolation was performed with the `scale_fill_gradient()` function from the `ggplot2` package.
+
+```{r}
+#| fig-cap: "Color palette for 2D-digital charts. The colors are interpolated from #0C2841 to #66D9FF, which are the the colors of the lighting conditions for a 3D-printed chart created with cyan filament."
+#| label: fig-color-pal
+#| fig-height: 2
+ggplot(mapping = aes(x = 1:10, y = 0)) + 
+  geom_tile(color = NA, fill = colorRampPalette(c('#0C2841','#66D9FF'))(10)) + 
+  theme_void() + 
+  coord_equal()
+```
+
+
+
+## Experimental Design
+
+Our experiment was designed with a 3 x 2 x 9 treatment structure. Media type is our main interest, with 2D-digital, 3D-digital, and 3D-printed charts. To ensure that results are not confounded with datasets, we used two datasets to create the heatmaps. A total of nine stimuli pairs were placed into each dataset. The order of treatments was given so that media and dataset combinations were grouped together randomly in the sequence and stimuli pairs were randomized within the groupings.
+
+Due to the practical constraint of participant fatigue, stimuli pairs were incompletely blocked. A full factorial design would result in 54 trials per participant, which could lead to a decrease in quality responses [@herzog1981]. Therefore, we selected four out of the nine possible stimuli pairs to create incomplete blocks, resulting in 18 blocks for a balanced design. Within each block, media type is fully crossed with dataset. Using the incomplete block structure, participants completed a total of 24 trials, which was more practical than the full factorial design. 
+
+We measured two responses for each trial – two questions for each trial and one question for each media by dataset combination. For each trial, participants are initially asked which stimuli in a pair is larger or if the stimuli are the same value. Next, they were asked to estimate the magnitude of the smaller stimuli if the larger stimuli represents 100 units, which is a subtractive process [@veit].
+
+We measured two responses for each trial, following a similar process to @cleveland1984. The first question asked participants to identify the larger value in a specified stimuli pair. An additional option was available if participants thought that the values were the same. The second question asked participants to estimate the value of the smaller stimuli if the larger stimuli represented 100 units. This was designed to be a ratio estimation of $A/B$, where $A\leq B$. 
+
+
+
+
+## Method of Analysis
+
+Our experiment follows a split-plot design with balanced incomplete blocking, where participants nested within blocks serve as the blocking factor, media type and dataset form the whole plot, and stimuli pair is the split plot. A similar design was presented by @mandal2020 for a single replicate. To account for response distributions and participant effects, (generalized) linear mixed models [@stroup] were fit to each question. For Question 1, where participants identified which value in a stimuli pair was larger (or if they were equal), a binomial generalized linear mixed model was used since responses were binary (correct or incorrect). For Question 2, participants estimated the ratio of the stimuli using a slider, creating a continuous response that was converted into an error metric following @cleveland1984.
+
+To measure numerical accuracy for Question 2, we calculated $Y=\log_2(|\text{Guess}-\text{Actual}|)$, where "Guess" is the participant's estimate and "Actual" is the true ratio value. The log transformation is similar to what @cleveland1984 used and accounts for the exponential relationship between subtractive and ratio estimations [@veit]. By using the absolute error, we measure estimation accuracy regardless of direction. Linear mixed models were fit to this transformed response, accounting for the nested structure of participants within blocks and repeated measures across media types, datasets, and stimuli pairs.
+
+
+## Subject Recruitment and Participation
+
+Participants were recruited from an introductory statistics course between June and December 2025 from both in-person and online sections of the course. The experiment was incorporated into the curriculum as part of an experiental learning project that allowed students to get hands-on experience with statistical research, although responses for the experiment were collected only if students agreed to data collection and they met the age of majority. 
+
+A Shiny application [@shiny] was developed to administer the experiment. The application consisted of five sections: informed consent, demographics, practice, experiment, and wrap-up. The entire application was designed to be completed in approximately 30 minutes. The Shiny application started with the informed consent screen, allowing participants to select if they are an introductory statistics student and if they agree to the data collection. Participants had to select a data collection option to continue. After submitting their data collection response, a completion code was generated and saved on the last page of the application. A copy of the informed consent will be available in our GitHub repository.
+
+Once a participant completed the demographics page or selected "No" to the data collection question, they were given a practice page. A modal dialog was initially shown with instructions, and users could display this window again at any point during the practice. The practice consisted of four trials: two from 2dd charts and two from 3dd charts. Each practice trial showed the correct solution after the participant submitted their trial. After all practice trials were completed, another modal dialog was displayed to ask participants if they have access to the 3D-printed charts. For students who were enrolled in an online section of the course, selecting this option removed the 3D-printed charts from their trials.
+
+The experiment page was presented to participants after completion of the practice trials. Each trial contained two questions -- one question for identifying which stimuli in the pair is larger and another question for estimating the value of the smaller stimuli if the larger stimuli is 100 units. The position of the slider input was randomly positioned for each trial. For 3D digital charts, the number of interactive clicks was also recorded. A trial could only be submitted if the first question was answered and if the slider was moved at least once.
+
+# Results
+
+A total of 196 students enrolled in an introductory statistics course participated in the study as part of an experiential learning project in their course curriculum. The vast majority of students were in the 19-25 age range (97.4%), with approximately two-thirds of students identifying as female. 
+
+## Question 1: Identification Accuracy
+
+The first question of each trial asked participants to identify the larger value in a given stimuli pair. Of 4,072 completed trials, there were 3,218 responses (79.03%) that correctly identified the larger value or if both values were the same. There were 135 students who had at least 75% of their responses correct to Question 1, with 31 students who were correct for every trial. 
+
+
+There was a significant three-way interaction between media type, data set, and stimuli pair (p-value = 0.0013) for correctly identifying the larger value in a stimuli pair. Simple effects of media types across data set and stimuli pair exhibited evidence of significantly smaller odds ratios for 12 of the 2D comparisons. In data set 1, there were larger odds of correct identification for the 3D digital chart than the 2D chart in stimuli pairs 1, 3, 6, 7, and 9. For 3D printed charts, this was only the case for stimuli pairs 3 and 6. For data set 2, the odds of success were larger for 3D digital and 3D printed charts than 2D charts in stimuli pairs 5 and 6. For stimuli pair 4, only the 3D digital chart had significantly larger odds of correct identification than the 2D chart. Additionally, the only significant simple effect between the 3D charts was in data set 1 for stimuli pair 9, where the odds of correctly choosing the larger value were greater for the digital chart than the 3D-printed chart (p-value = 0.0132). 
+
+
+
+
+```{r}
+#| label: fig-q1-plot
+#| fig-cap: "Estimated probability of success"
+#| eval: false
+library(glmmTMB)
+modq1 <- glmmTMB(
+  q1_correct ~ set*media*factor(pair_id) + (1 | user_id/set:media),
+  data = res.q1,
+  family = binomial()
+)
+
+mycols <- c(
+  '2dd' = '#ffbb6f',
+  '3dd' = '#5e4c5f',
+  '3dp' = '#999999'
+)
+
+library(emmeans)
+em1 <- emmeans(modq1, ~media | set + pair_id, type = 'response')
+sig.pairs <- pairs(em1) %>%
+  data.frame() %>%
+  filter(p.value < 0.05) %>%
+  # filter(str_detect(contrast, '2dd')) %>%
+  arrange(pair_id, set, contrast) %>% 
+  mutate(d2comp = str_extract(contrast, '3d.$'),
+         d2symb = ifelse(d2comp == '3dd', '†', '‡')) %>% 
+  group_by(set, pair_id) %>% 
+  mutate(text = paste(d2symb, collapse = ''),
+         pair_id = as.numeric(pair_id),
+         media = '2dd') %>% 
+  select(media, set, pair_id, text) %>% 
+  distinct()
+em1 %>% 
+  data.frame() %>% 
+  left_join(solutions) %>% 
+  left_join(sig.pairs) %>% 
+  ggplot(mapping = aes(x = media, y = prob)) + 
+  geom_col(aes(fill = media), position = position_dodge(), width = 3/4) + 
+  geom_text(aes(label = text, y = 0.1), size = 3) + 
+  scale_fill_manual(values = mycols) +
+  labs(x = 'Pair Id', y = 'Estimated probability of\ncorrect solution',
+       caption = '† = sig. smaller odds than 3dd\n‡ = sig. smaller odds than 3dp') + 
+  facet_grid(set~pair_id) + 
+  scale_color_manual(values = mycols) +
+  scale_y_continuous(limits = c(0,1)) +
+  theme_bw() + 
+  theme(#aspect.ratio = 1,
+        axis.text.x = element_text(angle = 90, hjust = 1),
+        panel.grid.major.x = element_blank())
+
+
+```
+
+
+
+## Question 2: Ratio Estimation Error
+
+```{r}
+library(ggsignif)
+mod.q2 <- lmer(q2 ~ set*media*factor(pair_id) + (1|user_id/set:media),
+                  data = res.q2)
+anova(mod.q2)
+em2.pair <- emmeans(mod.q2, ~pair_id, pbkrtest.limit = 100000)
+pairs(em2.pair)
+
+em2.media <- emmeans(mod.q2, ~media, pbkrtest.limit = 100000)
+# pairs(em2.media)
+
+```
+
+The second question in each trial was to estimate the size of the smaller value in the stimuli pair if the larger value represented 100 units. Of the 4,072 completed trials, we removed all trials where participants were incorrect in their response to Question 1 (854 trials), as well as responses to stimuli pair 5 (additional 280 trials). The first question served primarily as an attention check to see if participants were correctly identifying the larger value in the pair. Both stimuli in pair 5 were the same value, meaning that correct solutions to Question 1 should give an identical answer in the ratio estimation if participants were following instructions. For these reasons, 1,134 responses were removed for Question 2. 
+
+Using a similar error metric as @cleveland1984, we model our error as $\text{Error}=\log_2(|\text{judged percent}-\text{true percent}|)$. There were significant main effects for media type (p-value < .0001) and stimuli pair (p-value = 0.0022). For media types, the log absolute error was larger for the 2D chart than both the 3D digital chart (p-value < .0001) and the 3D-printed chart (p-value < .0001). There were no detectable differences between the digital and printed 3D charts. All significant differences in stimuli pairs included pair 6, where stimuli pair 6 had significantly smaller error than stimuli pairs 1 (p-value = 0.0398) and  2 (p-value = 0.0004), and marginally smaller errors than pairs 8 (p-value = 0.0560) and 9 (p-value = 0.0809). 
+
+
+```{r}
+#| label: fig-error-media
+#| fig-cap: "Least square means for chart media types. There was evidence of a significant difference in error between the 2D heatmap and both renderings of the 3D heatmaps."
+em2.media %>% 
+  data.frame() %>% 
+  ggplot(mapping = aes(x = media, y = emmean)) + 
+  geom_col(color = 'black', fill = '#1a80bb', width = 1/2) + 
+  geom_errorbar(aes(ymin = lower.CL, ymax = upper.CL),
+                width = 1/4) + 
+  scale_y_continuous(limits = c(0, 4.7)) + 
+  geom_signif(comparisons = list(
+    c('2dd', '3dd'),
+    c('2dd', '3dp')
+  ), y_position = c(4.1, 4.5), annotations = c('< .0001', 'p-value < .0001')) +
+  theme_bw() + 
+  theme(aspect.ratio = 1/2) + 
+  labs(x = 'Media', y = 'Estimate for log error')
+```
+
+
+# Discussion
+
+The findings in our study are consistent with similar studies that examine the dimensionality of charts. When the third dimension is informative, 
+
