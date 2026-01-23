@@ -1,0 +1,323 @@
+---
+title: "Better Model"
+date: "01-19-2026"
+date-modified: today
+format: html
+---
+
+The purpose of this document is to provide a better model that accounts for how people answered questions. 
+
+## Data cleaning
+
+```{r}
+# Data from Shiny app
+library(RSQLite)
+conn <- dbConnect(SQLite(), "../../shiny-apps/experiment-heat3d/data/stat218-summer2025.db")
+dbListTables(conn)
+blocks <- dbReadTable(conn, "blocks")
+exp_results <- dbReadTable(conn, "exp_results")
+users <- dbReadTable(conn, "users")
+dbDisconnect(conn)
+
+# Solutions
+solutions <- readRDS("../../data/solutions.rda")
+
+```
+
+
+```{r}
+library(tidyverse)
+# Pre-processing of results
+results <- exp_results %>%
+  
+  # Remove all practice trials
+  filter(set != "practice") %>%
+  
+  # Arrange by user id and trial time
+  group_by(user_id) %>%
+  arrange(start_time) %>%
+  
+  # Identify sequence of trials
+  mutate(user_seq = ifelse(user_trial_order > lag(user_trial_order), 0, 1),
+         user_seq = ifelse(start_time == min(start_time), 0, user_seq)) %>% 
+  mutate(user_seq = cumsum(user_seq)) %>%
+  
+  # Join with blocks
+  left_join(blocks, by = "user_id", relationship = 'many-to-many') %>%
+  group_by(user_id, user_seq) %>%
+  
+  # Remove blocks that were assigned after the trials started
+  filter(system_time < min(start_time)) %>%
+  
+  # Get time difference with block and filter for smallest difference
+  mutate(time_diff_block = min(start_time) - system_time) %>%
+  filter(time_diff_block == min(time_diff_block)) %>% 
+  
+  # Filter so that only the first completed trial is included
+  filter(user_seq == min(user_seq))
+
+```
+
+In the pre-processing, the number of rows matches with the number of rows of the data when the practice trials were removed.
+
+Next, we remove all sequences that did not complete the full experiment. Note that online users had 16 trials (2 media, 4 pairs, 2 sets) and in-person users had 24 trials (3 media, 4 pairs, 2 sets).
+
+```{r}
+# Get user sequences with full completions
+full_completions <- results %>% 
+  group_by(user_id, user_seq, block) %>%
+  count() %>%
+  filter(n %in% c(16,24))
+
+# Inner join to filter
+results <- inner_join(results, full_completions) %>%
+  select(-c(time_diff_block, n)) %>% 
+  ungroup()
+```
+
+```{r}
+# Join with results
+results <- left_join(results, solutions)
+```
+
+
+## Models
+
+```{r}
+res <- results %>%
+  mutate(y_cm = log2(abs(user_slider - 100*true_ratio)+1/8))
+```
+
+
+### Initial model
+
+This is the initial model that I used for the Stat 218 presentation. Data are filtered so that only correct solutions to the initial question are used.
+
+```{r}
+library(lme4)
+library(lmerTest)
+mod1 <- lmer(y_cm ~ (set+media+factor(pair_id))^3 + (1|block:user_id/set:media),
+             data = filter(res, user_larger == true_larger, pair_id != 5))
+summary(mod1)
+anova(mod1)
+```
+
+
+```{r}
+library(emmeans)
+pairs(emmeans(mod1, ~media, infer = c(T,T)))
+```
+
+
+
+## Clustering
+
+Obviously, there is a high amount of variation for each ratio estimation.
+
+```{r}
+results %>% 
+  ggplot(mapping = aes(x = user_slider, y = factor(100*true_ratio))) +
+  geom_boxplot()
+```
+
+```{r}
+#| fig-cap: "In this plot, it seems like incorrect responses are generally uniformly distributed. However, correct responses are almost bimodal."
+results %>% 
+  mutate(correct = user_larger == true_larger) %>% 
+  ggplot(mapping = aes(x=user_slider)) + 
+  geom_histogram() + 
+  geom_vline(aes(xintercept = true_ratio*100), color = 'red') +
+  facet_grid(correct~pair_id, scales = 'free_y', margins = 'correct')
+```
+
+
+
+
+```{r}
+#| fig-cap: "It sometimes looks like the bimodal (trimodal) components come from different estimation strategies. The red line is the correct task, dashed line is estimating the size of the value compared to the maximum value in the chart, and dotted line is the difference."
+res %>% 
+  mutate(true_size = ifelse(z > 50, 50, 50*true_ratio),
+         true_diff = z - true_size) %>% 
+  filter(user_larger == true_larger) %>%
+  ggplot(mapping = aes(x = user_slider)) + 
+  geom_histogram() + 
+  geom_vline(aes(xintercept = 100*true_ratio), color = 'red') +
+  geom_vline(aes(xintercept = true_size), linetype = 'dashed') +
+  geom_vline(aes(xintercept = true_diff), linetype = 'dotted') +
+  facet_wrap(~pair_id)
+```
+
+Since clustering is dependent on mean values and these change with each pair_id, 
+
+```{r}
+new_res <- data.frame()
+for(i in 1:9) {
+  try({
+    tmp <- filter(res, pair_id == i, user_larger == true_larger)
+    mus_df <- tmp %>% 
+      mutate(true_size = ifelse(z > 50, 50, 50*true_ratio),
+         true_diff = z - true_size)
+    
+    mu <- c(mus_df$true_ratio[1]*100, mus_df$true_size[1], mus_df$true_diff[1])
+    
+    tmp$class <- max.col(normalmixEM(tmp$user_slider, 
+                                     k=ifelse(i %in% c(1,2), 2, 3))$posterior)
+    new_res <- bind_rows(new_res, tmp)
+  }, silent = T)
+}
+```
+
+```{r}
+new_res %>% 
+  mutate(true_size = ifelse(z > 50, 50, 50*true_ratio),
+         true_diff = z - true_size) %>% 
+  # filter(pair_id==5) %>% 
+  ggplot(mapping = aes(x = user_slider, fill = factor(class), group = factor(class))) + 
+  geom_histogram() + 
+  geom_vline(aes(xintercept = 100*true_ratio), linetype = 'solid') +
+  geom_vline(aes(xintercept = true_size), linetype = 'dashed') +
+  geom_vline(aes(xintercept = true_diff), linetype = 'dotted') +
+  facet_wrap(~pair_id)
+```
+
+It is promising to see that a cluster forms at the true value every time
+
+## Something new?
+
+Let's see if we can figure out which participants are not following instructions. First, people following instructions should get the majority of smaller values correct for the smaller ratios (larger physical differences). For this, let's exclude pair_id 4, 5, and 6, which represent 88.9% and 100%. These are likely too close together and may be incorrect by people who are following instructions. This means that 55.6%, 66.7%, and 77.8% are included. Since 4 pair_id values are in each block, each participant is included in this approach.
+
+```{r}
+#| layout-ncol: 2
+#| fig-subcap: 
+#| - "Correct or incorrect (all ratios)"
+#| - "Correct or incorrect (without 4, 5, 6)"
+res %>% 
+  group_by(user_id) %>% 
+  summarise(q1_correct = mean(user_larger == true_larger)) %>% 
+  arrange(q1_correct) %>% 
+  ggplot(mapping = aes(x = q1_correct)) + 
+  geom_histogram(binwidth = 0.05, color = 'black')
+
+res %>% 
+  group_by(user_id) %>% 
+  filter(!(pair_id %in% c(4:6))) %>%
+  summarise(q1_correct = mean(user_larger == true_larger)) %>% 
+  arrange(q1_correct) %>% 
+  ggplot(mapping = aes(x = q1_correct)) + 
+  geom_histogram(binwidth = 0.05, color = 'black')
+```
+
+After filtering, it seems like excluding pair_id 4, 5, and 6 is reasonable.
+
+Now, let's see what happens when excluding pair_id 4, 5, and 6 on the numerical summary.
+
+```{r}
+res %>% 
+  group_by(user_id) %>% 
+  filter(!(pair_id %in% 4:6)) %>% 
+  summarize(prop_correct = mean(user_larger == true_larger)) %>% 
+  summary()
+```
+
+The media is above 90%, so I think we could reasonably exclude people below 90% percent accuracy to q1.
+
+Now, let's try the univariate normal mixtures again after excluding these people.
+
+```{r}
+include <- res %>% 
+  group_by(user_id) %>% 
+  filter(pair_id %in% c(1:3, 7:9)) %>% 
+  filter(mean(user_larger == true_larger) >= 0.9) %>% 
+  select(user_id) %>% 
+  distinct()
+
+new_res_filtered <- data.frame()
+for(i in 1:9) {
+  try({
+    tmp <- res %>% 
+      inner_join(include) %>% 
+      filter(pair_id == i)
+    mus_df <- tmp %>% 
+      mutate(true_size = ifelse(z > 50, 50, 50*true_ratio),
+         true_diff = z - true_size)
+    
+    mu <- c(mus_df$true_ratio[1]*100, mus_df$true_size[1], mus_df$true_diff[1])
+    
+    tmp$class <- max.col(normalmixEM(tmp$user_slider, 
+                                     k=ifelse(i %in% c(1,2,9),2,3))$posterior)
+    new_res_filtered <- bind_rows(new_res_filtered, tmp)
+  }, silent = T)
+}
+
+new_res_filtered %>% 
+  mutate(true_size = ifelse(z > 50, 50, 50*true_ratio),
+         true_diff = z - true_size) %>% 
+  # filter(pair_id==5) %>% 
+  ggplot(mapping = aes(x = user_slider, fill = factor(class), group = factor(class))) + 
+  geom_histogram() + 
+  geom_vline(aes(xintercept = 100*true_ratio), linetype = 'solid') +
+  geom_vline(aes(xintercept = true_size), linetype = 'dashed') +
+  geom_vline(aes(xintercept = true_diff), linetype = 'dotted') +
+  facet_wrap(~pair_id)
+```
+
+It looks like it may be difficult classify distributions, especially with 2 and 9. It does not seem like this approach can identify distributions on individual responses. So perhaps we need something that incorporates each person individually?
+
+```{r}
+#| fig-cap: "Histogram of average error for per participant"
+#| layout-ncol: 2
+
+res %>% 
+  mutate(error = user_slider - true_ratio*100) %>% 
+  group_by(user_id, pair_id) %>% 
+  summarise(mean_error = mean(error)) %>% 
+  ggplot(mapping = aes(x = mean_error)) + 
+  geom_histogram(binwidth = 5, color = 'black') + 
+  facet_wrap(~pair_id)
+
+res %>% 
+  mutate(error = user_slider - true_ratio*100) %>% 
+  group_by(user_id, pair_id) %>% 
+  summarise(mean_error = mean(error)) %>% 
+  ggplot(mapping = aes(x = mean_error)) + 
+  geom_histogram(binwidth = 5, color = 'black') 
+```
+
+Hmm, I'm not sure if centering errors would help us to distinguish what is going on. Possibly use with this paper on response strategies on a continuous scale for survey data:  
+
+- [https://pmc.ncbi.nlm.nih.gov/articles/PMC11572159/pdf/10.1177_00131644241242789.pdf](https://pmc.ncbi.nlm.nih.gov/articles/PMC11572159/pdf/10.1177_00131644241242789.pdf)
+
+- [https://link.springer.com/article/10.3758/s13428-025-02782-4](https://link.springer.com/article/10.3758/s13428-025-02782-4) (note: I cannot seem to access this article from the UNL library's website. Keeps redirecting me to sign in on the source website)
+
+::: {.callout-warning}
+The only issue I have with the response strategies approach is that it seems to be developed for when people are extreme in their responses. That is, either high values or low values. I'm not sure if this will work for our purposes, but was interesting to look into.
+:::
+
+Since participants completed 16 or 24 trials, let's see if we can identify the distribution based on their trials alone. Again, let's center the values so that the expectation is zero.
+
+```{r}
+#| fig-cap: "This is actually somewhat informative. Perhaps we can see if responses per individual are somewhat normal with a mean of zero? (Sorry about the area densities. Apparently Hadley had a reason to not alpha for the lines? https://github.com/tidyverse/ggplot2/issues/1371"
+res %>% 
+  mutate(error = user_slider - true_ratio*100) %>% 
+  ggplot(mapping = aes(x = error, group = user_id)) + 
+  geom_density(alpha = 1/10)
+
+res %>% 
+  mutate(error = user_slider - true_ratio*100) %>% 
+  ggplot(mapping = aes(x = error, group = user_id)) + 
+  stat_density(geom = 'line', alpha = 1/10)
+```
+
+The only issue that I can see with testing normality with mean zero is that we observe a difference between the 2D and 3D charts. Also, we definitely observe a distribution of means around 0, so perhaps 
+
+
+
+```{r}
+# This is annoying me that I have not yet saved these reoccurring values
+res <- res %>% 
+  mutate(error = user_slider - true_ratio*100,
+         true_size = ifelse(z == 50, 50*true_ratio, 50),
+         true_diff = z - true_size)
+res
+```
+
