@@ -10,6 +10,8 @@ The purpose of this document is to provide a better model that accounts for how 
 ## Data cleaning
 
 ```{r}
+set.seed(3141)
+
 # Data from Shiny app
 library(RSQLite)
 conn <- dbConnect(SQLite(), "../../shiny-apps/experiment-heat3d/data/stat218-summer2025.db")
@@ -151,6 +153,7 @@ Since clustering is dependent on mean values and these change with each pair_id,
 
 ```{r}
 new_res <- data.frame()
+library(mixtools)
 for(i in 1:9) {
   try({
     tmp <- filter(res, pair_id == i, user_larger == true_larger)
@@ -261,7 +264,7 @@ new_res_filtered %>%
   facet_wrap(~pair_id)
 ```
 
-It looks like it may be difficult classify distributions, especially with 2 and 9. It does not seem like this approach can identify distributions on individual responses. So perhaps we need something that incorporates each person individually?
+It looks like it may be difficult classify distributions, especially with 4 and 7. It does not seem like this approach can identify distributions on individual responses. So perhaps we need something that incorporates each person individually?
 
 ```{r}
 #| fig-cap: "Histogram of average error for per participant"
@@ -296,11 +299,11 @@ The only issue I have with the response strategies approach is that it seems to 
 Since participants completed 16 or 24 trials, let's see if we can identify the distribution based on their trials alone. Again, let's center the values so that the expectation is zero.
 
 ```{r}
-#| fig-cap: "This is actually somewhat informative. Perhaps we can see if responses per individual are somewhat normal with a mean of zero? (Sorry about the area densities. Apparently Hadley had a reason to not alpha for the lines? https://github.com/tidyverse/ggplot2/issues/1371"
+#| fig-cap: "This is actually somewhat informative. Perhaps we can see if responses per individual are somewhat normal with a mean of zero?"
 res %>% 
   mutate(error = user_slider - true_ratio*100) %>% 
   ggplot(mapping = aes(x = error, group = user_id)) + 
-  geom_density(alpha = 1/10)
+  geom_density(alpha = 1/8, color = alpha('black', alpha = 1/8))
 
 res %>% 
   mutate(error = user_slider - true_ratio*100) %>% 
@@ -308,7 +311,7 @@ res %>%
   stat_density(geom = 'line', alpha = 1/10)
 ```
 
-The only issue that I can see with testing normality with mean zero is that we observe a difference between the 2D and 3D charts. Also, we definitely observe a distribution of means around 0, so perhaps 
+The only issue that I can see with testing normality with mean zero is that we observe a difference between the 2D and 3D charts. Also, we definitely observe a distribution of means around 0, so perhaps it seems like people respond with a consistent bias. 
 
 
 
