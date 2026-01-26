@@ -324,3 +324,219 @@ res <- res %>%
 res
 ```
 
+
+```{r}
+res %>% 
+  mutate(error_ratio = user_slider - true_ratio*100,
+         error_diff = user_slider - true_diff,
+         error_size = user_slider - true_size) %>% 
+  ggplot(mapping = aes(x = error_diff, group = user_id)) + 
+  geom_density(alpha = 1/10, color = alpha('black', alpha = 1/10))
+```
+
+
+Differences seemed to be the second most used strategy. 
+
+Out of my own curiosity, what does this look like in a 3D plot?
+
+```{r}
+library(rgl)
+res_errors <- res %>% 
+  mutate(error_ratio = user_slider - true_ratio*100,
+         error_diff = user_slider - true_diff,
+         error_size = user_slider - true_size) 
+with(res_errors, rgl::plot3d(error_ratio, error_diff, error_size))
+rglwidget()
+```
+
+Not quite what I expected to see, but each "line" seems to be for each pair_id. Thinking about this, it does make sense. Each error has a linear relationship.
+
+
+
+
+### Mixture distribution using design of study
+
+```{r}
+library(flexmix)
+fm <- flexmix(user_slider ~ set*media*factor(pair_id) | user_id,
+              data = res_errors,
+              k = 3,
+              model = FLXMRglm(family = 'gaussian'))
+fm
+head(posterior(fm))
+
+strategy <- apply(posterior(fm), 1, which.max)
+```
+
+
+```{r}
+res_errors %>% 
+  mutate(strategy = strategy) %>% 
+  select(-error) %>%
+  pivot_longer(cols = starts_with('error_'),
+               names_to = 'error_type', values_to = 'error') %>%
+  ggplot(mapping = aes(x = error, group = user_id, color = factor(strategy))) + 
+  geom_density() + 
+  geom_vline(xintercept = 0) +
+  facet_wrap(~error_type, scales = 'free_y', nrow = 2) + 
+  theme(aspect.ratio = 1/2)
+```
+
+It looks like the `flexmix` package was able to somewhat successfully identify strategies?
+
+```{r}
+res_errors %>% 
+  mutate(strategy = strategy) %>% 
+  select(user_id, strategy) %>% 
+  distinct() %>% 
+  group_by(strategy) %>% 
+  count()
+```
+
+
+```{r}
+res_errors %>% 
+  ggplot(mapping = aes(x = user_slider, 
+                       fill = factor(strategy), 
+                       group = factor(strategy))) + 
+  geom_histogram() + 
+  geom_vline(aes(xintercept = 100*true_ratio), linetype = 'solid') +
+  geom_vline(aes(xintercept = true_size), linetype = 'dashed') +
+  geom_vline(aes(xintercept = true_diff), linetype = 'dotted') +
+  facet_wrap(~pair_id)
+```
+
+Upon closer inspection, I do not think that they may be the best strategy.
+
+
+```{r}
+mean_strategy <- res_errors %>% 
+  group_by(user_id) %>% 
+  summarize(mean_ratio_error = abs(mean(user_slider - 100*true_ratio)),
+            mean_diff_error  = abs(mean(user_slider - true_diff)),
+            mean_size_error  = abs(mean(user_slider - true_size))) %>% 
+  group_by(user_id) %>% 
+  mutate(min_error = min(mean_ratio_error, mean_diff_error, mean_size_error),
+         likely_strategy = case_when(
+      mean_ratio_error == min_error ~ "ratio",
+      mean_diff_error == min_error ~ "difference",
+      mean_size_error == min_error ~ "size"
+    ))
+res_errors %>% 
+  left_join(mean_strategy) %>% 
+  ggplot(mapping = aes(x = user_slider, 
+                       fill = factor(likely_strategy), 
+                       group = factor(likely_strategy))) + 
+  geom_histogram(position = position_stack()) + 
+  geom_vline(aes(xintercept = 100*true_ratio), linetype = 'solid') +
+  geom_vline(aes(xintercept = true_size), linetype = 'dashed') +
+  geom_vline(aes(xintercept = true_diff), linetype = 'dotted') +
+  facet_wrap(~pair_id)
+```
+
+What's frustrating is that this is similar to the `flexmix` model. What if I take another look, but only use the true values as predictors?
+
+### Another flexmix model
+
+
+
+```{r}
+
+fm <- flexmix(user_slider ~ I(true_ratio *100) + true_size + true_diff | user_id,
+              data = res_errors,
+              k = 3,
+              model = FLXMRglm(family = 'gaussian'))
+fm
+head(posterior(fm))
+
+strategy <- apply(posterior(fm), 1, which.max)
+```
+
+
+```{r}
+res_errors %>% 
+  mutate(strategy = strategy) %>% 
+  select(-error) %>%
+  pivot_longer(cols = starts_with('error_'),
+               names_to = 'error_type', values_to = 'error') %>%
+  ggplot(mapping = aes(x = error, group = user_id, color = factor(strategy))) + 
+  geom_density() + 
+  geom_vline(xintercept = 0) +
+  facet_wrap(~error_type, scales = 'free_y', nrow = 2) + 
+  theme(aspect.ratio = 1/2)
+```
+
+This is actually pretty similar to what was previously observed. For now, I want to see what happens if I do this again with the specified model and add a 4th distribution for random error. 
+
+```{r}
+set.seed(432134)
+fm <- flexmix(user_slider ~ set*media*factor(pair_id) | user_id,
+              data = res_errors,
+              k = 3,
+              model = FLXMRglm(family = 'gaussian'))
+fm
+head(posterior(fm))
+
+strategy <- apply(posterior(fm), 1, which.max)
+```
+
+First, let's try to figure our what strategy is being used for each group. 
+
+```{r}
+res_errors %>% 
+  mutate(strategy, correct = user_larger==true_larger) %>% 
+  ggplot(mapping = aes(x = error_ratio, color = factor(strategy), group = user_id)) + 
+  geom_density() + 
+  facet_wrap(~correct, scales = 'free_y')
+res_errors %>% 
+  mutate(strategy, correct = user_larger==true_larger) %>% 
+  ggplot(mapping = aes(x = error_diff, color = factor(strategy))) + 
+  geom_density() + 
+  facet_wrap(~correct, scales = 'free_y')
+res_errors %>% 
+  mutate(strategy, correct = user_larger==true_larger) %>% 
+  ggplot(mapping = aes(x = error_size, color = factor(strategy))) + 
+  geom_density() + 
+  facet_wrap(~correct, scales = 'free_y')
+```
+
+Based on this, 
+
+- ratio is 3
+- difference is 1, but maybe also size?
+
+However, 2 is confusing for me. It looks like it is a much higher variance of ratio estimation. 
+
+```{r}
+res_new <- res_errors %>% 
+  mutate(method = case_when(
+    strategy == 3 ~ 'ratio',
+    strategy == 1 ~ 'difference',
+    strategy == 2 ~ 'ratio?'
+  ))
+
+mod_ratio <- lmer(log(abs(error_ratio)) ~ set*media*factor(pair_id) + (1|block:user_id/set:media),
+     data = filter(res_new, strategy == 3 & pair_id != 5 & user_larger == true_larger))
+
+anova(mod_ratio)
+plot(mod_ratio)
+```
+
+
+
+Perhaps this is a multi-stage problem. I could try getting the ratio estimations from here since it is consistent, then look at the remaining participants to determine which alternate strategy should be used. 
+
+## Multi-stage data processing
+
+One thing that I noticed is that there are a number of students who were quite wrong in answering the first question. My plan was to remove incorrect responses as part of the analysis anyway, so 
+
+```{r}
+res_errors %>% 
+  group_by(user_id) %>% 
+  summarize(correct = mean(user_larger == true_larger)) %>% 
+  ggplot(mapping = aes(x = correct)) + 
+  geom_histogram(binwidth = 0.05, color = 'black')
+```
+
+
+
