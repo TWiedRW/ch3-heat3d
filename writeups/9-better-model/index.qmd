@@ -528,15 +528,80 @@ Perhaps this is a multi-stage problem. I could try getting the ratio estimations
 
 ## Multi-stage data processing
 
-One thing that I noticed is that there are a number of students who were quite wrong in answering the first question. My plan was to remove incorrect responses as part of the analysis anyway, so 
+One thing that I noticed is that there are a number of students who were quite wrong in answering the first question. My plan was to remove incorrect responses as part of the analysis anyway, so let's remove them initially.
+
 
 ```{r}
 res_errors %>% 
-  group_by(user_id) %>% 
+  group_by(user_id, block) %>% 
   summarize(correct = mean(user_larger == true_larger)) %>% 
   ggplot(mapping = aes(x = correct)) + 
-  geom_histogram(binwidth = 0.05, color = 'black')
+  geom_histogram(binwidth = 0.10, color = 'black')
+
+res_errors %>% 
+  group_by(user_id, block) %>% 
+  summarize(correct = mean(user_larger == true_larger)) %>% 
+  ggplot(mapping = aes(x = correct)) + 
+  geom_histogram(binwidth = 0.10, color = 'black') + 
+  facet_wrap(~block)
+```
+
+For the first pass, let's remove everybody who had more than 50% errors in the answer to question 1. There was clearly a misinterpretation of instructions and should remove about half of participants who were randomly guessing.
+
+```{r}
+res_errors_stage1 <- res_errors %>%
+  group_by(user_id) %>%
+  filter(mean(user_larger == true_larger) >= 0.5)
 ```
 
 
+Now let's look at what happens to the error distributions
+
+```{r}
+res_errors_stage1 %>% 
+  select(-error) %>%
+  pivot_longer(cols = starts_with('error_'),
+               names_to = 'error_type', values_to = 'error') %>%
+  ggplot(mapping = aes(x = error, group = user_id)) + 
+  geom_density(color = alpha('black', 1/10)) + 
+  geom_vline(xintercept = 0) +
+  facet_wrap(~error_type, scales = 'free_y', nrow = 2) + 
+  theme(aspect.ratio = 1/2)
+```
+
+Again, we see distributions around each estimation strategy. 
+
+```{r}
+res_errors_stage1 %>% 
+  group_by(user_id) %>% 
+  summarise(corr_ratio = cor(user_slider, true_ratio),
+            corr_diff = cor(user_slider, true_diff),
+            corr_size = cor(user_slider, true_size)) %>% 
+  arrange(-corr_ratio)
+```
+
+```{r}
+res_errors_stage1 %>% 
+  filter(user_id == '162d8160c0340900ce122198c496bbe7')
+```
+
+# Bayesian Modeling with brms
+
+I found this interesting paper that has a visual that is similar to what we are working with. <https://pmc.ncbi.nlm.nih.gov/articles/PMC11996974/>
+
+![From paper](https://www.ncbi.nlm.nih.gov/core/lw/2.0/html/tileshop_pmc/tileshop_pmc_inline.html?title=Click%20on%20image%20to%20zoom&p=PMC3&id=11996974_13428_2025_2643_Fig2_HTML.jpg)
+
+
+
+```{r}
+library(brms)
+res_errors$pair_id <- factor(res_errors$pair_id)
+mod_1 <- brm(user_slider ~ set*media*pair_id + (1+pair_id | user_id:block),
+    data = res_errors_stage1)
+```
+
+```{r}
+pp_check(mod_1)
+summary(mod_1)
+```
 
