@@ -1,0 +1,1174 @@
+% *** Authors should verify (and, if needed, correct) their LaTeX system  ***
+% *** with the testflow diagnostic prior to trusting their LaTeX platform ***
+% *** with production work. IEEE's font choices can trigger bugs that do  ***
+% *** not appear when using other class files.                            ***
+% The testflow support page is at:
+% http://www.michaelshell.org/tex/testflow/
+
+
+%%*************************************************************************
+%% Legal Notice:
+%% This code is offered as-is without any warranty either expressed or
+%% implied; without even the implied warranty of MERCHANTABILITY or
+%% FITNESS FOR A PARTICULAR PURPOSE!
+%% User assumes all risk.
+%% In no event shall IEEE or any contributor to this code be liable for
+%% any damages or losses, including, but not limited to, incidental,
+%% consequential, or any other damages, resulting from the use or misuse
+%% of any information contained here.
+%%
+%% All comments are the opinions of their respective authors and are not
+%% necessarily endorsed by the IEEE.
+%%
+%% This work is distributed under the LaTeX Project Public License (LPPL)
+%% ( http://www.latex-project.org/ ) version 1.3, and may be freely used,
+%% distributed and modified. A copy of the LPPL, version 1.3, is included
+%% in the base LaTeX documentation of all distributions of LaTeX released
+%% 2003/12/01 or later.
+%% Retain all contribution notices and credits.
+%% ** Modified files should be clearly indicated as such, including  **
+%% ** renaming them and changing author support contact information. **
+%%
+%% File list of work: IEEEtran.cls, New_IEEEtran_how-to.pdf, bare_jrnl_new_sample4.tex,
+%%*************************************************************************
+\PassOptionsToPackage{unicode}{hyperref}
+\PassOptionsToPackage{hyphens}{url}
+\PassOptionsToPackage{dvipsnames,svgnames,x11names}{xcolor}
+% Note that the a4paper option is mainly intended so that authors in
+% countries using A4 can easily print to A4 and see how their papers will
+% look in print - the typesetting of the document will not typically be
+% affected with changes in paper size (but the bottom and side margins will).
+% Use the testflow package mentioned above to verify correct handling of
+% both paper sizes by the user's LaTeX system.
+%
+% Also note that the "draftcls" or "draftclsnofoot", not "draft", option
+% should be used if it is desired that the figures are to be displayed in
+% draft mode.
+%
+\documentclass[
+  journal,
+]{IEEEtran}%
+% If IEEEtran.cls has not been installed into the LaTeX system files,
+% manually specify the path to it like:
+% \documentclass[journal]{../sty/IEEEtran}
+\usepackage[cmex10]{amsmath}
+\usepackage{amssymb}
+\usepackage{iftex}
+\ifPDFTeX
+  \usepackage[T1]{fontenc}
+  \usepackage[utf8]{inputenc}
+  \usepackage{textcomp} % provide euro and other symbols
+\else % if luatex or xetex
+  \usepackage{unicode-math} % this also loads fontspec
+  \defaultfontfeatures{Scale=MatchLowercase}
+  \defaultfontfeatures[\rmfamily]{Ligatures=TeX,Scale=1}
+\fi
+%\usepackage{lmodern}
+\ifPDFTeX\else
+\fi
+% Use upquote if available, for straight quotes in verbatim environments
+\IfFileExists{upquote.sty}{\usepackage{upquote}}{}
+\IfFileExists{microtype.sty}{% use microtype if available
+  \usepackage[]{microtype}
+  \UseMicrotypeSet[protrusion]{basicmath} % disable protrusion for tt fonts
+}{}
+\makeatletter
+\parindent    1.0em
+\ifCLASSOPTIONcompsoc
+  \parindent    1.5em
+\fi
+\makeatother
+\usepackage{xcolor}
+\setlength{\emergencystretch}{3em} % prevent overfull lines
+
+\setcounter{secnumdepth}{5}
+% Make \paragraph and \subparagraph free-standing
+\ifx\paragraph\undefined\else
+  \let\oldparagraph\paragraph
+  \renewcommand{\paragraph}[1]{\oldparagraph{#1}\mbox{}}
+\fi
+\ifx\subparagraph\undefined\else
+  \let\oldsubparagraph\subparagraph
+  \renewcommand{\subparagraph}[1]{\oldsubparagraph{#1}\mbox{}}
+\fi
+
+\usepackage{longtable,booktabs,array}
+\usepackage{calc} % for calculating minipage widths
+% Correct order of tables after \paragraph or \subparagraph
+\usepackage{etoolbox}
+\makeatletter
+\patchcmd\longtable{\par}{\if@noskipsec\mbox{}\fi\par}{}{}
+\makeatother
+% Allow footnotes in longtable head/foot
+\IfFileExists{footnotehyper.sty}{\usepackage{footnotehyper}}{\usepackage{footnote}}
+\makesavenoteenv{longtable}
+\usepackage{graphicx}
+\makeatletter
+\newsavebox\pandoc@box
+\newcommand*\pandocbounded[1]{% scales image to fit in text height/width
+  \sbox\pandoc@box{#1}%
+  \Gscale@div\@tempa{\textheight}{\dimexpr\ht\pandoc@box+\dp\pandoc@box\relax}%
+  \Gscale@div\@tempb{\linewidth}{\wd\pandoc@box}%
+  \ifdim\@tempb\p@<\@tempa\p@\let\@tempa\@tempb\fi% select the smaller of both
+  \ifdim\@tempa\p@<\p@\scalebox{\@tempa}{\usebox\pandoc@box}%
+  \else\usebox{\pandoc@box}%
+  \fi%
+}
+% Set default figure placement to htbp
+\def\fps@figure{htbp}
+\makeatother
+
+
+% definitions for citeproc citations
+\NewDocumentCommand\citeproctext{}{}
+\NewDocumentCommand\citeproc{mm}{%
+  \begingroup\def\citeproctext{#2}\cite{#1}\endgroup}
+\makeatletter
+ % allow citations to break across lines
+ \let\@cite@ofmt\@firstofone
+ % avoid brackets around text for \cite:
+ \def\@biblabel#1{}
+ \def\@cite#1#2{{#1\if@tempswa , #2\fi}}
+\makeatother
+\newlength{\cslhangindent}
+\setlength{\cslhangindent}{1.5em}
+\newlength{\csllabelwidth}
+\setlength{\csllabelwidth}{3em}
+\newenvironment{CSLReferences}[2] % #1 hanging-indent, #2 entry-spacing
+ {\begin{list}{}{%
+  \setlength{\itemindent}{0pt}
+  \setlength{\leftmargin}{0pt}
+  \setlength{\parsep}{0pt}
+  % turn on hanging indent if param 1 is 1
+  \ifodd #1
+   \setlength{\leftmargin}{\cslhangindent}
+   \setlength{\itemindent}{-1\cslhangindent}
+  \fi
+  % set entry spacing
+  \setlength{\itemsep}{#2\baselineskip}}}
+ {\end{list}}
+\usepackage{calc}
+\newcommand{\CSLBlock}[1]{\hfill\break\parbox[t]{\linewidth}{\strut\ignorespaces#1\strut}}
+\newcommand{\CSLLeftMargin}[1]{\parbox[t]{\csllabelwidth}{\strut#1\strut}}
+\newcommand{\CSLRightInline}[1]{\parbox[t]{\linewidth - \csllabelwidth}{\strut#1\strut}}
+\newcommand{\CSLIndent}[1]{\hspace{\cslhangindent}#1}
+
+
+
+\setlength{\emergencystretch}{3em} % prevent overfull lines
+
+\providecommand{\tightlist}{%
+  \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
+
+
+
+ 
+
+
+\usepackage{physics}
+\usepackage[version=3]{mhchem}
+\usepackage{orcidlink}
+\usepackage{float}
+\floatplacement{table}{htb}
+\makeatletter
+\@ifpackageloaded{caption}{}{\usepackage{caption}}
+\AtBeginDocument{%
+\ifdefined\contentsname
+  \renewcommand*\contentsname{Table of contents}
+\else
+  \newcommand\contentsname{Table of contents}
+\fi
+\ifdefined\listfigurename
+  \renewcommand*\listfigurename{List of Figures}
+\else
+  \newcommand\listfigurename{List of Figures}
+\fi
+\ifdefined\listtablename
+  \renewcommand*\listtablename{List of Tables}
+\else
+  \newcommand\listtablename{List of Tables}
+\fi
+\ifdefined\figurename
+  \renewcommand*\figurename{Fig.}
+\else
+  \newcommand\figurename{Fig.}
+\fi
+\ifdefined\tablename
+  \renewcommand*\tablename{Table}
+\else
+  \newcommand\tablename{Table}
+\fi
+}
+\@ifpackageloaded{float}{}{\usepackage{float}}
+\floatstyle{ruled}
+\@ifundefined{c@chapter}{\newfloat{codelisting}{h}{lop}}{\newfloat{codelisting}{h}{lop}[chapter]}
+\floatname{codelisting}{Listing}
+\newcommand*\listoflistings{\listof{codelisting}{List of Listings}}
+\makeatother
+\makeatletter
+\makeatother
+\makeatletter
+\@ifpackageloaded{caption}{}{\usepackage{caption}}
+\@ifpackageloaded{subcaption}{}{\usepackage{subcaption}}
+\makeatother
+\usepackage[skip=2pt,font=footnotesize]{caption}
+%\captionsetup{format=myformat}
+\makeatletter
+%\setlength{\cslhangindent}{0pt plus .5pt}
+\providecommand{\bibfont}{\footnotesize}
+\let\CSLReferences@rig=\CSLReferences
+\renewcommand{\CSLReferences}[2]{
+\bibfont\settowidth\csllabelwidth{[999]}
+\CSLReferences@rig{#1}{#2}
+\vskip 0.3\baselineskip plus 0.1\baselineskip minus 0.1\baselineskip%
+}
+\makeatother
+\ifLuaTeX
+  \usepackage{selnolig}  % disable illegal ligatures
+\fi
+\IfFileExists{bookmark.sty}{\usepackage{bookmark}}{\usepackage{hyperref}}
+\IfFileExists{xurl.sty}{\usepackage{xurl}}{} % add URL line breaks if available
+\urlstyle{same} % disable monospaced font for URLs
+\hypersetup{
+  pdftitle={Heat to Height},
+  colorlinks=true,
+  linkcolor={blue},
+  filecolor={Maroon},
+  citecolor={Blue},
+  urlcolor={Blue},
+  pdfcreator={LaTeX via pandoc}}
+
+% *** Do not adjust lengths that control margins, column widths, etc. ***
+% *** Do not use packages that alter fonts (such as pslatex).         ***
+% There should be no need to do such things with IEEEtran.cls V1.6 and later.
+% (Unless specifically asked to do so by the journal or conference you plan
+% to submit to, of course. )
+
+
+% correct bad hyphenation here
+\hyphenation{op-tical net-works semi-conduc-tor}
+
+%
+% paper title
+% can use linebreaks \\ within to get better formatting as desired
+% Do not put math or special symbols in the title.
+% paper title
+% can use linebreaks \\ within to get better formatting as desired
+% Do not put math or special symbols in the title.
+\title{Heat to Height}
+
+\author{
+
+}
+\begin{document}
+
+% The paper headers
+
+% use for special paper notices
+
+% make the title area
+\maketitle
+
+% As a general rule, do not put math, special symbols or citations
+% in the abstract or keywords.
+\begin{abstract}
+The display of 3-dimensional (3D) data is often limited by how it can be
+rendered. These renderings are typically presented as charts on
+2-dimensional (2D) computer screens using 2D or 3D chart styles.
+However, computer renderings do not provide the level of interactivity
+of 3D charts that we experience in a 3D world, something which can be
+accomplished through the use of 3D printing. In this paper, we describe
+a study to compare 2D and 3D heatmaps rendered digitally or via 3D
+printing and assess the findings of 3D printed charts for the use of
+displaying statistical information.
+\end{abstract}
+% Note that keywords are not normally used for peerreview papers.
+
+% For peer review papers, you can put extra information on the cover
+% page as needed:
+% \ifCLASSOPTIONpeerreview
+% \begin{center} \bfseries EDICS Category: 3-BBND \end{center}
+% \fi
+%
+% For peerreview papers, this IEEEtran command inserts a page break and
+% creates the second title. It will be ignored for other modes.
+% \IEEEpeerreviewmaketitle
+
+
+\section{Introduction}\label{introduction}
+
+In the 20th century, advancements in technology made data visualizations
+increasingly more affordable and accessible to a broader population. The
+primary change in formal data visualizations was from hand-crafted
+charts to computer-rendered charts \citeproc{ref-tukey1965}{{[}1{]}},
+yet other technological advances have allowed for data visualizations to
+enter other mediums. These include the ability to effectively use the
+3-dimensional (3D) world around us with the novel use of 3D-printed
+charts. This newer type of visualization has gained a small amount of
+traction in recent years as a method of producing tangible charts.
+
+At this time, there are few, if any, studies that evaluate 3D-printed
+charts for the purpose of displaying statistical information. This may
+in part be due to the cost of materials and rendering times as compared
+to charts produced on a computer. A single chart can take up to a day to
+print, limiting the ability to quickly produce visualizations. Given the
+nature of 3-dimensional data, viewing a 3D realization of statistical
+information in a 3D environment is a realistic scenario that could
+increase the ability for information extraction. However, the process of
+converting data into tangible objects remains mostly as an artistic
+representation \citeproc{ref-huronMakingDataPhysical2023}{{[}2{]}}, with
+few empirical studies evaluating their effectiveness for statistical
+information extraction.
+
+3D-printed visualizations have shown mixed or promising results across
+other disciplines. \citeproc{ref-katsioloudis2018}{{[}3{]}} showed no
+evidence of a statistical difference in the method of 3D renderings when
+tasked with drawing a cross-sectional of a dodecahedron. This
+demonstrated that spatial awareness between computer-rendered and
+3D-printed shapes was not largely different among engineering students.
+The use of 3D-printed maps for navigation for people with low vision
+showed positive feedback by \citeproc{ref-holloway2019}{{[}4{]}},
+increasing the accessibility of navigation. In the clinical setting,
+3D-printed anatomy structures were well accepted along with VR-glasses
+and 3D computer renderings \citeproc{ref-muff2022}{{[}5{]}}. With the
+rise of 3D-printed visualizations in scientific fields, we turn our
+attention to their use for statistical graphics.
+
+\subsection{Literature Review}\label{literature-review}
+
+An identical dataset across multiple chart types does not ensure that
+the data is perceived in the same way
+\citeproc{ref-cleveland1984}{{[}6{]}}--\citeproc{ref-vanderplas2020}{{[}8{]}}.
+One of the main factors contributing to this phenomenon is how data is
+encoded into the chart. These encodings include, but are not limited to,
+placement along axes, lengths, areas, volumes, and color scales. For
+example, bar charts and pie charts are two common visualizations that
+have long since been the topic of debate
+\citeproc{ref-cleveland1984}{{[}6{]}},
+\citeproc{ref-eells1926}{{[}9{]}}, \citeproc{ref-croxton1927}{{[}10{]}}.
+In the case of bar charts and pie charts, encodings are represented by
+lengths and angles, respectively. Inherently, the comparison of
+different chart types is a comparison of encodings due to the changes in
+how data is being displayed.
+
+\citeproc{ref-cleveland1984}{{[}6{]}} noted that estimates involving
+numerical accuracy may decrease when increasing dimensionality of the
+encoding, although this was not formally tested in their experiments.
+The reasoning is possibly due to Stevens' power law, a mathematical
+formulation of how magnitudes are perceived given different stimuli
+sources \citeproc{ref-stevens1986}{{[}11{]}}. The general form of the
+law is \(\psi(I)=kI^\alpha\), where \(I\) is the magnitude of a
+stimulus, \(\psi(I)\) is the perceived magnitude, \(k\) is a
+proportionality constant from the unit of the stimulus, and \(\alpha\)
+is the exponent from the type of stimuli used. Studies have estimated
+that lengths are perceived without bias (i.e., \(\alpha=1\)), but areas
+and volumes tend to have skewed perceptions
+\citeproc{ref-cleveland1984}{{[}6{]}}. This indicates that
+lower-dimensional charts might perform better when readers are tasked
+with extracting numerical estimates from the chart.
+
+There are mixed results in regard to the use of 3D charts, mostly
+attributing to the purpose of third dimension. When the extra dimension
+does not convey meaningful information, estimates of accuracy decrease
+and solution times increase as compared to equivalent 2D charts
+\citeproc{ref-fisher1997}{{[}12{]}}--\citeproc{ref-fischer2000}{{[}14{]}}.
+The same increase in solution time is seen when the third dimension is
+utilized for displaying data, but can sometimes produce better error
+rates than 2D charts \citeproc{ref-barfield1989}{{[}15{]}},
+\citeproc{ref-kraus2020}{{[}16{]}}. Additionally, when given the option
+of 2D or 3D charts for extracting numerical information, the 2D charts
+showed increased preference and confidence than their 3D counterparts
+\citeproc{ref-fisher1997}{{[}12{]}},
+\citeproc{ref-barfield1989}{{[}15{]}}. It is worth noting that all of
+the studies listed use renderings of 3D charts and not physical 3D
+charts.
+
+Formal studies involving true 3D charts are limited, and it is unclear
+if they follow the framework of existing theories on data
+visualizations. Unlike paper and computer rendered charts, constructing
+true 3D charts inherently contains many additional factors that could
+affect perception, such as chart materials, natural lighting,
+interactivity, and viewing distance. Some of these factors have already
+been shown to have an effect on computer renderings
+\citeproc{ref-tarr2001}{{[}17{]}}, \citeproc{ref-wang2022}{{[}18{]}}.
+However, we aim to provide some of the initial findings on the use of
+3D-printing for the creation of statistical graphics.
+
+We hypothesize that 3D charts in 3D environments will produce better
+information extraction than their computer rendered counterparts.
+Specifically, we will compare 3D-printed charts to digital 2D and 3D
+renderings. We suspect that this difference will hold across multiple
+data sets and different magnitudes of stimuli. In this paper, we
+evaluate the accuracy of numerical estimations on true 3D charts by
+conducting a factorial experiment that assessed chart types and ratios
+of pairs of stimuli. We discuss the construction of the stimuli and how
+we closely matched the charts to compare 2D, 3D-digital, and 3D-printed
+renderings of heatmap data.
+
+\section{Methods}\label{methods}
+
+Our study was designed to evaluate and expand the literature on
+numerical estimation of 3D charts. One chart type that is typically
+presented in both 2D and 3D renderings is the heatmap. These charts
+consist of a grid coordinate system across two explanatory variables and
+encode a response variable using either color (in 2D) or height (in 3D).
+Inherently, the differences between 2D and 3D heatmaps require careful
+consideration in their construction to allow for direct comparisons of
+dimensionality. All data and methods will be publicly available at the
+conclusion of the study to promote open science and reproducibility. In
+this section, we describe the design of our experiment and methods of
+analysis.
+
+\subsection{Stimuli}\label{stimuli}
+
+We denote ``stimuli'' to represent the magnitude of our chosen values.
+In a 3D Cartesian space, the X and Y axes represent the coordinates of
+the stimuli, and the Z-axis represents the value for the stimuli. Each X
+and Y coordinate is represented by a square tile with a 1:1 aspect
+ratio. The Z-axis is denoted by a color gradient scale for 2D charts and
+by height in 3D charts. All stimuli and remaining randomly generated
+values range between 0 and 100 units. In this experiment,
+\(X=1, 2, \dots,10\) and \(Y=1, 2,\dots,10\).
+
+The design of our experiment made use of the method of constant stimuli,
+where comparisons between stimuli are with respect to a stimuli that
+remains the same magnitude \citeproc{ref-kingdom2016}{{[}19{]}}. We set
+the constant stimuli at 50 units. For stimuli between 50 and 100, we set
+the maximum stimuli value at 90 and equally partitioned the ratios of
+stimuli with the constant stimuli, \(\frac{50}{90}=0.556\) to
+\(\frac{50}{50}=1.0\), resulting in four varying stimuli values where 50
+is the smallest value. The same ratios obtained with stimuli between 50
+and 90 were used to create 4 stimuli varying between 0 and 50, where 50
+is the largest value. Additionally, we also included a stimuli pair
+where both values are 50, resulting in nine total pairs of stimuli. We
+note that while most ratios occur twice, the physical differences in
+heights of different stimuli pairs for identical ratios are different.
+This is to account for the different scaling factors of mapping color to
+height since no one-to-one relationship between color and height exist.
+All stimuli values can be found in Fig.~\ref{fig-stimuli-values}.
+
+\begin{figure}
+
+\centering{
+
+\pandocbounded{\includegraphics[keepaspectratio]{index_files/figure-pdf/fig-stimuli-values-1.pdf}}
+
+}
+
+\caption{\label{fig-stimuli-values}Values for stimuli in the heatmap
+experiment. All values are paired with the constant stimuli of 50 units,
+creating nine pairs of stimuli.}
+
+\end{figure}%
+
+To generate non-stimuli random values, we used a mixture distribution of
+random uniform noise and mathematical functions to populate our
+coordinate grid. The mathematical functions are scaled between 0 and
+100, \(g(Z)=100\cdot\frac{Z-\min(Z)}{\max(Z)-min(Z)}\). Two datasets
+were created for the experiment. The first dataset, called Set 1, used
+the formula for the top half of sphere that is centered within our X and
+Y coordinate grid, \(f_1(X,Y)=\sqrt{7^2-(X-\bar{X})^2-(Y-\bar{Y})^2}\),
+where \(\bar{X}\) and \(\bar{Y}\) are the averages of the \(X\) and
+\(Y\) coordinate ranges. The second dataset, called Set 2, is calculated
+similarly using the formula for the bottom half of sphere,
+\(f_2(X,Y)=\sqrt{7^2-(X-\bar{X})^2+(Y-\bar{Y})^2}\). Denoting \(Z\) as
+the random values, \(U(0,100)\) as a random variable drawn from a
+continuous uniform distribution, and \(X,Y\) as heatmap coordinates, our
+random heatmap data is calculated as
+\(Z=c\cdot U(0,100)+(1-c)\cdot g(f_i(X,Y))\), where \(c=0.3\). An
+example of varying \(c\) values is presented in Fig.~\ref{fig-random-z}.
+
+\begin{figure}
+
+\begin{minipage}{0.20\linewidth}
+
+\centering{
+
+\pandocbounded{\includegraphics[keepaspectratio]{plots/z100.png}}
+
+}
+
+\subcaption{\label{fig-z100}\(c=0\)}
+
+\end{minipage}%
+%
+\begin{minipage}{0.20\linewidth}
+
+\centering{
+
+\pandocbounded{\includegraphics[keepaspectratio]{plots/z75.png}}
+
+}
+
+\subcaption{\label{fig-z75}\(c=0.25\)}
+
+\end{minipage}%
+%
+\begin{minipage}{0.20\linewidth}
+
+\centering{
+
+\pandocbounded{\includegraphics[keepaspectratio]{plots/z50.png}}
+
+}
+
+\subcaption{\label{fig-z50}\(c=0.5\)}
+
+\end{minipage}%
+%
+\begin{minipage}{0.20\linewidth}
+
+\centering{
+
+\pandocbounded{\includegraphics[keepaspectratio]{plots/z25.png}}
+
+}
+
+\subcaption{\label{fig-z25}\(c=0.75\)}
+
+\end{minipage}%
+%
+\begin{minipage}{0.20\linewidth}
+
+\centering{
+
+\pandocbounded{\includegraphics[keepaspectratio]{plots/z0.png}}
+
+}
+
+\subcaption{\label{fig-z0}\(c=1\)}
+
+\end{minipage}%
+
+\caption{\label{fig-random-z}Mixture distribution using random uniform
+noise and formula for the top half of a sphere. As \(c\) approaches 1,
+the distribution resembles uniform random noise. Similarly, as \(c\)
+approaches 0, the distribution becomes the underlying mathematical
+function.}
+
+\end{figure}%
+
+The placement of chosen stimuli values onto the randomly generated
+heatmap data was done via simulation to try to make their placement look
+as natural as possible. Twenty random heatmaps were generated for each
+dataset. For each heatmap, the non-constant stimuli was placed onto the
+coordinate such that the difference between the stimuli and randomly
+generated value is minimized. The constant stimuli was then placed onto
+a coordinate with a Manhattan distance of three or four that minimizes
+the difference between the constant stimuli and randomly generated
+values, where the Manhattan distance is given by
+\(|X_i - X_j| + |Y_i - Y_j|\) for stimuli \(i\) and \(j\). To ensure
+that stimuli placement is evenly position across the heatmap, the count
+of stimuli was computed separately across the X and Y axes. For example,
+in Data Set 1, the X-axis has four stimuli in \(X=1\), three stimuli in
+\(X=2\), and so forth. Chi-squared statistics were calculated for each
+axis and the heatmap with the smallest average Chi-squared statistic was
+selected as the final dataset. A visual inspection of this process
+showed that the stimuli were not clustered in any one area of the chart
+and that the stimuli look natural with respect to the random mixture
+distribution.
+
+\begin{figure}
+
+\begin{minipage}{0.50\linewidth}
+
+\pandocbounded{\includegraphics[keepaspectratio]{../_images/stimuli-set1.png}}
+
+\subcaption{\label{}Set 1}
+\end{minipage}%
+%
+\begin{minipage}{0.50\linewidth}
+
+\begin{description}
+\item[\pandocbounded{\includegraphics[keepaspectratio]{../_images/stimuli-set1.png}}]
+Placement of stimuli on data sets.
+\end{description}
+
+\end{minipage}%
+
+\end{figure}%
+
+\subsection{Charts}\label{charts}
+
+Three types of charts were considered for this study: 2D-digital (2dd),
+3D-digital (3dd), and 3D-printed (3dp). We constructed these charts so
+that they are as similar as possible, but inherent differences in
+dimensionality led to artistic decisions that attempt to focus solely on
+the dimensionality of the charts. The process of creating the charts is
+discussed in this section.
+
+The 3D-printed charts were rendered with OpenSCAD
+\citeproc{ref-kintelOpenSCADDocumentation2023}{{[}20{]}}. To include
+plot text, a 120mm by 120mm by 10mm base was created with a solid color
+that was either white or black. Cells of the heatmap measured 10mm by
+10mm, resulting in a heatmap that is 100mm by 100mm and is centered on
+the base. The upper bound of the height of heatmap values is 100mm,
+where 1-unit in the heatmap data is represented by 1mm of height on the
+heatmap. Once rendered, the heatmap was saved to 3D Manufacturing Format
+(3mf) and Standard Triangle Language (stl) files. A variety of solid and
+gradient filaments were used to print the output files from OpenSCAD. An
+example of the 3D-printed chart is shown in Fig.~\ref{fig-3dp}.
+
+\begin{figure}
+
+\begin{minipage}{0.50\linewidth}
+
+\centering{
+
+\pandocbounded{\includegraphics[keepaspectratio]{images/3dp-gradient.JPG}}
+
+}
+
+\subcaption{\label{fig-3dp-gradient}Solid filament of Data Set 1}
+
+\end{minipage}%
+%
+\begin{minipage}{0.50\linewidth}
+
+\centering{
+
+\pandocbounded{\includegraphics[keepaspectratio]{images/3dp-solid.JPG}}
+
+}
+
+\subcaption{\label{fig-3dp-solid}Solid filament of Data Set 2}
+
+\end{minipage}%
+
+\caption{\label{fig-3dp}3D printed heatmaps.}
+
+\end{figure}%
+
+To closely match the 3D-digital chart to the 3D-printed chart, multiple
+stl files were created for each colored component and combined with the
+RGL package \citeproc{ref-rgl}{{[}21{]}}. The base was rendered with
+white smoke (\#F5F5F5) to slightly contrast with the default white
+background color (\#FFFFFF). Heatmap tiles were rendered with cyan
+(\#74CCFF) and text labels were rendered with black (\#000000). Lighting
+was fixed at 45 degree angles at two opposite corners of the chart. The
+end result was a near perfect replica of the 3D-printed charts, with the
+exception of different heatmap tile colors, where an example is given in
+Fig.~\ref{fig-3dd}.
+
+\begin{figure}
+
+\centering{
+
+\pandocbounded{\includegraphics[keepaspectratio]{images/chart-3dd.png}}
+
+}
+
+\caption{\label{fig-3dd}RGL rendering of Data Set 2 for 3dd charts.}
+
+\end{figure}%
+
+Unlike the 3D charts, the 2D charts needed a different encoding to
+convey heatmap values. The 2D heatmaps were created with
+\texttt{ggplot2} \citeproc{ref-ggplot2}{{[}22{]}} using
+\texttt{geom\_tile()}. Fill colors for the cells use a color gradient
+from Blue Zodiac (\#0C2841) to Malibu (\#66D9FF), which were selected
+from a color picker using shadows on our initial 3D-printed charts. The
+color interpolation was performed with the
+\texttt{scale\_fill\_gradient()} function from the \texttt{ggplot2}
+package.
+
+\begin{figure}
+
+\centering{
+
+\pandocbounded{\includegraphics[keepaspectratio]{index_files/figure-pdf/fig-color-pal-1.pdf}}
+
+}
+
+\caption{\label{fig-color-pal}Color palette for 2D-digital charts. The
+colors are interpolated from \#0C2841 to \#66D9FF, which are the the
+colors of the lighting conditions for a 3D-printed chart created with
+cyan filament.}
+
+\end{figure}%
+
+\subsection{Experimental Design}\label{experimental-design}
+
+Our experiment was designed with a 3 x 2 x 9 treatment structure. Media
+type is our main interest, with 2D-digital, 3D-digital, and 3D-printed
+charts. To ensure that results are not confounded with datasets, we used
+two datasets to create the heatmaps. A total of nine stimuli pairs were
+placed into each dataset. The order of treatments was given so that
+media and dataset combinations were grouped together randomly in the
+sequence and stimuli pairs were randomized within the groupings.
+
+Due to the practical constraint of participant fatigue, stimuli pairs
+were incompletely blocked. A full factorial design would result in 54
+trials per participant, which could lead to a decrease in quality
+responses \citeproc{ref-herzog1981}{{[}23{]}}. Therefore, we selected
+four out of the nine possible stimuli pairs to create incomplete blocks,
+resulting in 18 blocks for a balanced design. Within each block, media
+type is fully crossed with dataset. Using the incomplete block
+structure, participants completed a total of 24 trials, which was more
+practical than the full factorial design.
+
+We measured two responses for each trial -- two questions for each trial
+and one question for each media by dataset combination. For each trial,
+participants are initially asked which stimuli in a pair is larger or if
+the stimuli are the same value. Next, they were asked to estimate the
+magnitude of the smaller stimuli if the larger stimuli represents 100
+units, which is a subtractive process \citeproc{ref-veit}{{[}24{]}}.
+
+We measured two responses for each trial, following a similar process to
+\citeproc{ref-cleveland1984}{{[}6{]}}. The first question asked
+participants to identify the larger value in a specified stimuli pair.
+An additional option was available if participants thought that the
+values were the same. The second question asked participants to estimate
+the value of the smaller stimuli if the larger stimuli represented 100
+units. This was designed to be a ratio estimation of \(A/B\), where
+\(A\leq B\).
+
+\subsection{Method of Analysis}\label{method-of-analysis}
+
+Our experiment follows a split-plot design with balanced incomplete
+blocking, where participants nested within blocks serve as the blocking
+factor, media type and dataset form the whole plot, and stimuli pair is
+the split plot. A similar design was presented by
+\citeproc{ref-mandal2020}{{[}25{]}} for a single replicate. To account
+for response distributions and participant effects, (generalized) linear
+mixed models \citeproc{ref-stroup}{{[}26{]}} were fit to each question.
+For Question 1, where participants identified which value in a stimuli
+pair was larger (or if they were equal), a binomial generalized linear
+mixed model was used since responses were binary (correct or incorrect).
+For Question 2, participants estimated the ratio of the stimuli using a
+slider, creating a continuous response that was converted into an error
+metric following \citeproc{ref-cleveland1984}{{[}6{]}}.
+
+To measure numerical accuracy for Question 2, we calculated
+\(Y=\log_2(|\text{Guess}-\text{Actual}|)\), where ``Guess'' is the
+participant's estimate and ``Actual'' is the true ratio value. The log
+transformation is similar to what \citeproc{ref-cleveland1984}{{[}6{]}}
+used and accounts for the exponential relationship between subtractive
+and ratio estimations \citeproc{ref-veit}{{[}24{]}}. By using the
+absolute error, we measure estimation accuracy regardless of direction.
+Linear mixed models were fit to this transformed response, accounting
+for the nested structure of participants within blocks and repeated
+measures across media types, datasets, and stimuli pairs.
+
+\subsection{Subject Recruitment and
+Participation}\label{subject-recruitment-and-participation}
+
+Participants were recruited from an introductory statistics course
+between June and December 2025 from both in-person and online sections
+of the course. The experiment was incorporated into the curriculum as
+part of an experiental learning project that allowed students to get
+hands-on experience with statistical research, although responses for
+the experiment were collected only if students agreed to data collection
+and they met the age of majority.
+
+A Shiny application \citeproc{ref-shiny}{{[}27{]}} was developed to
+administer the experiment. The application consisted of five sections:
+informed consent, demographics, practice, experiment, and wrap-up. The
+entire application was designed to be completed in approximately 30
+minutes. The Shiny application started with the informed consent screen,
+allowing participants to select if they are an introductory statistics
+student and if they agree to the data collection. Participants had to
+select a data collection option to continue. After submitting their data
+collection response, a completion code was generated and saved on the
+last page of the application. A copy of the informed consent will be
+available in our GitHub repository.
+
+Once a participant completed the demographics page or selected ``No'' to
+the data collection question, they were given a practice page. A modal
+dialog was initially shown with instructions, and users could display
+this window again at any point during the practice. The practice
+consisted of four trials: two from 2dd charts and two from 3dd charts.
+Each practice trial showed the correct solution after the participant
+submitted their trial. After all practice trials were completed, another
+modal dialog was displayed to ask participants if they have access to
+the 3D-printed charts. For students who were enrolled in an online
+section of the course, selecting this option removed the 3D-printed
+charts from their trials.
+
+The experiment page was presented to participants after completion of
+the practice trials. Each trial contained two questions -- one question
+for identifying which stimuli in the pair is larger and another question
+for estimating the value of the smaller stimuli if the larger stimuli is
+100 units. The position of the slider input was randomly positioned for
+each trial. For 3D digital charts, the number of interactive clicks was
+also recorded. A trial could only be submitted if the first question was
+answered and if the slider was moved at least once.
+
+\section{Results}\label{results}
+
+A total of 196 students enrolled in an introductory statistics course
+participated in the study as part of an experiential learning project in
+their course curriculum. The vast majority of students were in the 19-25
+age range (97.4\%), with approximately two-thirds of students
+identifying as female.
+
+\subsection{Question 1: Identification
+Accuracy}\label{question-1-identification-accuracy}
+
+The first question of each trial asked participants to identify the
+larger value in a given stimuli pair. Of 4,072 completed trials, there
+were 3,218 responses (79.03\%) that correctly identified the larger
+value or if both values were the same. There were 135 students who had
+at least 75\% of their responses correct to Question 1, with 31 students
+who were correct for every trial.
+
+There was a significant three-way interaction between media type, data
+set, and stimuli pair (p-value = 0.0013) for correctly identifying the
+larger value in a stimuli pair. Simple effects of media types across
+data set and stimuli pair exhibited evidence of significantly smaller
+odds ratios for 12 of the 2D comparisons. In data set 1, there were
+larger odds of correct identification for the 3D digital chart than the
+2D chart in stimuli pairs 1, 3, 6, 7, and 9. For 3D printed charts, this
+was only the case for stimuli pairs 3 and 6. For data set 2, the odds of
+success were larger for 3D digital and 3D printed charts than 2D charts
+in stimuli pairs 5 and 6. For stimuli pair 4, only the 3D digital chart
+had significantly larger odds of correct identification than the 2D
+chart. Additionally, the only significant simple effect between the 3D
+charts was in data set 1 for stimuli pair 9, where the odds of correctly
+choosing the larger value were greater for the digital chart than the
+3D-printed chart (p-value = 0.0132).
+
+\subsection{Question 2: Ratio Estimation
+Error}\label{question-2-ratio-estimation-error}
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\linewidth - 12\tabcolsep) * \real{0.3059}}
+  >{\raggedleft\arraybackslash}p{(\linewidth - 12\tabcolsep) * \real{0.1294}}
+  >{\raggedleft\arraybackslash}p{(\linewidth - 12\tabcolsep) * \real{0.1294}}
+  >{\raggedleft\arraybackslash}p{(\linewidth - 12\tabcolsep) * \real{0.0706}}
+  >{\raggedleft\arraybackslash}p{(\linewidth - 12\tabcolsep) * \real{0.1176}}
+  >{\raggedleft\arraybackslash}p{(\linewidth - 12\tabcolsep) * \real{0.1294}}
+  >{\raggedleft\arraybackslash}p{(\linewidth - 12\tabcolsep) * \real{0.1176}}@{}}
+\toprule\noalign{}
+\begin{minipage}[b]{\linewidth}\raggedright
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+Sum Sq
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+Mean Sq
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+NumDF
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+DenDF
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+F value
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+Pr(\textgreater F)
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+set & 6.1070321 & 6.1070321 & 1 & 758.7656 & 2.3650272 & 0.1244986 \\
+media & 83.2301727 & 41.6150864 & 2 & 781.0343 & 16.1159809 &
+0.0000001 \\
+factor(pair\_id) & 58.0714810 & 8.2959259 & 7 & 2284.4315 & 3.2127047 &
+0.0021638 \\
+set:media & 0.4573538 & 0.2286769 & 2 & 758.4677 & 0.0885581 &
+0.9152594 \\
+set:factor(pair\_id) & 21.0607229 & 3.0086747 & 7 & 2639.5514 &
+1.1651482 & 0.3194528 \\
+media:factor(pair\_id) & 38.1654950 & 2.7261068 & 14 & 2629.5780 &
+1.0557201 & 0.3938952 \\
+set:media:factor(pair\_id) & 36.4947840 & 2.6067703 & 14 & 2636.8690 &
+1.0095055 & 0.4402649 \\
+\end{longtable}
+
+\begin{verbatim}
+ contrast            estimate    SE   df t.ratio p.value
+ pair_id1 - pair_id2  -0.1552 0.134 2261  -1.157  0.9438
+ pair_id1 - pair_id3   0.1414 0.133 2243   1.065  0.9638
+ pair_id1 - pair_id4   0.1978 0.140 2294   1.413  0.8513
+ pair_id1 - pair_id6   0.4293 0.138 2307   3.110  0.0398
+ pair_id1 - pair_id7   0.1086 0.129 2240   0.841  0.9907
+ pair_id1 - pair_id8   0.0148 0.135 2264   0.109  1.0000
+ pair_id1 - pair_id9   0.0370 0.133 2224   0.279  1.0000
+ pair_id2 - pair_id3   0.2966 0.132 2242   2.247  0.3242
+ pair_id2 - pair_id4   0.3530 0.139 2295   2.544  0.1778
+ pair_id2 - pair_id6   0.5844 0.135 2286   4.335  0.0004
+ pair_id2 - pair_id7   0.2637 0.127 2229   2.070  0.4349
+ pair_id2 - pair_id8   0.1699 0.132 2245   1.284  0.9051
+ pair_id2 - pair_id9   0.1922 0.132 2224   1.460  0.8284
+ pair_id3 - pair_id4   0.0564 0.140 2296   0.404  0.9999
+ pair_id3 - pair_id6   0.2878 0.138 2321   2.079  0.4287
+ pair_id3 - pair_id7  -0.0329 0.129 2243  -0.254  1.0000
+ pair_id3 - pair_id8  -0.1267 0.135 2257  -0.940  0.9821
+ pair_id3 - pair_id9  -0.1044 0.131 2220  -0.795  0.9934
+ pair_id4 - pair_id6   0.2314 0.145 2346   1.598  0.7516
+ pair_id4 - pair_id7  -0.0893 0.134 2249  -0.667  0.9978
+ pair_id4 - pair_id8  -0.1831 0.140 2292  -1.304  0.8978
+ pair_id4 - pair_id9  -0.1608 0.137 2251  -1.172  0.9397
+ pair_id6 - pair_id7  -0.3207 0.133 2285  -2.408  0.2380
+ pair_id6 - pair_id8  -0.4145 0.138 2313  -2.995  0.0560
+ pair_id6 - pair_id9  -0.3922 0.137 2305  -2.862  0.0809
+ pair_id7 - pair_id8  -0.0938 0.129 2226  -0.728  0.9962
+ pair_id7 - pair_id9  -0.0715 0.127 2203  -0.562  0.9993
+ pair_id8 - pair_id9   0.0223 0.132 2207   0.169  1.0000
+
+Results are averaged over the levels of: set, media 
+Degrees-of-freedom method: kenward-roger 
+P value adjustment: tukey method for comparing a family of 8 estimates 
+\end{verbatim}
+
+The second question in each trial was to estimate the size of the
+smaller value in the stimuli pair if the larger value represented 100
+units. Of the 4,072 completed trials, we removed all trials where
+participants were incorrect in their response to Question 1 (854
+trials), as well as responses to stimuli pair 5 (additional 280 trials).
+The first question served primarily as an attention check to see if
+participants were correctly identifying the larger value in the pair.
+Both stimuli in pair 5 were the same value, meaning that correct
+solutions to Question 1 should give an identical answer in the ratio
+estimation if participants were following instructions. For these
+reasons, 1,134 responses were removed for Question 2.
+
+Using a similar error metric as \citeproc{ref-cleveland1984}{{[}6{]}},
+we model our error as
+\(\text{Error}=\log_2(|\text{judged percent}-\text{true percent}|)\).
+There were significant main effects for media type (p-value \textless{}
+.0001) and stimuli pair (p-value = 0.0022). For media types, the log
+absolute error was larger for the 2D chart than both the 3D digital
+chart (p-value \textless{} .0001) and the 3D-printed chart (p-value
+\textless{} .0001). There were no detectable differences between the
+digital and printed 3D charts. All significant differences in stimuli
+pairs included pair 6, where stimuli pair 6 had significantly smaller
+error than stimuli pairs 1 (p-value = 0.0398) and 2 (p-value = 0.0004),
+and marginally smaller errors than pairs 8 (p-value = 0.0560) and 9
+(p-value = 0.0809).
+
+\begin{figure}
+
+\centering{
+
+\pandocbounded{\includegraphics[keepaspectratio]{index_files/figure-pdf/fig-error-media-1.pdf}}
+
+}
+
+\caption{\label{fig-error-media}Least square means for chart media
+types. There was evidence of a significant difference in error between
+the 2D heatmap and both renderings of the 3D heatmaps.}
+
+\end{figure}%
+
+\section{Discussion}\label{discussion}
+
+The findings in our study are consistent with similar studies that
+examine the dimensionality of charts. When the third dimension is
+informative,
+
+\phantomsection\label{refs}
+\begin{CSLReferences}{0}{0}
+\bibitem[\citeproctext]{ref-tukey1965}
+\CSLLeftMargin{{[}1{]} }%
+\CSLRightInline{J. W. Tukey, {``The technical tools of statistics,''}
+\emph{The American Statistician}, vol. 19, no. 2, pp. 23--28, 1965
+{[}Online{]}. Available: \url{https://www.jstor.org/stable/2682374}}
+
+\bibitem[\citeproctext]{ref-huronMakingDataPhysical2023}
+\CSLLeftMargin{{[}2{]} }%
+\CSLRightInline{S. Huron, T. Nagel, L. Oehlberg, and W. Willett, Eds.,
+\emph{Making with data: Physical design and craft in a data- driven
+world}, First edition. Boca Raton: AK Peters : CRC Press, 2023. }
+
+\bibitem[\citeproctext]{ref-katsioloudis2018}
+\CSLLeftMargin{{[}3{]} }%
+\CSLRightInline{P. Katsioloudis and M. Jones, {``A Comparative Analysis
+of Holographic, 3D-Printed, and Computer-Generated Models: Implications
+for Engineering Technology Students{'} Spatial Visualization Ability,''}
+\emph{Journal of Technology Education}, vol. 29, no. 2, pp. 36--53, Jun.
+2018 {[}Online{]}. Available:
+\url{https://scholar.lib.vt.edu/ejournals/JTE/v29n2/pdf/katsioloudis.pdf}}
+
+\bibitem[\citeproctext]{ref-holloway2019}
+\CSLLeftMargin{{[}4{]} }%
+\CSLRightInline{L. Holloway, K. Marriott, M. Butler, and S. Reinders,
+{``ASSETS '19: The 21st International ACM SIGACCESS Conference on
+Computers and Accessibility,''} 2019, pp. 183--195 {[}Online{]}.
+Available: \url{https://dl.acm.org/doi/10.1145/3308561.3353790}}
+
+\bibitem[\citeproctext]{ref-muff2022}
+\CSLLeftMargin{{[}5{]} }%
+\CSLRightInline{J. L. Muff, T. Heye, F. M. Thieringer, and P. Brantner,
+{``Clinical acceptance of advanced visualization methods: A comparison
+study of 3D-print, virtual reality glasses, and 3D-display,''} \emph{3D
+Printing in Medicine}, vol. 8, p. 5, Jan. 2022 {[}Online{]}. Available:
+\url{https://www.ncbi.nlm.nih.gov/pmc/articles/PMC8801110/}}
+
+\bibitem[\citeproctext]{ref-cleveland1984}
+\CSLLeftMargin{{[}6{]} }%
+\CSLRightInline{W. S. Cleveland and R. McGill, {``Graphical Perception:
+Theory, Experimentation, and Application to the Development of Graphical
+Methods,''} \emph{Journal of the American Statistical Association}, vol.
+79, no. 387, pp. 531--554, Sep. 1984 {[}Online{]}. Available:
+\url{http://www.tandfonline.com/doi/abs/10.1080/01621459.1984.10478080}}
+
+\bibitem[\citeproctext]{ref-hofmann2012}
+\CSLLeftMargin{{[}7{]} }%
+\CSLRightInline{H. Hofmann, L. Follett, M. Majumder, and D. Cook,
+{``Graphical tests for power comparison of competing designs,''}
+\emph{IEEE Transactions on Visualization and Computer Graphics}, vol.
+18, no. 12, pp. 2441--2448, Dec. 2012 {[}Online{]}. Available:
+\url{https://ieeexplore.ieee.org/document/6327249/?arnumber=6327249}}
+
+\bibitem[\citeproctext]{ref-vanderplas2020}
+\CSLLeftMargin{{[}8{]} }%
+\CSLRightInline{S. Vanderplas, D. Cook, and H. Hofmann, {``Testing
+Statistical Charts: What Makes a Good Graph?''} \emph{Annual Review of
+Statistics and Its Application}, vol. 7, no. 1, pp. 61--88, Mar. 2020
+{[}Online{]}. Available:
+\url{https://www.annualreviews.org/doi/10.1146/annurev-statistics-031219-041252}}
+
+\bibitem[\citeproctext]{ref-eells1926}
+\CSLLeftMargin{{[}9{]} }%
+\CSLRightInline{W. C. Eells, {``The relative merits of circles and bars
+for representing component parts,''} \emph{Journal of the American
+Statistical Association}, vol. 21, no. 154, pp. 119--132, Jun. 1926
+{[}Online{]}. Available:
+\url{https://www.tandfonline.com/doi/abs/10.1080/01621459.1926.10502165}}
+
+\bibitem[\citeproctext]{ref-croxton1927}
+\CSLLeftMargin{{[}10{]} }%
+\CSLRightInline{F. E. Croxton and R. E. Stryker, {``Bar charts versus
+circle diagrams,''} \emph{Journal of the American Statistical
+Association}, vol. 22, no. 160, pp. 473--482, 1927 {[}Online{]}.
+Available: \url{https://www.jstor.org/stable/2276829}}
+
+\bibitem[\citeproctext]{ref-stevens1986}
+\CSLLeftMargin{{[}11{]} }%
+\CSLRightInline{S. S. Stevens and G. Stevens, \emph{Psychophysics:
+introduction to its perceptual, neural, and social prospects}. New
+Brunswick, U.S.A: Transaction Books, 1986. }
+
+\bibitem[\citeproctext]{ref-fisher1997}
+\CSLLeftMargin{{[}12{]} }%
+\CSLRightInline{S. H. Fisher, J. V. Dempsey, and R. T. Marousky, {``Data
+Visualization: Preference and Use of Two-Dimensional and
+Three-Dimensional Graphs,''} \emph{Social Science Computer Review}, vol.
+15, no. 3, pp. 256--263, Oct. 1997 {[}Online{]}. Available:
+\url{http://journals.sagepub.com/doi/10.1177/089443939701500303}}
+
+\bibitem[\citeproctext]{ref-zacks1998}
+\CSLLeftMargin{{[}13{]} }%
+\CSLRightInline{J. Zacks, E. Levy, B. Tversky, and D. J. Schiano,
+{``\href{https://doi.org/10.1037/1076-898X.4.2.119}{Reading bar graphs:
+Effects of extraneous depth cues and graphical context},''}
+\emph{Journal of Experimental Psychology: Applied}, vol. 4, no. 2, pp.
+119--138, 1998. }
+
+\bibitem[\citeproctext]{ref-fischer2000}
+\CSLLeftMargin{{[}14{]} }%
+\CSLRightInline{M. H. Fischer, {``Do irrelevant depth cues affect the
+comprehension of bar graphs?''} \emph{Applied Cognitive Psychology},
+vol. 14, no. 2, pp. 151--162, Mar. 2000 {[}Online{]}. Available:
+\url{https://onlinelibrary.wiley.com/doi/10.1002/(SICI)1099-0720(200003/04)14:2\%3C151::AID-ACP629\%3E3.0.CO;2-Z}}
+
+\bibitem[\citeproctext]{ref-barfield1989}
+\CSLLeftMargin{{[}15{]} }%
+\CSLRightInline{W. Barfield and R. Robless, {``The effects of two- or
+three-dimensional graphics on the problem-solving performance of
+experienced and novice decision makers,''} \emph{Behaviour \&
+Information Technology}, vol. 8, no. 5, pp. 369--385, Oct. 1989
+{[}Online{]}. Available:
+\url{http://www.tandfonline.com/doi/abs/10.1080/01449298908914567}}
+
+\bibitem[\citeproctext]{ref-kraus2020}
+\CSLLeftMargin{{[}16{]} }%
+\CSLRightInline{M. Kraus \emph{et al.}, {``CHI '20: CHI Conference on
+Human Factors in Computing Systems,''} 2020, pp. 1--14 {[}Online{]}.
+Available: \url{https://dl.acm.org/doi/10.1145/3313831.3376675}}
+
+\bibitem[\citeproctext]{ref-tarr2001}
+\CSLLeftMargin{{[}17{]} }%
+\CSLRightInline{M. J. Tarr and D. J. Kriegman, {``What defines a
+view?''} \emph{Vision Research}, vol. 41, no. 15, pp. 1981--2004, Jul.
+2001 {[}Online{]}. Available:
+\url{https://linkinghub.elsevier.com/retrieve/pii/S0042698901000244}}
+
+\bibitem[\citeproctext]{ref-wang2022}
+\CSLLeftMargin{{[}18{]} }%
+\CSLRightInline{X. Wang, L. Besançon, M. Ammi, and T. Isenberg,
+{``Understanding differences between combinations of 2D and 3D input and
+output devices for 3D data visualization,''} \emph{International Journal
+of Human-Computer Studies}, vol. 163, p. 102820, Jul. 2022 {[}Online{]}.
+Available:
+\url{https://linkinghub.elsevier.com/retrieve/pii/S1071581922000490}}
+
+\bibitem[\citeproctext]{ref-kingdom2016}
+\CSLLeftMargin{{[}19{]} }%
+\CSLRightInline{F. A. A. Kingdom and N. Prins, \emph{Psychophysics: a
+practical introduction}, Second edition. Amsterdam: Elsevier/Academic
+Press, 2016. }
+
+\bibitem[\citeproctext]{ref-kintelOpenSCADDocumentation2023}
+\CSLLeftMargin{{[}20{]} }%
+\CSLRightInline{M. Kintel, {``{OpenSCAD}. {OpenSCAD}.org,''}
+17-Jul-2023. {[}Online{]}. Available:
+\url{http://openscad.org/documentation.html}. {[}Accessed:
+31-Jul-2023{]}}
+
+\bibitem[\citeproctext]{ref-rgl}
+\CSLLeftMargin{{[}21{]} }%
+\CSLRightInline{D. Murdoch and D. Adler, \emph{Rgl: 3D visualization
+using OpenGL}. 2023. }
+
+\bibitem[\citeproctext]{ref-ggplot2}
+\CSLLeftMargin{{[}22{]} }%
+\CSLRightInline{H. Wickham, {``ggplot2: Elegant graphics for data
+analysis,''} 2016 {[}Online{]}. Available:
+\url{https://ggplot2.tidyverse.org}}
+
+\bibitem[\citeproctext]{ref-herzog1981}
+\CSLLeftMargin{{[}23{]} }%
+\CSLRightInline{A. R. Herzog and J. G. Bachman, {``Effects of
+questionnaire length on response quality,''} \emph{The Public Opinion
+Quarterly}, vol. 45, no. 4, pp. 549--559, 1981 {[}Online{]}. Available:
+\url{https://www.jstor.org/stable/2748903}}
+
+\bibitem[\citeproctext]{ref-veit}
+\CSLLeftMargin{{[}24{]} }%
+\CSLRightInline{C. T. Veit, {``Ratio and Subtractive Processes in
+Psychophysical Judgment.''} }
+
+\bibitem[\citeproctext]{ref-mandal2020}
+\CSLLeftMargin{{[}25{]} }%
+\CSLRightInline{B. N. Mandal, R. Parsad, and S. Dash, {``Incomplete
+split-plot designs: Construction and analysis,''} \emph{Statistics \&
+Probability Letters}, vol. 166, p. 108869, Nov. 2020 {[}Online{]}.
+Available:
+\url{https://linkinghub.elsevier.com/retrieve/pii/S0167715220301723}}
+
+\bibitem[\citeproctext]{ref-stroup}
+\CSLLeftMargin{{[}26{]} }%
+\CSLRightInline{W. W. Stroup, G. A. Milliken, E. A. Claassen, and R. D.
+Wolfinger, \emph{SAS for Mixed Models: Introduction and Basic
+Applications}. }
+
+\bibitem[\citeproctext]{ref-shiny}
+\CSLLeftMargin{{[}27{]} }%
+\CSLRightInline{W. Chang \emph{et al.}, {``Shiny: Web application
+framework for r,''} 2024 {[}Online{]}. Available:
+\url{https://shiny.posit.co/}}
+
+\end{CSLReferences}
+
+
+% Can use something like this to put references on a page
+% by themselves when using endfloat and the captionsoff option.
+\ifCLASSOPTIONcaptionsoff
+  \newpage
+\fi
+
+% trigger a \newpage just before the given reference
+% number - used to balance the columns on the last page
+% adjust value as needed - may need to be readjusted if
+% the document is modified later
+%\IEEEtriggeratref{8}
+% The "triggered" command can be changed if desired:
+%\IEEEtriggercmd{\enlargethispage{-5in}}
+
+% Uncomment when use biblatex with style=ieee
+%\renewcommand{\bibfont}{\footnotesize} % for IEEE bibfont size
+
+\pagebreak[3]
+% that's all folks
+\end{document}
+
