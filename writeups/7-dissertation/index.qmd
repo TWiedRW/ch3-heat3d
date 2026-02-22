@@ -19,6 +19,8 @@ bibliography: references.bib
 #| warning: false
 #| echo: false
 library(tidyverse)
+library(lme4)
+library(lmerTest)
 ```
 
 ## Introduction
@@ -124,7 +126,11 @@ ggplot(mapping = aes(x = 1:10, y = 0)) +
 
 ### Subject Recruitment
 
-Participants were recruited from all STAT 218: *Introduction to Statistics* sections at University of Nebraska-Lincoln from June 2025 to Spring 2026. The experiment was incorporated into the curriculum as a project that allowed students to get hands-on experience with statistics. Throughout the project, students were also given a series of reflections to evaluate their perspectives on statistics. The first reflection had gathered students' thoughts on the scientific process before participating in the experiment. After the experiment participation, students reflected on what they thought the experiment was measuring. Lastly, students were given a written article and video presentation of the experiment and asked how their view of the experiment changed from their initial perspectives of the experiment's purpose.
+::: {.callout-note}
+Take out the experiential learning part. This won't be talked about in this paper.
+:::
+
+Participants were recruited from all sections of STAT 218: *Introduction to Statistics* at the University of Nebraska-Lincoln from June 2025 to December 2025. The experiment was incorporated into the curriculum as a project that allowed students to get hands-on experience with statistics. Throughout the project, students were also given a series of reflections to evaluate their perspectives on statistics. The first reflection had gathered students' thoughts on the scientific process before participating in the experiment. After the experiment participation, students reflected on what they thought the experiment was measuring. Lastly, students were given a written article and video presentation of the experiment and asked how their view of the experiment changed from their initial perspectives of the experiment's purpose.
 
 To assess whether students completed the experiment or not, the experiment produced a completion code for students to submit to Canvas. The completion code was created by concatenating three words with dashes (e.g., palm-raising-creatively). Words for the completion code came from the movie transcripts of the Star Wars prequel movies (Episodes 1, 2, and 3) as presented by [movies.fandom.com](movies.fandom.com). The movie transcripts were tokenism and filtered to remove colorful language[^1], stop words[^2], and fictional words[^3]. Instructors were provided an R script to check if their students completed the experiment, but the completion codes were not saved with any identifying information that could link experiment responses to student reflection responses.
 
@@ -307,7 +313,6 @@ users_in_person <- users_clean %>%
 We had `r nrow(users_clean)` students participate in the experiment across eight sections of Stat 218 between XXX and XXX. Of these students, `r nrow(users_clean)-nrow(users_in_person)` were enrolled in online sections of the course and did not have access to the 3D printed charts. The vast majority of participants were actively completing their undergraduate degree and between the ages of 19 and 25. See 
 
 ```{r}
-library(gt)
 users_clean %>% 
   group_by(user_gender) %>% 
   count() %>% 
@@ -383,13 +388,7 @@ car::Anova(mod_q1, type = 3) %>%
                col.names = c("Term", "Chi-square", "df", "p-value"))
 ```
 
-To test our hypothesis that 3D heat maps outperform 2D heat maps in the identification of larger values in stimuli pair, we focus on the on the simple effects of media types at each level of data set and stimuli pair. There were 13 media types comparisons with significant odds ratios, of which 10 involve the 2D heat maps. Of these 10 comparisons, all showed significantly smaller odds of correctly identifying the larger value. We also observed that the 3D digital heat maps had larger odds of correct identification than 3D physical heat maps for stimuli pairs 1 and 9 within data set 1, which was where the ratio 0.556. The same conclusion was observed for stimuli pair 9 in data set 2. 
-
-:::{.callout-warning}
-
-REVISIT THIS! THERE WAS A CHANGE WHEN ONLY INCLUDING THE FIRST BLOCK PER PARTICIPANT
-
-:::
+To test our hypothesis that 3D heat maps outperform 2D heat maps in the identification of larger values in stimuli pair, we focus on the on the simple effects of media types at each level of data set and stimuli pair. There were 14 media types comparisons with significant odds ratios, of which 11 involve the 2D heat maps. Of these 11 comparisons, all showed significantly smaller odds of correctly identifying the larger value. We also observed that the 3D digital heat maps had larger odds of correct identification than 3D physical heat maps for stimuli pairs 1 and 9 within data set 1, which was where the ratio 0.556. The same conclusion was observed for stimuli pair 9 in data set 2. 
 
 ```{r}
 library(emmeans)
@@ -423,8 +422,7 @@ em_q1 %>%
                             annotations = label, y_position = y),
               manual = T) + 
   facet_grid(set~pair_id) + 
-  labs(x = 'Pair Id', y = 'Estimated probability of\ncorrect solution',
-       caption = '† = sig. smaller odds than 3dd\n‡ = sig. smaller odds than 3dp') +
+  labs(x = 'Pair Id', y = 'Estimated probability of\ncorrect solution') +
   scale_fill_manual(values = mycols) +
   theme_bw() + 
   theme(aspect.ratio = 2,
@@ -436,11 +434,11 @@ em_q1 %>%
 
 ### Question 2
 
-Our initial exploratory data analysis of Question 2 revealed an interesting comprehension issue. While participants were tasked to estimate the size of the smaller value if the larger value in the pair represented 100 units, a non-negligible amount of participants had alternative estimation strategies. This was observed predominately in stimuli pair 5, which was where both values were the same. Based on consistent trends with possible strategies, we suspect that some participants either estimated the difference between the values in the stimuli pair or the value of the smaller value with respect to the entire chart. 
+Our initial exploratory data analysis of Question 2 revealed an interesting comprehension issue. While participants were tasked to estimate the size of the smaller value if the larger value in the pair represented 100 units, a non-negligible number of participants had alternative estimation strategies. This was observed predominately in stimuli pair 5, which was where both values were the same magnitude [see @fig-q2-eda]. Additionally, a visual inspection of responses across possible strategies showed that many participants were randomly selecting their answers (PUT SOME PARTICIPANT PLOTS HERE TO SHOW CORRECT, STRATEGY, AND RANDOM)
 
 ```{r}
 #| label: fig-q2-eda
-#| fig-cap: "Histogram of participant responses to Question 2 for Stimuli Pair 5. The correct response to Question 2 is 100, but clusters appear to form around 0 for an estimation of differences and 50 for estimation of "
+#| fig-cap: "Histogram of participant responses to Question 2 for Stimuli Pair 5. The correct response to Question 2 is 100, but clusters appear to form around 0 for an estimation of differences and 50 for estimation of ...."
 results %>% 
   filter(pair_id == 5) %>% 
   ggplot(mapping = aes(x = user_slider)) + 
@@ -450,6 +448,34 @@ results %>%
     theme(aspect.ratio = 1/2)
 ```
 
+We considered multiple candidate models to accommodate varying degrees of participant filtering. These are including responses from all participants, subsetting participants who had a correct response rate of at least 87.5% to Question 1, and using participants from a cluster analysis who strongly followed the ratio estimation task. For each of these categories, we include models for all responses and responses that were correct for Question 1, both for cases where Stimuli Pair 5 (both stimuli are the same value) is included and excluded. The result of our models showed that XXX. In this section, we discuss XXX.
+
+
+- All responses
+- All correct responses
+- All responses minus pair_id 5
+- All correct responses minus pair_id 5
+
+- Filtered responses
+- Filtered correct responses
+- Filtered responses minus pair_id 5
+- Filtered correct responses minus pair_id 5
+
+- Filtered responses for cluster 1
+- Filtered correct responses for cluster 1
+- Filtered responses for cluster 1 minus pair_id 5
+- Filtered correct responses for cluster 1 minus pair_id 5
+
+
+```{r}
+res_q2 <- results %>%
+  mutate(target_ratio = 100*true_ratio,
+         target_size = ifelse(z > 50, 50, z*true_ratio),
+         target_diff = z-target_size) %>%
+  group_by(user_id, block) %>%
+  mutate(prop_correct = mean(user_larger==true_larger),
+         error = user_slider - target_ratio)
+```
 
 
 
@@ -462,3 +488,305 @@ results %>%
 ## Conclusion
 
 ## Appendix
+
+### Modelling Participant Error
+
+Many participants in our study appear to be randomly guessing in their responses. We considered the following models on 
+
+
+$$
+\text{Error}=\text{particiapnt slider}-\text{true ratio}\times100
+$$
+
+#### Responses from all participants
+
+```{r}
+mod.all.all <- lmer(error ~ set*media*pair_id + (1|user_id:block/set:media),
+                    data = res_q2)
+```
+
+```{r}
+mod.all.mp5 <- lmer(error ~ set*media*pair_id + (1|user_id:block/set:media),
+                    data = filter(res_q2, pair_id != 5))
+```
+
+```{r}
+mod.all.all.c <- lmer(error ~ set*media*pair_id + (1|user_id:block/set:media),
+                    data = filter(res_q2, user_larger == true_larger))
+```
+
+```{r}
+mod.all.mp5.c <- lmer(error ~ set*media*pair_id + (1|user_id:block/set:media),
+                    data = dplyr::filter(res_q2, pair_id != 5, user_larger == true_larger))
+```
+
+
+
+#### Responses from non
+
+```{r}
+# At least 87.5% correct
+res_q2_filter_q1_875 <- res_q2 %>%
+  group_by(user_id, block) %>%
+  filter(mean(user_larger==true_larger) >= 0.875)
+length(unique(res_q2$user_id)) - length(unique(res_q2_filter_q1_875$user_id))
+all_users <- unique(res_q2$user_id); length(all_users)
+sub_users <- unique(res_q2_filter_q1_875$user_id); length(sub_users)
+
+
+users %>%
+  filter(user_id %in% sub_users) %>%
+  group_by(user_reason) %>%
+  summarize(count = n()) %>%
+  mutate(included = 'yes',
+         prop = count/sum(count))
+
+users %>%
+  filter(!(user_id %in% sub_users)) %>%
+  group_by(user_reason) %>%
+  summarize(count = n()) %>%
+  mutate(included = 'no',
+         prop = count/sum(count))
+```
+
+
+- Filtered responses
+- Filtered correct responses
+- Filtered responses minus pair_id 5
+- Filtered correct responses minus pair_id 5
+
+```{r}
+mod.filt.all <- lmer(error ~ set*media*pair_id + (1|user_id:block/set:media),
+                    data = filter(res_q2, prop_correct >= 0.875))
+```
+
+```{r}
+mod.filt.mp5 <- lmer(error ~ set*media*pair_id + (1|user_id:block/set:media),
+                    data = filter(res_q2,prop_correct >= 0.875, pair_id != 5))
+```
+
+```{r}
+mod.filt.all.c <- lmer(error ~ set*media*pair_id + (1|user_id:block/set:media),
+                    data = filter(res_q2, prop_correct >= 0.875, user_larger == true_larger))
+```
+
+```{r}
+mod.filt.mp5.c <- lmer(error ~ set*media*pair_id + (1|user_id:block/set:media),
+                    data = dplyr::filter(res_q2, prop_correct >= 0.875, pair_id != 5, user_larger == true_larger))
+```
+
+
+#### Responses from clustering
+
+For many participants, responses are generally close to their expected target. The goal of clustering is to create an additional subset to identify users who had the clearest understanding of the task.
+
+To accomplish clustering, we use the `flexmix` package to model finite mixtures of regression models. We apply a constraint that each participant solely belongs to a single 
+
+
+```{r}
+#| cache: true
+
+library(flexmix)
+set.seed(21321)
+# Potential variables
+variables <- c("target_ratio", "target_diff", "target_size", "media", "set")
+
+# All combinations of variables
+all_formulas <- unlist(
+  lapply(1:length(variables), function(m) {
+    combn(variables, m, function(x) {
+      main_effects <- paste(x, collapse = " + ") #main effects
+      interaction_terms <- paste(x, collapse = " * ") #interactions
+      c(
+        paste("user_slider ~", main_effects, "| user_id:block"),
+        paste("user_slider ~", interaction_terms, "| user_id:block")
+      )
+    })
+  })
+)
+
+# View all generated formulas
+all_combs <- data.frame()
+for(i in seq_along(all_formulas)) {
+  try({
+    mod.sf <- stepFlexmix(as.formula(all_formulas[i]),
+                          data = res_q2_filter_q1_875,
+                          k = 1:5, nrep = 4)
+    k <- 1:5; aic <- AIC(mod.sf); bic <- BIC(mod.sf)
+    tmp.df <- data.frame(formula = all_formulas[i], k = k, aic = aic, bic = bic)
+    all_combs <- rbind(all_combs, tmp.df)
+  }, silent = T)
+}
+```
+
+```{r}
+all_combs %>% 
+  # arrange(aic) %>% head()
+  filter(aic == min(aic) | bic == min(bic))
+```
+
+```{r}
+library(flexmix)
+set.seed(4271)
+mod.flex <- flexmix(user_slider ~ target_ratio | user_id:block,
+                    data = res_q2_filter_q1_875, k = 5)
+parameters(mod.flex) %>% 
+  data.frame() %>% 
+  rownames_to_column(var = 'Term') %>% 
+  knitr::kable(col.names = c('Term', 'Cluster 1', 'Cluster 2', 'Cluster 3', 'Cluster 4', 'Cluster 5'))
+
+res_q2_filtered_cluster <- res_q2_filter_q1_875 %>% 
+  ungroup() %>% 
+  mutate(cluster = clusters(mod.flex))
+```
+
+The best clustering model by AIC and BIC is a five component mixture that simply contains a linear relationship between the submitted slider response and the target ratio. In this model, cluster 3 identifies participants who were precise and accurate in estimating the ratios. Cluster 4 also shows accurate participants, but those who are less precise. The other clusters may be indicative of alternative estimation strategies or lack of precision. Due to the small sample size of cluster 3 ($n=15$), we combine clusters 3 and 4 for our final category of models. 
+
+```{r}
+#| fig-cap: "Distribution of errors by cluster. Cluster 3 had the highest accuracy and precision in ratio estimations."
+#| label: fig-cluster-errors
+res_q2_filtered_cluster%>% 
+  ggplot(mapping = aes(x = error, group = interaction(user_id, block))) + 
+  geom_density(color = alpha('black', 0.3)) + 
+  geom_vline(xintercept = 0, linetype = 'dashed', color = 'red') + 
+  labs(x = 'Deviation from Target Ratio', y = 'Density') + 
+  facet_wrap(~cluster, labeller = label_both) + 
+  theme_bw() + 
+  theme(aspect.ratio = 1)
+```
+
+```{r}
+res_q2_filtered_cluster%>% 
+  select(user_id, block, cluster) %>% 
+  distinct() %>% 
+  group_by(cluster) %>% 
+  count() %>% 
+  pivot_wider(names_from = cluster, values_from = n, names_prefix = 'Cluster ') %>% 
+  knitr::kable(caption = 'Count of participants by cluster')
+```
+
+```{r}
+mod.flex.all <-  lmer(error ~ set*media*pair_id + (1|user_id:block/set:media),
+     data = filter(res_q2_filtered_cluster, cluster %in% 3))
+mod.flex.all.c <-  lmer(error ~ set*media*pair_id + (1|user_id:block/set:media),
+     data = filter(res_q2_filtered_cluster, cluster %in% 3, user_larger == true_larger))
+
+mod.flex.mp5 <-  lmer(error ~ set*media*pair_id + (1|user_id:block/set:media),
+     data = filter(res_q2_filtered_cluster, cluster %in% 3, pair_id != 5))
+mod.flex.mp5.c <-  lmer(error ~ set*media*pair_id + (1|user_id:block/set:media),
+     data = filter(res_q2_filtered_cluster, cluster %in% 3, pair_id != 5, user_larger == true_larger))
+```
+
+```{r}
+mod.flex2.all <-  lmer(error ~ set*media*pair_id + (1|user_id:block/set:media),
+     data = filter(res_q2_filtered_cluster, cluster %in% 3:4))
+mod.flex2.all.c <-  lmer(error ~ set*media*pair_id + (1|user_id:block/set:media),
+     data = filter(res_q2_filtered_cluster, cluster %in% 3:4, user_larger == true_larger))
+
+mod.flex2.mp5 <-  lmer(error ~ set*media*pair_id + (1|user_id:block/set:media),
+     data = filter(res_q2_filtered_cluster, cluster %in% 3:4, pair_id != 5))
+mod.flex2.mp5.c <-  lmer(error ~ set*media*pair_id + (1|user_id:block/set:media),
+     data = filter(res_q2_filtered_cluster, cluster %in% 3:4, pair_id != 5, user_larger == true_larger))
+```
+
+
+```{r}
+library(kableExtra)
+get_sig_terms <- function(model, index) {
+  tmp <- car::Anova(model) %>% data.frame() %>% 
+    janitor::clean_names() %>% 
+    rownames_to_column(var = 'term') %>% 
+    select(term, pr_chisq) %>% 
+    pivot_wider(names_from = term, values_from = pr_chisq) %>% 
+    mutate(model = index)
+}
+
+q2_models <- c(
+  mod.all.all, mod.all.all.c, mod.all.mp5, mod.all.mp5.c, #All participants
+  mod.filt.all, mod.filt.all.c, mod.filt.mp5, mod.filt.mp5.c, #At least 87.5%
+  mod.flex2.all, mod.flex2.all.c, mod.flex2.mp5, mod.flex2.mp5.c, #Best 2 clusters
+  mod.flex.all, mod.flex.all.c, mod.flex.mp5, mod.flex.mp5.c #Best cluster
+)
+
+model_terms <- data.frame() 
+model_diffs <- data.frame()
+model_means <- data.frame()
+
+for(i in seq_along(q2_models)) {
+  current_model <- q2_models[[i]]
+  model_terms <- bind_rows(model_terms, get_sig_terms(current_model, i))
+  model_means <- bind_rows(model_means, data.frame(emmeans(current_model, ~media|set+pair_id, pbkrtest.limit=5800)) %>% mutate(model = i)) 
+  model_diffs <- bind_rows(model_diffs, data.frame(pairs(emmeans(current_model, ~media|set+pair_id, pbkrtest.limit=5800))) %>% mutate(model = i))
+  
+}
+
+
+model_terms %>% 
+  mutate(Category = case_when(
+    model %in% 1:4 ~ 'All participants',
+    model %in% 5:8 ~ 'At least 87.5% correct response rate to Q1',
+    model %in% 9:12 ~ 'In best 2 clusters',
+    model %in% 13:16 ~ 'In best cluster'
+  )) %>% 
+  mutate(Filter = case_when(
+    model %% 4 == 1 ~ 'All responses',
+    model %% 4 == 2 ~ 'Exclude incorrect Q1',
+    model %% 4 == 3 ~ 'Exclude Stimuli Pair 5',
+    model %% 4 == 0 ~ 'Exclude incorrect Q1 and Stimuli Pair 5'
+  )) %>% 
+  select(Filter, Category, set:`set:media:pair_id`)
+  
+model_diffs %>% 
+  mutate(Category = case_when(
+    model %in% 1:4 ~ 'All participants',
+    model %in% 5:8 ~ 'At least 87.5% correct response rate to Q1',
+    model %in% 9:12 ~ 'In best 2 clusters',
+    model %in% 13:16 ~ 'In best cluster'
+  )) %>% 
+  mutate(Filter = case_when(
+    model %% 4 == 1 ~ 'All responses',
+    model %% 4 == 2 ~ 'Exclude incorrect Q1',
+    model %% 4 == 3 ~ 'Exclude Stimuli Pair 5',
+    model %% 4 == 0 ~ 'Exclude incorrect Q1 and Stimuli Pair 5'
+  )) %>% 
+  group_by(Category, Filter) %>% 
+  summarize(n = n(), n.sig = sum(p.value < 0.05),
+            `2dd > 3dp` = sum(p.value < 0.05 & str_detect(contrast, '2dd - 3dp') & estimate > 0),
+            `2dd > 3dd` = sum(p.value < 0.05 & str_detect(contrast, '2dd - 3dd') & estimate > 0),
+            `3dd > 3dp` = sum(p.value < 0.05 & str_detect(contrast, '3dd - 3dp') & estimate > 0),
+            `2dd < 3dp` = sum(p.value < 0.05 & str_detect(contrast, '2dd - 3dp') & estimate < 0),
+            `2dd < 3dd` = sum(p.value < 0.05 & str_detect(contrast, '2dd - 3dd') & estimate < 0),
+            `3dd < 3dp` = sum(p.value < 0.05 & str_detect(contrast, '3dd - 3dp') & estimate < 0)) %>% 
+  # kbl() %>% 
+  # collapse_rows(columns = 1:2)
+  pivot_longer(cols = `2dd > 3dp`:`3dd < 3dp`, names_to = 'Error', values_to = 'prop.sig') %>%
+
+  ggplot(mapping = aes(y = Filter, x = Error, fill = prop.sig)) +
+  geom_tile() +
+  geom_text(aes(label = prop.sig)) +
+  # scale_fill_continuous(limits = c(0,1)) +
+  theme(aspect.ratio = 1, axis.text.x = element_text(angle = 45, hjust = 1)) +
+  facet_wrap(~Category)
+
+model_means %>% 
+  mutate(Category = case_when(
+    model %in% 1:4 ~ 'All participants',
+    model %in% 5:8 ~ 'At least 87.5% correct response rate to Q1',
+    model %in% 9:12 ~ 'In best 2 clusters',
+    model %in% 13:16 ~ 'In best cluster'
+  )) %>% 
+  mutate(Filter = case_when(
+    model %% 4 == 1 ~ 'All responses',
+    model %% 4 == 2 ~ 'Exclude incorrect Q1',
+    model %% 4 == 3 ~ 'Exclude Stimuli Pair 5',
+    model %% 4 == 0 ~ 'Exclude incorrect Q1 and Stimuli Pair 5'
+  )) %>% 
+  # filter(set == 'set2' & pair_id == 1) %>% 
+  ggplot(mapping = aes(x = media, y = emmean, group_by = factor(model),
+                       fill = factor(pair_id))) + 
+  geom_col(position = position_dodge()) + 
+  facet_grid(Filter~Category) + 
+  theme(aspect.ratio = 1,
+        legend.position = 'none')
+```
+
