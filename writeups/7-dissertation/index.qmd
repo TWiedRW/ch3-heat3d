@@ -98,11 +98,12 @@ Mixture distribution of @eq-random-z using the formula for the top half of a sph
 
 The placement of stimuli values onto the randomly generated heat map data was done via simulation to try to make their placement look as natural as possible. Twenty random heat maps were generated. For each heat map, the non-constant stimuli was placed onto the coordinate such that the difference between the stimuli and randomly generated value is minimized. The constant stimuli was then placed onto a coordinate within a Manhattan distance of three or four that minimizes the difference between the constant stimuli and randomly generated values, where the Manhattan distance is given by $|X_i - X_j| + |Y_i - Y_j|$ for stimuli $i$ and $j$. To ensure that stimuli placement is evenly position across the heat map, the count of stimuli was computed separately across the X and Y axes. For example, in Data Set 1, the X-axis has four stimuli in $X=1$, three stimuli in $X=2$, and so forth. Chi-squared statistics were calculated for each axis and the heat map with the smallest average Chi-squared statistic was selected as the final dataset. A visual inspection of this process showed that the stimuli were not clustered in any one area of the chart and that the stimuli look natural with respect to the random mixture distribution.
 
-:::{#fig-placement layout-ncol=2}
+:::{#fig-placement layout-ncol="2"}
 
 ![Placement of stimuli on Set 1](../_images/stimuli-set1.png)
 
 ![Placement of stimuli on Set 2](../_images/stimuli-set2.png)
+
 Placement of stimuli on the two data sets. Bars with solid fills are the fixed stimuli values, where opaque bars are randomly generated.
 :::
 
@@ -138,99 +139,54 @@ ggplot(mapping = aes(x = 1:10, y = 0)) +
 
 ### Subject Recruitment
 
-::: callout-note
-Take out the experiential learning part. This won't be talked about in this paper.
-:::
+Participants were recruited from all sections of STAT 218: *Introduction to Statistics* at the University of Nebraska-Lincoln from June 2025 to December 2025. The experiment was incorporated into the curriculum as a project that allowed students to get hands-on experience with statistics. For data to be collected as part of our study, students had to be at least 19 years of age and provide consent to data collection.
 
-Participants were recruited from all sections of STAT 218: *Introduction to Statistics* at the University of Nebraska-Lincoln from June 2025 to December 2025. The experiment was incorporated into the curriculum as a project that allowed students to get hands-on experience with statistics. Throughout the project, students were also given a series of reflections to evaluate their perspectives on statistics. The first reflection had gathered students' thoughts on the scientific process before participating in the experiment. After the experiment participation, students reflected on what they thought the experiment was measuring. Lastly, students were given a written article and video presentation of the experiment and asked how their view of the experiment changed from their initial perspectives of the experiment's purpose.
+STAT 218 is one of the possible courses under the general education requirements for undergraduate degrees at the University of Nebraska. As such, many students enrolled in the course are in the 18-25 age range and are in the process of obtaining a Bachelor's degree. This allowed for the unique opportunity for us to obtain a sample size that is considerably larger than typical studies in graphical perception.
 
-To assess whether students completed the experiment or not, the experiment produced a completion code for students to submit to Canvas. The completion code was created by concatenating three words with dashes (e.g., palm-raising-creatively). Words for the completion code came from the movie transcripts of the Star Wars prequel movies (Episodes 1, 2, and 3) as presented by [movies.fandom.com](movies.fandom.com). The movie transcripts were tokenism and filtered to remove colorful language[^index-1], stop words[^index-2], and fictional words[^index-3]. Instructors were provided an R script to check if their students completed the experiment, but the completion codes were not saved with any identifying information that could link experiment responses to student reflection responses.
-
-[^index-1]: <https://www.cs.cmu.edu/~biglou/resources/bad-words.txt>
-
-[^index-2]: tm package [@tm]
-
-[^index-3]: @web2_dict
 
 ### Experimental Design
 
-Our experiment was designed with a 3 x 2 x 9 treatment structure. Media type is our main interest, with 2D-digital, 3D-digital, and 3D-printed charts. To ensure that results are not confounded with datasets, we used two datasets to create the heatmaps. A total of 9 stimuli pairs were placed into each dataset. The order of treatments was given so that media and dataset combinations were grouped together randomly in the sequence and stimuli pairs were randomized within the groupings.
+Our experiment was designed with a 3 x 2 x 9 treatment structure. Media type is our main interest, with 2D-digital, 3D-digital, and 3D-printed charts. To ensure that results are not confounded with datasets, we used two datasets to create the heat maps. A total of 9 stimuli pairs were placed into each dataset. The order of treatments was given so that media and dataset combinations were grouped together randomly in the sequence and stimuli pairs were randomized within the groupings.
 
-Due to practical constraints, stimuli pairs were incompletely blocked. A full factorial design would result in 54 trials per participant, which could lead to a decrease in quality responses [@herzog1981]. Therefore, we selected four out of the nine possible stimuli pairs to create incomplete blocks. This resulted in 18 blocks for a balanced incomplete block design. Within each block, media type is fully crossed with dataset. Using the incomplete block structure, participants completed a total of 24 trials, which is more practical than the full factorial design. Blocks were chosen for each participant by using probabilities that are proportional to the inverse counts of used blocks, meaning
+Due to practical constraints, stimuli pairs were incompletely blocked. A full factorial design would result in 54 trials per participant, which could lead to a decrease in quality responses [@herzog1981]. Therefore, we selected four out of the nine possible stimuli pairs to create incomplete blocks. This resulted in 18 blocks for a balanced incomplete block design. Within each block, media type is fully crossed with dataset. Using the incomplete block structure, participants completed a total of 24 trials, which is more practical than the full factorial design. Blocks were chosen for each participant by using probabilities that were proportional to the inverse counts of previously chosen blocks. This ensured that blocks were approximately equally distributed amongst the participants by increasing the probabilistic weight of lesser chosen blocks. 
 
-We measured three responses – two questions for each trial and one question for each media by dataset combination. For each trial, participants are initially asked which stimuli in a pair is larger or if the stimuli are the same value. Next, they were asked to estimate the magnitude of the smaller stimuli if the larger stimuli represents 100 units, which is a subtractive process [@veit]. After each grouping of media and dataset, participants were presented with a modal dialog window asking them to rate their confidence on a 5-point Likert scale for their answers of the previous group of charts.
+Following the procedure of @cleveland1984, we asked participants two questions in each trial. The first question asked participants which stimuli in a specified pair is larger or if the stimuli are the same value. Next, participants were asked to estimate the magnitude of the smaller stimuli if the larger stimuli represents 100 units, which is a subtractive process [@veit]. This question is designed to estimate $A/B$, where $A\leq B$.
 
 #### Shiny Application
 
-A Shiny application [@shiny] was developed to administer the experiment. The application consisted of five sections: informed consent, demographics, practice, experiment, and wrap-up. The entire application is designed to be completed in approximately 30 minutes.
+A Shiny application [@shiny] was developed to administer the experiment. The application consisted of five sections: informed consent, demographics, practice, experiment, and wrap-up. The entire application was designed to be completed in approximately 30 minutes.
 
 The Shiny application started with the informed consent screen, allowing participants to select if they are a STAT 218 Student and if they agree to the data collection. Participants had to select a data collection option to continue. After submitting their data collection response, a completion code was generated and saved on the last page of the application. A copy of the informed consent is available in our GitHub repository.
 
 If participants agreed to have their data collected, they were presented with the demographics section. This section asked participants to use drop down menus to specify their age, gender identity, highest education level, and a question about how their participation in the experiment is graded. The last question was a text box and asked participants to specify their favorite movie and/or actor. Demographic information was combined with the application start time and completion code to create a hash for an anonymzed participant identifier using the `rlang` package [@rlang].
 
-Once a participant completed the demographics page or selected "No" to the data collection question, participants were given a practice page. A modal dialog window was initially shown with instructions, and users could display this window again at any point during the practice. The practice consisted of four questions: two trials from 2dd charts and two trials from 3dd charts. Each practice trial showed the correct solution after the participant submits their trial. After all practice trials were completed, another modal dialog window was displayed to ask participants if they have access to the 3D-printed charts. This was necessary since the experiment was given to potentially online sections of STAT 218 who did not have access to the physical charts.
+Once a participant completed the demographics page or selected "No" to the data collection question, they were given a practice page. A modal dialog window was initially shown with instructions, and users could display this window again at any point during the practice trials. The practice consisted of four questions: two trials from 2dd charts and two trials from 3dd charts. Once participants provided a response to both questions in a practice trial, they were able display the correct solution to check their answers. 
 
-The experiment page was presented to participants after completion of the practice trials [@fig-exp-page]. Each page contained two questions -- one question for identifying which stimuli is larger and another question for estimating the value of the smaller stimuli if the larger stimuli is 100 units. If participants selected that the stimuli are the same value, then the slider was automatically placed at 100 units. Each trial has the slider initially placed at 50 units. An option was provided for displaying the coordinates of the stimuli pair on a 2D heatmap, but was left unchecked by default. For 3dd charts, the number of interactive clicks was also recorded. A trial could only be submitted if the first question is answered and if the slider was moved at least once.
+The experiment page was presented to participants after completion of the practice trials [@fig-exp-page]. Each page contained two questions -- one question for identifying which stimuli is larger and another question for estimating the value of the smaller stimuli if the larger stimuli is 100 units. Each trial had the initial slider position randomized in order to prevent starting position bias. For 3dd charts, the number of interactive clicks was also recorded. A trial could only be submitted if the first question is answered and if the slider was moved at least once.
 
 ![Graphics experiment page. Each trial contained two questions about a pair of stimuli, and a check box that displays the location of the stimuli if needed.](images/experiment-page.png){#fig-exp-page width="100%"}
 
-After completing all trials, participants were given the completion code and informed to copy the code to Canvas since they will not have access to the code after closing out of the experiment.
+After completing all trials, participants were given the completion code and informed to the code to their instructor since they will not have access to the code after closing out of the experiment.
 
 #### Method of Analysis
 
-The design of our experiment is a balanced incomplete split-plot with replication, where media type and dataset is the whole plot and stimuli pair is the split plot. A similar design was presented by @mandal2020 for a single replicate. For our experiment, the ANOVA table is in [@tbl-anova].
+The design of our experiment is a balanced incomplete split-plot with replication, where media type and dataset is the whole plot factor for each participant and stimuli pair is the split plot. A similar design was presented by @mandal2020 for a single replicate. For our experiment, we use the following model:
 
-| Source                                          | Degrees of Freedom    |
-|-------------------------------------------------|-----------------------|
-| Block (B)                                       | 18-1                  |
-| Media type (M)                                  | 3-1                   |
-| Data Set (D)                                    | 2-1                   |
-| Whole-plot error = $B\times M \times D$         | (18-1)(3-1)(2-1)      |
-| Stimuli Pair (P)                                | 9-1                   |
-| $P\times M$                                     | (9-1)(3-1)            |
-| $P\times D$                                     | (9-1)(2-1)            |
-| $P\times M \times D$                            | (9-1)(3-1)(2-1)       |
-| Split-plot error = $B\times M\times D \times P$ | (18-1)(3-1)(2-1)(9-1) |
+$$
+Y_{ijklm}=\mu+S_i\times M_j\times P_k+\gamma_{lm}+\omega_{ijlm}+\epsilon_{ijklm}
+$$
 
-: ANOVA table for analysis of a single replicate of the balanced incomplete split-plot. {#tbl-anova}
+:::{.callout-note}
+
+Finish this section!
+
+:::
 
 The first question for each trial was to indicate which value within a stimuli pair was larger, or if they were the same value. Since a participant could either answer this question correctly or incorrectly, a Binomial generalized linear mixed model [@stroup] was fit to the responses.
 
 To measure numerical accuracy of participant responses for the second question in each trial, we used the absolute value of the difference between the participant estimate of the smaller stimuli value and its true value. By using the absolute value of the error, we measure how far off a participant's estimate was rather than the direction of error. For numerical accuracy, we fit a linear mixed model. If the responses do not fit well to a Gaussian distribution, other distributions, such as the log-normal or gamma distributions, will be used for a generalized linear mixed model.
 
-$$
-Y=|\text{Guess}-\text{Actual|}
-$$
 
-```{r}
-#| eval: false
-#| echo: false
-results <- data.frame()
-
-for(i in 1:18){
-  for(j in 1:3){
-    results <- bind_rows(results, mutate(randomize_order(i, plan, F), block = i, id = j))
-  }
-}
-
-dat <- results %>% 
-  mutate(y = rnorm(nrow(.), 50, 3),
-         pair_id = factor(pair_id),
-         block = factor(block)) %>% 
-  rowwise() %>% 
-  mutate(id = rlang::hash(paste0(block, id)))
-         
-library(lme4)
-library(lmerTest)
-mod <- lmer(y ~ (1|block) + set + media + set:media +(1|block:set:media) + pair_id + pair_id:set + pair_id:media + pair_id:set:media, data = dat)
-anova(mod)
-summary(mod)
-
-```
-
-In addition to linear mixed models, we used the bootstrap distribution of mean errors as described by @cleveland1984 to provide empirical claims for the effect of dimensionality. A common issue in experiments involving perception is that random noise often covers the effects of interest, so the empirical claims may provide additional insight into the effect of chart dimensionality (XXX).
-
-After each media type and data set grouping, participants were given a question to rate their confidence on their answers. Here, we use descriptive statistics and visualizations to assess confidence across our treatment factors.
 
 ## Results
 
@@ -486,6 +442,7 @@ We define our error metric as follows:
 $$
 y=\log_2(|\text{User Response}-100\times(\text{True ratio})|+1/8)
 $$
+
 
 In our analysis, we excluded responses where participants were incorrect in their response to the initial question and all trials for stimuli pair 5. The initial question served as an attention check to verify that the participants were making the correct comparison between stimuli values. The removal of stimuli pair 5 is due to the
 
@@ -755,6 +712,8 @@ time %>%
 ```
 
 ```{r}
+#| layout-ncol: 2
+#| label: fig-clicks3dd
 clicks %>% 
   ggplot(mapping = aes(x = clicks_3dd)) + 
   geom_histogram(binwidth = 1, color = 'black', fill = '#1a80bb') + 
@@ -771,6 +730,8 @@ clicks %>%
 ```
 
 ```{r}
+#| layout-ncol: 2
+#| label: fig-slider-clicks
 res_q2_filtered %>% 
   ggplot(mapping = aes(x = slider_clicks)) + 
   geom_histogram(binwidth = 1, fill = '#1a80bb', color = 'black') + 
@@ -786,6 +747,7 @@ res_q2_filtered %>%
 ```
 
 ```{r}
+#| label: fig-slider-start
 res_q2_filtered %>% 
   ggplot(mapping = aes(x = slider_start, y = user_slider)) + 
   geom_point(alpha = 1/10) +
