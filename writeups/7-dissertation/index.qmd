@@ -344,6 +344,7 @@ Our experiment was conducted with eight sections of Stat 218 between August 25th
 
 ```{r}
 #| label: tbl-demographics
+#| tbl-cap: "Demographic Information"
 tbl_gender <- users_clean %>% 
   group_by(user_gender) %>% 
   summarize(n = n()) %>% 
@@ -374,7 +375,7 @@ tbl_demographics <- bind_rows(tbl_gender, tbl_age, tbl_education) %>%
   ))
   
 tbl_demographics[c(1,2,4,3, 5, 6, 16, 7, 8, 9, 11, 14, 15, 13, 10, 12), c(3,1,2)] %>% 
-kbl(digits = 2, caption = 'Demographic Information', booktabs = T, col.names = c('', 'Count', 'Proportion')) %>% 
+kbl(digits = 2, booktabs = T, col.names = c('', 'Count', 'Proportion')) %>% 
   kable_paper() %>% 
   pack_rows('Gender', 1, 4) %>% 
   pack_rows('Age', 5, 10) %>% 
@@ -912,7 +913,7 @@ For each model, we exclude stimuli pair 5. In theory, participants who answer th
 
 ```{r}
 #| fig-height: 3
-#| fig-cap: "Counts of response behavior for when values in the stimuli pair were the same."
+#| fig-cap: "Counts of response behavior for Stimuli Pair 5. This pair had identical values, which means that true solutions indicates marking that they were the same value and positioning the slider at 100."
 #| label: fig-pair5-issues
 infilter.labs <- c('Included Participants', 'Excluded Participants')
 names(infilter.labs) <- c(TRUE, FALSE)
@@ -1018,12 +1019,16 @@ bind_rows(
 
 
 ```{r}
-#| fig-height: 6
+#| fig-height: 8
 em_all_all <- emmeans(mod_all_all, ~media+set+pair_id, pbkrtest.limit = 5800)
 em_all_q1 <- emmeans(mod_all_q1, ~media+set+pair_id, pbkrtest.limit = 5800)
 em_q1_all <- emmeans(mod_q1_all, ~media+set+pair_id, pbkrtest.limit = 5800)
 em_q1_q1 <- emmeans(mod_q1_q1, ~media+set+pair_id, pbkrtest.limit = 5800)
+```
 
+
+```{r}
+#| eval: false
 bind_rows(
   data.frame(em_all_all),
   data.frame(em_all_q1),
@@ -1031,14 +1036,148 @@ bind_rows(
   data.frame(em_q1_q1),
   .id = 'model'
 ) %>% 
+  mutate(model = case_when(
+    model=='1' ~ 'All participants, all responses',
+    model=='2' ~ 'All participants, Q1 correct',
+    model=='3' ~ 'Filtered participants, all responses',
+    model=='4' ~ 'Filtered participants, Q1 correct'
+  )) %>% 
   ggplot(mapping = aes(x = media, y = emmean, fill = factor(model))) + 
   geom_col(position = position_dodge()) + 
-  facet_grid(set ~ pair_id) + 
+  facet_wrap(~set+pair_id) +
+  # facet_grid(set ~ pair_id) + 
   # facet_grid(pair_id ~ set) + 
   theme_bw() +
-  theme(aspect.ratio = 1,
+  theme(#aspect.ratio = 1,
+        legend.position = 'right')
+```
+
+```{r}
+#| fig-height: 6
+#| label: fig-mod-int-plots
+bind_rows(
+  data.frame(em_all_all),
+  data.frame(em_all_q1),
+  data.frame(em_q1_all),
+  data.frame(em_q1_q1),
+  .id = 'model'
+) %>% 
+  mutate(model = case_when(
+    model=='1' ~ 'All participants, all responses',
+    model=='2' ~ 'All participants, Q1 correct',
+    model=='3' ~ 'Filtered participants, all responses',
+    model=='4' ~ 'Filtered participants, Q1 correct'
+  )) %>% 
+  ggplot(mapping = aes(x = media, y = emmean, color = factor(model))) + 
+  geom_line(aes(group = factor(model))) + 
+  geom_point() + 
+  facet_wrap(~set+pair_id) +
+  # facet_grid(set ~ pair_id) + 
+  # facet_grid(pair_id ~ set) + 
+  theme_bw() +
+  theme(aspect.ratio = 1/2,
         legend.position = 'bottom')
 ```
+
+
+```{r}
+#| fig-height: 6
+bind_rows(
+  data.frame(pairs(emmeans(mod_all_all, ~media | pair_id + set, pbkrtest.limit = 5800), infer = c(T,T))),
+  data.frame(pairs(emmeans(mod_all_q1, ~media | pair_id + set, pbkrtest.limit = 5800), infer = c(T,T))),
+  data.frame(pairs(emmeans(mod_q1_all, ~media | pair_id + set, pbkrtest.limit = 5800), infer = c(T,T))),
+  data.frame(pairs(emmeans(mod_q1_q1, ~media | pair_id + set, pbkrtest.limit = 5800), infer = c(T,T))),
+  .id = 'model'
+) %>% 
+  mutate(model = case_when(
+    model=='1' ~ 'All participants, all responses',
+    model=='2' ~ 'All participants, Q1 correct',
+    model=='3' ~ 'Filtered participants, all responses',
+    model=='4' ~ 'Filtered participants, Q1 correct'
+  )) %>% 
+  mutate(contain0 = ifelse(lower.CL < 0 & upper.CL > 0, 1, 0)) %>% 
+  ggplot(mapping = aes(x = estimate, 
+                       y = contrast,
+                       group = model,
+                       # shape = model,
+                       color = factor(model))) + 
+  geom_point(position = position_dodge(width = 1/2), size = 1/3) + 
+  geom_errorbar(aes(xmin = lower.CL, xmax = upper.CL),
+                position = position_dodge(width = 1/2), 
+                width = 1/4) + 
+  guides(color = guide_legend(nrow = 2)) + 
+  facet_grid(set ~ pair_id) + 
+  theme_bw() + 
+  theme(aspect.ratio = 1.5, legend.position = 'bottom')
+```
+
+
+```{r}
+#| fig-height: 8
+bind_rows(
+  data.frame(pairs(emmeans(mod_all_all, ~pair_id | media + set, pbkrtest.limit = 5800), infer = c(T,T))),
+  data.frame(pairs(emmeans(mod_all_q1, ~pair_id | media + set, pbkrtest.limit = 5800), infer = c(T,T))),
+  data.frame(pairs(emmeans(mod_q1_all, ~pair_id | media + set, pbkrtest.limit = 5800), infer = c(T,T))),
+  data.frame(pairs(emmeans(mod_q1_q1, ~pair_id | media + set, pbkrtest.limit = 5800), infer = c(T,T))),
+  .id = 'model'
+) %>% 
+  mutate(model = case_when(
+    model=='1' ~ 'All participants, all responses',
+    model=='2' ~ 'All participants, Q1 correct',
+    model=='3' ~ 'Filtered participants, all responses',
+    model=='4' ~ 'Filtered participants, Q1 correct'
+  )) %>% 
+  mutate(contain0 = ifelse(lower.CL < 0 & upper.CL > 0, 1, 0)) %>% 
+  ggplot(mapping = aes(x = estimate, 
+                       y = reorder(contrast, estimate, mean),
+                       group = model,
+                       # shape = model,
+                       color = factor(model))) + 
+  geom_point(position = position_dodge(width = 1/2), size = 1/3) + 
+  geom_errorbar(aes(xmin = lower.CL, xmax = upper.CL),
+                position = position_dodge(width = 1/2), 
+                width = 1/4) + 
+  guides(color = guide_legend(nrow = 2)) + 
+  facet_wrap(~ media+set, nrow = 1) + 
+  theme_bw() + 
+  theme(aspect.ratio = 5, legend.position = 'bottom')
+```
+
+```{r}
+#| fig-height: 6
+bind_rows(
+  data.frame(pairs(emmeans(mod_all_all, ~set | media + pair_id, pbkrtest.limit = 5800), infer = c(T,T))),
+  data.frame(pairs(emmeans(mod_all_q1, ~set | media + pair_id, pbkrtest.limit = 5800), infer = c(T,T))),
+  data.frame(pairs(emmeans(mod_q1_all, ~set | media + pair_id, pbkrtest.limit = 5800), infer = c(T,T))),
+  data.frame(pairs(emmeans(mod_q1_q1, ~set | media + pair_id, pbkrtest.limit = 5800), infer = c(T,T))),
+  .id = 'model'
+) %>% 
+  mutate(model = case_when(
+    model=='1' ~ 'All participants, all responses',
+    model=='2' ~ 'All participants, Q1 correct',
+    model=='3' ~ 'Filtered participants, all responses',
+    model=='4' ~ 'Filtered participants, Q1 correct'
+  )) %>% 
+  mutate(contain0 = ifelse(lower.CL < 0 & upper.CL > 0, 1, 0)) %>% 
+  ggplot(mapping = aes(x = estimate, 
+                       y = contrast,
+                       group = model,
+                       # shape = model,
+                       color = factor(model))) + 
+  geom_point(position = position_dodge(width = 1/2), size = 1/3) + 
+  geom_errorbar(aes(xmin = lower.CL, xmax = upper.CL),
+                position = position_dodge(width = 1/2), 
+                width = 1/4) + 
+  guides(color = guide_legend(nrow = 2)) + 
+  facet_grid(media ~ pair_id) + 
+  theme_bw() + 
+  theme(aspect.ratio = 1, legend.position = 'bottom')
+```
+
+
+
+
+
 
 In addition to our parametric methods, we also present the results of a generalized additive model in @eq-gam
 
@@ -1082,3 +1221,4 @@ em_gam %>%
 ## References
 
 :::{#refs}
+:::
