@@ -43,11 +43,13 @@ At this time, there are few, if any, studies that evaluate 3D-printed charts for
 
 ### Literature Review
 
-An identical dataset across multiple chart types does not ensure that the data is perceived in the same way [@cleveland1984; @hofmann2012; @vanderplas2020]. One of the main factors to this phenomena is with how data is encoded into the chart. These encodings include, but are not limited to, placement along axes, lengths, areas, volumes, and color scales. For example, bar charts and pie charts are two common visualizations that have long since been the topic of debate [@eells1926; @croxton1927; @cleveland1984]. In the case of bar charts and pie charts, encodings are represented by lengths and angles, respectively. Inherently, the comparison of different chart types is a comparison of encodings due to the changes in how data is being displayed. 
+An identical dataset across multiple chart types does not ensure that the data is perceived in the same way [@cleveland1984; @hofmann2012; @vanderplas2020]. One of the main factors in this phenomenon is how data is encoded into the chart. These encodings include, but are not limited to, placement along axes, lengths, areas, volumes, and color scales. For example, bar charts and pie charts are two common visualizations that have long since been the topic of debate [@eells1926; @croxton1927; @cleveland1984]. In the case of bar charts and pie charts, encodings are represented by lengths and angles, respectively. Inherently, the comparison of different chart types is a comparison of encodings due to the changes in how data is being displayed. 
 
 @cleveland1984 noted that estimates involving numerical accuracy may decrease when increasing dimensionality of the encoding, although this was not formally tested in their experiments. Their reasoning was due to Stevens' power law, a mathematical formulation of how magnitudes are perceived given different stimuli sources [@stevens1986]. The general form of the law is $\psi(I)=kI^\alpha$, where $I$ is the magnitude of a stimulus, $\psi(I)$ is the perceived magnitude, $k$ is a proportionality constant from the unit of the stimulus, and $\alpha$ is the exponent from the type of stimuli used. Studies have estimated that lengths are perceived without bias (i.e., $\alpha=1$), but areas and volumes tend to have skewed perceptions [@cleveland1984]. This indicates that lower-dimensional charts may perform better when readers are tasked with extracting numerical estimates from the chart, although this has been a topic of debate in the last several decades. 
 
-There are mixed results in regard to the use of 3D charts, mostly attributing to the purpose of third dimension. When the extra dimension does not convey meaningful information, estimates of accuracy decrease and solution times increase as compared to equivalent 2D charts [@fisher1997; @zacks1998; @fischer2000]. The same increase in solution time is seen when the third dimension is utilized for displaying data, but can sometimes produce better error rates than 2D charts [@barfield1989; @kraus2020]. Additionally, when given the option of 2D or 3D charts for extracting numerical information, the 2D charts showed increased preference and confidence than their 3D counterparts [@barfield1989; @fisher1997]. It is worth noting that all of these studies use 2D or virtual reality renderings of 3D charts and not physical 3D charts.
+There are mixed results in regard to the use of 3D charts, mostly attributing to the purpose of the third dimension. When the extra dimension does not convey meaningful information, estimates of accuracy decrease and solution times increase as compared to equivalent 2D charts [@fisher1997; @zacks1998; @fischer2000]. The same increase in solution time is seen when the third dimension is utilized for displaying data, but can sometimes produce better error rates than 2D charts [@barfield1989; @kraus2020]. Additionally, when given the option of 2D or 3D charts for extracting numerical information, the 2D charts showed increased preference and confidence than their 3D counterparts [@barfield1989; @fisher1997]. It is worth noting that all of these studies use 2D or virtual reality renderings of 3D charts and not physical 3D charts.
+
+<!---
 
 :::{#fig-3d-charts layout-ncol=2}
 
@@ -58,19 +60,21 @@ There are mixed results in regard to the use of 3D charts, mostly attributing to
 Two examples of 3D charts. @fig-bar3d uses the third dimension as an artistic choice and was optional. On the other hand, @fig-heat3d uses all three dimensions to convey information simultaneously. 
 :::
 
-Formal studies involving true 3D charts are limited, and it is unclear if they follow the framework of existing theories on data visualizations. Unlike paper and computer rendered charts, constructing true 3D charts inherently contains many additional factors that could affect perception, such as chart materials, natural lighting, interactivity, and viewing distance. Some of these factors have already been shown to have an effect on computer renderings [@tarr2001; @wang2022]. 
+--->
 
-We hypothesize that 3D charts in 3D environments will produce better information extraction than their computer rendered counterparts. Specifically, we compare 3D-printed charts to digital 2D and 3D renderings. We suspect that this difference will hold across multiple data sets and different magnitudes of stimuli. In this paper, we evaluate the accuracy of numerical estimations on true 3D charts by conducting a factorial experiment that assessed chart types and ratios of pairs of stimuli. We discuss the construction of the stimuli and how we closely matched the charts to compare 2D, 3D-digital, and 3D-printed renderings of heatmap data.
+Formal studies involving true 3D charts are limited, and it is unclear if they follow the framework of existing theories on data visualizations. Unlike paper and computer-rendered charts, constructing true 3D charts inherently contains many additional factors that could affect perception, such as chart materials, natural lighting, interactivity, and viewing distance. Some of these factors have already been shown to have an effect on computer renderings [@tarr2001; @wang2022]. 
+
+We hypothesize that 3D charts in 3D environments will produce better information extraction than their computer-rendered counterparts. Specifically, we compare 3D-printed charts to digital 2D and 3D renderings. We suspect that this difference will hold across multiple data sets and different magnitudes of stimuli. In this paper, we evaluate the accuracy of numerical estimations on true 3D charts by conducting a factorial experiment that assessed chart types and ratios of pairs of stimuli. We discuss the construction of the stimuli and how we closely matched the charts to compare 2D, 3D-digital, and 3D-printed renderings of heatmap data.
 
 ## Methods
 
-Our study was designed to evaluate and expand the literature on numerical estimation of dimensionality for 3D charts. In our study, we focused on 2D and 3D heatmaps, which we carefully construct to ensure that differences are contributed to the dimensionality of the chart. All of our data and methods are publicly available for open science and reproducibility at <https://github.com/TWiedRW/ch3-heat3d>. In this section, we discuss process of designing our experiment and participant recruitment.
+Our study was designed to evaluate and expand the literature on numerical estimation of dimensionality for 3D charts. In our study, we focused on 2D and 3D heatmaps, which we carefully constructed to ensure that differences can be attributed to the dimensionality of the chart. All of our data and methods are publicly available for open science and reproducibility at <https://github.com/TWiedRW/ch3-heat3d>. In this section, we discuss the process of designing our experiment and participant recruitment.
 
 ### Stimuli
 
 We denote "stimuli" to represent the magnitude of our chosen values. In a 3D Cartesian space, the X- and Y- axes represent the coordinates of the stimuli, and the Z-axis represents the value for the stimuli. Each X and Y coordinate is represented by a square tile with a 1:1 aspect ratio. For a 2D space, the Z-axis is replaced by a color gradient scale. All stimuli and remaining randomly generated values range between 0 and 100 units. In this experiment, $X=1, 2, \dots,10$ and $Y=1, 2,\dots,10$.
 
-The design of our experiment made use of the method of constant stimuli, where comparisons between stimuli are with respect to a stimuli that remains the same magnitude [@kingdom2016 chap. 3]. We set the constant stimuli at 50 units. For stimuli between 50 and 100, we set the maximum stimuli value at 90 and equally partitioned the ratios of stimuli with the constant stimuli, $\frac{50}{90}=0.556$ to $\frac{50}{50}=1.0$, resulting in 4 varying stimuli values where 50 is the smallest value. The same ratios obtained with stimuli between 50 and 90 were used to create 4 stimuli varying between 0 and 50, where 50 is the largest value. Additionally, we also included a stimuli pair where both values are 50, resulting in nine total pairs of stimuli. All stimuli values can be found in @fig-stimuli-values.
+The design of our experiment made use of the method of constant stimuli, where comparisons between stimuli are with respect to a stimulus that remains the same magnitude [@kingdom2016 chap. 3]. We set the constant stimuli at 50 units. For stimuli between 50 and 100, we set the maximum stimuli value at 90 and equally partitioned the ratios of stimuli with the constant stimuli, $\frac{50}{90}=0.556$ to $\frac{50}{50}=1.0$, resulting in 4 varying stimuli values where 50 is the smallest value. The same ratios obtained with stimuli between 50 and 90 were used to create 4 stimuli varying between 0 and 50, where 50 is the largest value. Additionally, we also included a stimulus pair where both values are 50, resulting in nine total pairs of stimuli. All stimuli values can be found in @fig-stimuli-values.
 
 ```{r}
 #| fig-cap: "Values for stimuli in the heatmap experiment. All values are paired with the constant stimuli of 50 units, creating nine pairs of stimuli."
@@ -93,7 +97,7 @@ stimuli %>%
         panel.grid.minor.y = element_line(color = 'grey80', linetype = 'dashed'))
 ```
 
-To generate non-stimuli random values, we used a mixture distribution of random uniform noise and a mathematical function to populate our coordinate grid. The mathematical functions are scaled between 0 and 100, $g(Z)=100\cdot\frac{Z-\min(Z)}{\max(Z)-min(Z)}$. Two datasets were created for the experiment. The first dataset, called set 1, used the formula for the top half of sphere that is centered within our X and Y coordinate grid, $f_1(X,Y)=\sqrt{7^2-(X-\bar{X})^2-(Y-\bar{Y})^2}$, where $\bar{X}$ and $\bar{Y}$ are the averages of the $X$ and $Y$ coordinate ranges. The second dataset is calculated similarly using the formula for the bottom half of sphere, $f_2(X,Y)=\sqrt{7^2-(X-\bar{X})^2+(Y-\bar{Y})^2}$. Denoting $Z$ as the random values, $U(0,100)$ as a random variable drawn from a continuous uniform distribution between 0 and 100, and $X,Y$ as heatmap coordinates, our random heatmap data is calculated in @eq-random-z with $c=0.3$. An example of varying $c$ values is presented in @fig-random-z.
+To generate non-stimuli random values, we used a mixture distribution of random uniform noise and a mathematical function to populate our coordinate grid. The mathematical functions are scaled between 0 and 100, $g(Z)=100\cdot\frac{Z-\min(Z)}{\max(Z)-min(Z)}$. Two datasets were created for the experiment. The first dataset, called set 1, used the formula for the top half of a sphere that is centered within our X and Y coordinate grid, $f_1(X,Y)=\sqrt{7^2-(X-\bar{X})^2-(Y-\bar{Y})^2}$, where $\bar{X}$ and $\bar{Y}$ are the averages of the $X$ and $Y$ coordinate ranges. The second dataset is calculated similarly using the formula for the bottom half of a sphere, $f_2(X,Y)=\sqrt{7^2-(X-\bar{X})^2+(Y-\bar{Y})^2}$. Denoting $Z$ as the random values, $U(0,100)$ as a random variable drawn from a continuous uniform distribution between 0 and 100, and $X,Y$ as heatmap coordinates, our random heatmap data is calculated in @eq-random-z with $c=0.3$. An example of varying $c$ values is presented in @fig-random-z.
 
 $$
 Z=c\cdot U(0,100)+(1-c)\cdot g(f_i(X,Y))
@@ -113,7 +117,7 @@ $$ {#eq-random-z}
 Mixture distribution of @eq-random-z using the formula for the top half of a sphere. As $c$ approaches 1, the distribution resembles uniform random noise.
 :::
 
-The placement of stimuli values onto the randomly generated heatmap data was done via simulation to try to make their placement look as natural as possible. Twenty random heatmaps were generated. For each heatmap, the non-constant stimuli was placed onto the coordinate such that the difference between the stimuli and randomly generated value is minimized. The constant stimuli was then placed onto a coordinate within a Manhattan distance of three or four that minimizes the difference between the constant stimuli and randomly generated values, where the Manhattan distance is given by $|X_i - X_j| + |Y_i - Y_j|$ for stimuli $i$ and $j$. To ensure that stimuli placement is evenly position across the heatmap, the count of stimuli was computed separately across the X and Y axes. For example, in Data Set 1, the X-axis has four stimuli in $X=1$, three stimuli in $X=2$, and so forth. Chi-squared statistics were calculated for each axis and the heatmap with the smallest average Chi-squared statistic was selected as the final dataset. A visual inspection of this process showed that the stimuli were not clustered in any one area of the chart and that the stimuli look natural with respect to the random mixture distribution.
+The placement of stimuli values onto the randomly generated heatmap data was done via simulation to try to make their placement look as natural as possible. Twenty random heatmaps were generated. For each heatmap, the non-constant stimuli was placed onto the coordinate such that the difference between the stimuli and randomly generated value is minimized. The constant stimuli was then placed onto a coordinate within a Manhattan distance of three or four that minimizes the difference between the constant stimuli and randomly generated values, where the Manhattan distance is given by $|X_i - X_j| + |Y_i - Y_j|$ for stimuli $i$ and $j$. To ensure that stimuli placement is evenly positioned across the heatmap, the count of stimuli was computed separately across the X and Y axes. For example, in Data Set 1, the X-axis has four stimuli in $X=1$, three stimuli in $X=2$, and so forth. Chi-squared statistics were calculated for each axis and the heatmap with the smallest average Chi-squared statistic was selected as the final dataset. A visual inspection of this process showed that the stimuli were not clustered in any one area of the chart and that the stimuli look natural with respect to the random mixture distribution.
 
 :::{#fig-placement layout-ncol="2"}
 
@@ -126,7 +130,7 @@ Placement of stimuli on the two data sets. Bars with solid fills are the fixed s
 
 ### Charts
 
-Three types of charts were considered for this study: 2D-digital (2dd), 3D-digital (3dd), and 3D-printed (3dp). We constructed these charts so that they were as similar as possible, but inherent difference between dimensionality led to artistic decisions that attempt to focus solely on the dimensionality of the charts. The process of creating the charts is discussed in this section.
+Three types of charts were considered for this study: 2D-digital (2dd), 3D-digital (3dd), and 3D-printed (3dp). We constructed these charts so that they were as similar as possible, but inherent differences in dimensionality led to artistic decisions that attempt to focus solely on the dimensionality of the charts. The process of creating the charts is discussed in this section.
 
 The 3D-printed charts were rendered with OpenSCAD [@kintelOpenSCADDocumentation2023]. To include plot text, a 120mm by 120mm by 10mm base was created with a solid color that was either white or black. Cells of the heatmap measured 10mm by 10mm, resulting in a heatmap that is 100mm by 100mm and is centered on the base. The upper bound of the height of heatmap values is 100mm, where 1-unit in the heatmap data is represented by 1mm of height on the heatmap. Once rendered, the heatmap was saved to 3D Manufacturing Format (3mf) and Standard Triangle Language (stl) files. A variety of solid and gradient filaments were used to print the output files from OpenSCAD. An example of the 3D-printed chart is shown in @fig-3dp.
 
@@ -138,7 +142,7 @@ The 3D-printed charts were rendered with OpenSCAD [@kintelOpenSCADDocumentation2
 
 :::
 
-To closely match the 3D-digital chart to the 3D-printed chart, multiple stl files were created for each colored component and combined with the RGL package [@rgl]. The base was rendered with white smoke (#F5F5F5) to slightly contrast with the default white background color (#FFFFFF). heatmap tiles were rendered with cyan (#74CCFF) and text labels were rendered with black (#000000). Lighting was fixed at 45 degree angles at two opposite corners of the chart. The end result was a near perfect replica of the 3D-printed charts, with the exception of different heatmap tile colors, where an example is given in @fig-3dd.
+To closely match the 3D-digital chart to the 3D-printed chart, multiple stl files were created for each colored component and combined with the RGL package [@rgl]. The base was rendered with white smoke (#F5F5F5) to slightly contrast with the default white background color (#FFFFFF). Heatmap tiles were rendered with cyan (#74CCFF) and text labels were rendered with black (#000000). Lighting was fixed at 45 degree angles at two opposite corners of the chart. The end result was a near-perfect replica of the 3D-printed charts, with the exception of different heatmap tile colors, where an example is given in @fig-3dd.
 
 ![RGL rendering of Data Set 2 for 3dd charts.](images/chart-3dd.png){#fig-3dd fig-height="3in"}
 
@@ -177,26 +181,26 @@ The Shiny application started with the informed consent screen, allowing partici
 
 If participants agreed to have their data collected, they were presented with the demographics section. This section asked participants to use drop down menus to specify their age, gender identity, highest education level, and a question about how their participation in the experiment is graded. The last question was a text box and asked participants to specify their favorite movie and/or actor. Demographic information was combined with the application start time and completion code to create a hash for an anonymized participant identifier using the `rlang` package [@rlang].
 
-Once a participant completed the demographics page or selected "No" to the data collection question, they were given a practice page. A modal dialog window was initially shown with instructions, and users could display this window again at any point during the practice trials. The practice consisted of four questions: two trials from 2dd charts and two trials from 3dd charts. Once participants provided a response to both questions in a practice trial, they were able display the correct solution to check their answers. 
+Once a participant completed the demographics page or selected "No" to the data collection question, they were given a practice page. A modal dialog window was initially shown with instructions, and users could display this window again at any point during the practice trials. The practice consisted of four questions: two trials from 2dd charts and two trials from 3dd charts. Once participants provided a response to both questions in a practice trial, they were able to display the correct solution to check their answers. 
 
 The experiment page was presented to participants after completion of the practice trials [@fig-exp-page]. Each page contained two questions -- one question for identifying which stimuli is larger and another question for estimating the value of the smaller stimuli if the larger stimuli is 100 units. Each trial had the initial slider position randomized in order to prevent starting position bias. For 3dd charts, the number of interactive clicks was also recorded. A trial could only be submitted if the first question is answered and if the slider was moved at least once.
 
 ![Graphics experiment page. Each trial contained two questions about a pair of stimuli, and a check box that displays the location of the stimuli if needed.](images/experiment-page.png){#fig-exp-page width="100%"}
 
-After completing all trials, participants were given the completion code and informed to the code to their instructor since they will not have access to the code after closing out of the experiment.
+After completing all trials, participants were given the completion code and informed to provide the code to their instructor since they would not have access to the code after closing out of the experiment.
 
 #### Method of Analysis
 
-The design of our experiment is a balanced incomplete split-plot with replication, where media type and dataset is the whole plot factor for each participant and stimuli pair is the split plot. A similar design was presented by @mandal2020 for a single replicate. For our analysis, we used the following model as a baseline:
+The design of our experiment is a balanced incomplete split-plot with replication, where media type and dataset are whole-plot factors for each participant and stimuli pair is the split plot. A similar design was presented by @mandal2020 for a single replicate. For our analysis, we used the following model as a baseline:
 
 $$
 Y_{ijklm}=\mu+S_i\times M_j\times P_k+\gamma_{lm}+\omega_{ijlm}+\epsilon_{ijklm}
 $$
 
-In our model, $Y_ijklm$ is a metric of error for participant responses to the ratio estimation question, $S_i$ is the effect of dataset $i$, $M_j$ is the effect of chart type $j$, $P_k$ is the effect of stimuli pair $k$, and $S_i\times M_j\times P_k$ is all of the corresponding main effects and two-way and three-way interactions. Our random effects include $\gamma_{lm}\sim N(0,\sigma^2_A)$ for participant $m$ in block $l$, $\omega_{ijlm}\sim N(0,\sigma^2_B)$ for the ordering of dataset $i$ and chart type $j$ for participant $m$ in block $l$, and $\epsilon_{ijklm}\sim N(0, \sigma^2_C)$ for the residual error. We assume that $\gamma_{lm}$, $\omega_{ijlm}$, and $\epsilon_{ijklm}$ are independently and identically distributed. 
+In our model, $Y_ijklm$ is a metric of error for participant responses to the ratio estimation question, $S_i$ is the effect of dataset $i$, $M_j$ is the effect of chart type $j$, $P_k$ is the effect of stimuli pair $k$, and $S_i\times M_j\times P_k$ includes all corresponding main effects and two-way and three-way interactions. Our random effects include $\gamma_{lm}\sim N(0,\sigma^2_A)$ for participant $m$ in block $l$, $\omega_{ijlm}\sim N(0,\sigma^2_B)$ for the ordering of dataset $i$ and chart type $j$ for participant $m$ in block $l$, and $\epsilon_{ijklm}\sim N(0, \sigma^2_C)$ for the residual error. We assume that $\gamma_{lm}$, $\omega_{ijlm}$, and $\epsilon_{ijklm}$ are independently and identically distributed. 
 
 
-The first question in each trial was to indicate which value within a stimuli pair was larger, or if they were the same value. Following @cleveland1984, we use this question as an attention check to verify that participants are following the procedure and that the correct comparison is being made. 
+The first question in each trial was to indicate which value within a stimulus pair was larger, or if they were the same value. Following @cleveland1984, we use this question as an attention check to verify that participants are following the procedure and that the correct comparison is being made. 
 
 
 ## Results
@@ -433,7 +437,7 @@ df_time %>%
 ```
 
 
-During our initial exploration of the results, we discovered a non-negligible number of students who did not follow the instructions. In some cases, participants appeared to using alternative estimation strategies, such as estimating the difference between the two values in a stimuli pair. Additionally, we noticed that several students were randomly entering values in order to obtain the completion code at the end of the experiment. We provide some examples of individual participant responses in @fig-user-strategies to illustrate this issue.
+During our initial exploration of the results, we discovered a non-negligible number of students who did not follow the instructions. In some cases, participants appeared to be using alternative estimation strategies, such as estimating the difference between the two values in a stimulus pair. Additionally, we noticed that several students were randomly entering values in order to obtain the completion code at the end of the experiment. We provide some examples of individual participant responses in @fig-user-strategies to illustrate this issue.
 
 ```{r}
 #| fig-width: 6
@@ -479,7 +483,7 @@ results %>%
   theme(panel.grid.major.x = element_blank(), panel.grid.minor.x = element_blank())
 ```
 
-It is commonly acknowledged in psychology that careless respondents should be addressed to some degree, although there is no general consensus on how to handle this in recent years [@jasoIdentificationCarelessResponding2021; @ward2023]. Some proposed solutions include removing participants based on observed patterns or to fit mixture models to address latent class variables. In this section, we discuss one possible subset of participant responses to address careless respondents. We also include the models of several other subsets in the appendix.
+It is commonly acknowledged in psychology that careless respondents should be addressed to some degree, although there is no general consensus on how to handle this in recent years [@jasoIdentificationCarelessResponding2021; @ward2023]. Some proposed solutions include removing participants based on observed patterns or fitting mixture models to address latent class variables. In this section, we discuss one possible subset of participant responses to address careless respondents. We also include the models of several other subsets in the appendix.
 
 ```{r}
 res_q1 <- results %>% 
@@ -508,13 +512,14 @@ res_q1_filtered <- res_q1 %>%
 
 ### Addressing Random Categorical Responses {#sec-remove-random-categories}
 
-To improve the quality of our data, we started by assessing random guesses in identifying the larger value of a stimuli pair. In each trial, participants have a 1/3 probability of correctly identifying the larger value if they are randomly guessing. Since stimuli pair 5 is identical values, we temporarily exclude those trials to focus on stimuli pairs where there was a difference between the values. For each participant, we test $H_0: \pi\leq2/3\text{ vs. }H_1:\pi>2/3$ with $\alpha=0.05$, where $\pi$ is the probability of a participant correctly answering the initial question and $\alpha$ is the level of the test. Using the first question for participant screening, `r nrow(res_q1) - nrow(res_q1_filtered)` participants are excluded for suspected random selecting, leaving `r nrow(res_q1_filtered)` participants. The effect of this exclusion can be seen in @fig-q1-eda.
+To improve the quality of our data, we started by assessing random guesses in identifying the larger value of a stimulus pair. In each trial, participants have a 1/3 probability of correctly identifying the larger value if they are randomly guessing. Since stimuli pair 5 contains identical values, we temporarily exclude those trials to focus on stimuli pairs where there was a difference between the values. For each participant, we test $H_0: \pi\leq2/3\text{ vs. }H_1:\pi>2/3$ with $\alpha=0.05$, where $\pi$ is the probability of a participant correctly answering the initial question and $\alpha$ is the level of the test. Using the first question for participant screening, `r nrow(res_q1) - nrow(res_q1_filtered)` participants are excluded for suspected random selecting, leaving `r nrow(res_q1_filtered)` participants. The effect of this exclusion can be seen in @fig-q1-eda.
 
 
 ```{r}
 #| label: fig-q1-eda
 #| layout-ncol: 2
-#| fig-cap: "Proportion of correct responses to Question 1 across stimuli pairs and media types. For all pairs, with the exception of Pair 5, a correct answer was 'Larger value'. Stimuli Pair 5 had two identical values, XXXXX"
+#| out-width: 90%
+#| fig-cap: "Proportion of correct responses to Question 1 across stimuli pairs and media types. For all pairs, with the exception of Pair 5, a correct answer was 'Larger value'. Stimuli Pair 5 had two identical values, meaning that options other than 'Both values are the same' were incorrect."
 #| fig-subcap:
 #| - "No participant filtering"
 #| - "Exclude random guessers"
@@ -570,7 +575,7 @@ mod_q2_anova <- car::Anova(mod_q2, type = 3, test = 'F')
 p.vals_mod2 <- mod_q2_anova$`Pr(>F)`
 ```
 
-With our specified exclusion criteria, we find that was marginal evidence for the effects of chart type (p-value = `r round(p.vals_mod2[3], 3)`) and the data set and stimuli pair interaction (p-value = `r round(p.vals_mod2[6], 3)`). This finding is consistent with models fitted with various participant and response filters.
+With our specified exclusion criteria, we find that there was marginal evidence for the effects of chart type (p-value = `r round(p.vals_mod2[3], 3)`) and the data set and stimuli pair interaction (p-value = `r round(p.vals_mod2[6], 3)`). This finding is consistent with models fitted with various participant and response filters.
 
 ```{r}
 #| echo: false
@@ -888,7 +893,9 @@ res_q2_filtered %>%
 
 Our study was designed to test the numerical estimation of ratios in 2D and 3D heatmaps rendered in digital and physical environments. The current state of tangible statistical graphics is limited mainly to tactile displays, whereas 3D printed statistical graphics are largely unexplored. We found that when the third dimension is conveying meaningful information, the heights of 3D heatmaps had smaller errors than the color gradient of 2D heatmaps. No differences were detected between the digital and physical 3D heatmaps, which is perhaps attributed to the exact one-to-one design relationship between the digital display and the 3D printed chart.
 
-An interesting observation from the stimuli pairs and dataset interaction was from the non-detectable differences. We note that no differences were detected across datasets for a given stimuli pair. While not explicitly tested in our experiment, there have been previous studies that have investigated and found the behavior of neighboring values to have an effect [@zacks1998; @vanderplasSignsSineIllusion2015]. This effect would be worth exploring in future studies with 3D heatmaps. Another concern we had when designing our experiment was the lack of direct translation from color scales to heights. The differences between stimuli pairs of identical ratios were non-detectable, which alleviates this concern for future studies. 
+An interesting observation from the stimuli pairs and dataset interaction was from the non-detectable differences. We note that no differences were detected across datasets for a given stimuli pair. While not explicitly tested in our experiment, there have been previous studies that have investigated and found the behavior of neighboring values to have an effect [@zacks1998; @vanderplasSignsSineIllusion2015]. This effect would be worth exploring in future studies with 3D heatmaps. Another concern we had when designing our experiment was the lack of direct translation from color scales to heights. The differences between stimuli pairs of identical ratios were non-detectable, which alleviates this concern for future studies. However, this effect would likely important to consider if assessing just noticeable differences [@luModelingJustNoticeable2022; @zhangJustNoticeableDifference2023]. 
+
+While our hypothesis that 3D-printed heatmaps would outperform digital 2D and 3D heat maps in numerical estimations of ratios was not supported, we were able to show that 3D charts have a place in the analysis of data. When the third dimension is used to display information, the mapping of that dimension to height provides better ratio estimations than a color gradient scale. This result has been observed previously in digital 3D heatmaps [@barfield1989; @kraus2020], and our findings suggests that this holds for physical 3D heatmaps.
 
 
 
@@ -896,7 +903,10 @@ An interesting observation from the stimuli pairs and dataset interaction was fr
 
 ## Appendix
 
-In this section, we include multiple models for the transparency of model selection. Visual inspections of participant responses indicate that several participants clearly did not follow instructions by either using alternate estimation strategies or by carelessly responding. While we should take these cases into consideration, there is no singular solution to suggest a "best" model [@jasoIdentificationCarelessResponding2021; @ward2023]. Our purpose for including these alternate models is to examine model sensitivity to results through various levels of participant and response filtering.
+In this section, we include multiple models for the transparency of model selection. 
+Visual inspections of participant responses indicate that several participants clearly did not follow instructions by either using alternate estimation strategies or by carelessly responding [@fig-q1-eda]. 
+While we should take these cases into consideration, there is no singular solution to suggest a "best" model [@jasoIdentificationCarelessResponding2021; @ward2023]. 
+Our purpose for including these alternate models is to examine model sensitivity to results through various levels of participant and response filtering.
 
 For each model, we exclude stimuli pair 5. In theory, participants who answer this question correctly will select that both values are the same and move the slider to 100. From the included participants, as described in @sec-remove-random-categories, virtually all participants who put the slider at 100 answered the first question correctly. However, nearly 60 percent of responses indicated that the values were the same in the first question but did not move the slider to 100. Several factors could have attributed to this, such as slider sensitivity or participants using alternate estimation strategies. Rather than correcting what we think participants should have answered, we removed this stimuli pair and motivate future research into "just noticeable differences" for 3D heatmaps.
 
@@ -929,7 +939,9 @@ res_q2 %>%
   theme(aspect.ratio = 1, legend.position = 'bottom')
 ```
 
-There are multiple levels of participant and response filtering that we considered. For participant filtering, we consider the following levels: (1) no participant filtering, (2) remove suspected random guessers, and (3) participants strongly suspected to use ratio estimation strategy. The process of (2) was described in @sec-remove-random-categories. As for (3), we used the `flexmix` package [XXX] and extracted participants who demonstrated strong linear relationships with the ratio estimation task. Filtering individual responses is straightforward process, where we considered (i) include all responses, (ii) remove responses with incorrect Q1 solutions. 
+There are multiple levels of participant and response filtering that we considered. For participant filtering, we consider the following levels: (1) no participant filtering and (2) remove suspected random guessers. The process of (2) was described in @sec-remove-random-categories. 
+Filtering individual responses is a straightforward process, where we considered (i) include all responses, and (ii) remove responses with incorrect Q1 solutions. 
+
 
 ```{r}
 # Format: mod_(participant)_(response)
@@ -1028,6 +1040,45 @@ bind_rows(
         legend.position = 'bottom')
 ```
 
+In addition to our parametric methods, we also present the results of a generalized additive model in @eq-gam
+
+:::{.callout-note}
+
+I adapted code from our first paper, but I would like a second look over this model before writing it up. The good news is that the results seem to be similar :) 
+
+:::
+
+$$
+\text{MODEL GOES HERE}
+$${#eq-gam}
 
 
+```{r}
+# GAM
+library(mgcv)
+mod_gam <- gam(
+  q2_error_cm ~ 
+    set*media + 
+    s(target_ratio, k = 4, by = media) + 
+    s(target_ratio, k = 4, by = set) + 
+    s(user_id, bs='re'),
+  data = filter(res_q2_filtered, pair_id != 5 & user_larger == true_larger) %>% 
+    mutate(set = factor(set),
+           media = factor(media),
+           user_id = factor(user_id))
+)
+anova(mod_gam)
 
+em_gam <- emmeans(mod_gam, ~media)
+em_gam %>% 
+  data.frame() %>% 
+  ggplot(mapping = aes(x = media, y = emmean)) + 
+  geom_col()
+
+```
+
+\newpage
+
+## References
+
+:::{#refs}
