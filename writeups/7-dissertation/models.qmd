@@ -269,26 +269,26 @@ Using BIC, 6 components are selected. Here, components 1, 3, and 5 appear to be 
 #| - "No strategy"
 
   
-res_q2_flt %>% 
-  mutate(cluster = clusters(sfm.mod)) %>% 
-  ggplot(mapping = aes(x = user_slider - target_ratio, group = user_id)) + 
-  geom_density(aes(color = alpha(factor(cluster), alpha = 0.15))) +
-  scale_y_continuous(limits = c(0, 0.08)) + scale_x_continuous(limits = c(-100, 100)) + 
-  facet_wrap(~cluster)
-
-res_q2_flt %>% 
-  mutate(cluster = clusters(sfm.mod)) %>% 
-  ggplot(mapping = aes(x = user_slider - target_diff, group = user_id)) + 
-  geom_density(aes(color = alpha(factor(cluster), alpha = 0.15))) +
-  scale_y_continuous(limits = c(0, 0.08)) + scale_x_continuous(limits = c(-100, 100)) + 
-  facet_wrap(~cluster)
-
-res_q2_flt %>% 
-  mutate(cluster = clusters(sfm.mod)) %>% 
-  ggplot(mapping = aes(x = user_slider, group = user_id)) + 
-  geom_density(aes(color = alpha(factor(cluster), alpha = 0.15))) +
-  scale_y_continuous(limits = c(0, 0.08)) + scale_x_continuous(limits = c(-100, 100)) + 
-  facet_wrap(~cluster)
+# res_q2_flt %>% 
+#   mutate(cluster = clusters(sfm.mod)) %>% 
+#   ggplot(mapping = aes(x = user_slider - target_ratio, group = user_id)) + 
+#   geom_density(aes(color = alpha(factor(cluster), alpha = 0.15))) +
+#   scale_y_continuous(limits = c(0, 0.08)) + scale_x_continuous(limits = c(-100, 100)) + 
+#   facet_wrap(~cluster)
+# 
+# res_q2_flt %>% 
+#   mutate(cluster = clusters(sfm.mod)) %>% 
+#   ggplot(mapping = aes(x = user_slider - target_diff, group = user_id)) + 
+#   geom_density(aes(color = alpha(factor(cluster), alpha = 0.15))) +
+#   scale_y_continuous(limits = c(0, 0.08)) + scale_x_continuous(limits = c(-100, 100)) + 
+#   facet_wrap(~cluster)
+# 
+# res_q2_flt %>% 
+#   mutate(cluster = clusters(sfm.mod)) %>% 
+#   ggplot(mapping = aes(x = user_slider, group = user_id)) + 
+#   geom_density(aes(color = alpha(factor(cluster), alpha = 0.15))) +
+#   scale_y_continuous(limits = c(0, 0.08)) + scale_x_continuous(limits = c(-100, 100)) + 
+#   facet_wrap(~cluster)
 
 ```
 
@@ -334,17 +334,17 @@ mod.q1.xq1xq5 <- lmer(q2_error ~ set*media*pair_id + (1|user_id/set:media),
 ```
 
 ```{r}
-res_q2_fm <- res_q2_flt %>% 
-  mutate(cluster = clusters(sfm.mod)) %>% 
-  filter(cluster %in% c(1,3,5,6))
-mod.fm.all <- lmer(q2_error ~ set*media*pair_id + (1|user_id/set:media),
-     data = res_q2_fm)
-mod.fm.xq1 <- lmer(q2_error ~ set*media*pair_id + (1|user_id/set:media),
-     data = filter(res_q2_fm, user_larger == true_larger))
-mod.fm.xp5 <- lmer(q2_error ~ set*media*pair_id + (1|user_id/set:media),
-     data = filter(res_q2_fm, pair_id != 5))
-mod.fm.xq1xq5 <- lmer(q2_error ~ set*media*pair_id + (1|user_id/set:media),
-     data = filter(res_q2_fm, user_larger == true_larger & pair_id != 5))
+# res_q2_fm <- res_q2_flt %>% 
+#   mutate(cluster = clusters(sfm.mod)) %>% 
+#   filter(cluster %in% c(1,3,5,6))
+# mod.fm.all <- lmer(q2_error ~ set*media*pair_id + (1|user_id/set:media),
+#      data = res_q2_fm)
+# mod.fm.xq1 <- lmer(q2_error ~ set*media*pair_id + (1|user_id/set:media),
+#      data = filter(res_q2_fm, user_larger == true_larger))
+# mod.fm.xp5 <- lmer(q2_error ~ set*media*pair_id + (1|user_id/set:media),
+#      data = filter(res_q2_fm, pair_id != 5))
+# mod.fm.xq1xq5 <- lmer(q2_error ~ set*media*pair_id + (1|user_id/set:media),
+#      data = filter(res_q2_fm, user_larger == true_larger & pair_id != 5))
 ```
 
 
@@ -373,53 +373,53 @@ mod.cm.q1.xq1xq5 <- lmer(q2_error_cm ~ set*media*pair_id + (1|user_id/set:media)
 ```
 
 ```{r}
-res_q2_fm <- res_q2_flt %>% 
-  mutate(cluster = clusters(sfm.mod)) %>% 
-  filter(cluster %in% c(1,3,5,6))
-
-mod.cm.fm.all <- lmer(q2_error_cm ~ set*media*pair_id + (1|user_id/set:media),
-     data = res_q2_fm)
-mod.cm.fm.xq1 <- lmer(q2_error_cm ~ set*media*pair_id + (1|user_id/set:media),
-     data = filter(res_q2_fm, user_larger == true_larger))
-mod.cm.fm.xp5 <- lmer(q2_error_cm ~ set*media*pair_id + (1|user_id/set:media),
-     data = filter(res_q2_fm, pair_id != 5))
-mod.cm.fm.xq1xq5 <- lmer(q2_error_cm ~ set*media*pair_id + (1|user_id/set:media),
-     data = filter(res_q2_fm, user_larger == true_larger & pair_id != 5))
+# res_q2_fm <- res_q2_flt %>% 
+#   mutate(cluster = clusters(sfm.mod)) %>% 
+#   filter(cluster %in% c(1,3,5,6))
+# 
+# mod.cm.fm.all <- lmer(q2_error_cm ~ set*media*pair_id + (1|user_id/set:media),
+#      data = res_q2_fm)
+# mod.cm.fm.xq1 <- lmer(q2_error_cm ~ set*media*pair_id + (1|user_id/set:media),
+#      data = filter(res_q2_fm, user_larger == true_larger))
+# mod.cm.fm.xp5 <- lmer(q2_error_cm ~ set*media*pair_id + (1|user_id/set:media),
+#      data = filter(res_q2_fm, pair_id != 5))
+# mod.cm.fm.xq1xq5 <- lmer(q2_error_cm ~ set*media*pair_id + (1|user_id/set:media),
+#      data = filter(res_q2_fm, user_larger == true_larger & pair_id != 5))
 ```
 
 
 ```{r}
-all_models <- mget(ls(pattern = '^mod'))
-all_em <- map(all_models, \(x)(emmeans(x, ~media|set:pair_id, pbkrtest.limit = 5800)))
-all_em_df <- map(all_em, data.frame)
-
-all_pairs <- map(all_em, pairs)
-all_pairs_df <- map(all_pairs, data.frame)
-
-# Parse model names into metadata
-parse_model_meta <- function(name) {
-  parts <- str_split(name, "\\.")[[1]]
-  if (parts[2] == "cm") {
-    tibble(scale = "Log (CM)", participant_filter = parts[3], response_filter = parts[4])
-  } else {
-    tibble(scale = "Slider", participant_filter = parts[2], response_filter = parts[3])
-  }
-}
-
-pf_levels <- c("all" = "All participants", "q1" = "Q1 filtered", "fm" = "FlexMix filtered")
-rf_levels <- c("all" = "All responses", "xq1" = "Excl. wrong Q1",
-               "xp5" = "Excl. pair 5", "xq1xq5" = "Excl. wrong Q1 & pair 5")
-
-model_meta <- map_dfr(names(all_em_df), parse_model_meta, .id = "model") %>%
-  mutate(model = names(all_em_df)[as.integer(model)],
-         participant_filter = factor(participant_filter, levels = names(pf_levels), labels = pf_levels),
-         response_filter    = factor(response_filter,    levels = names(rf_levels), labels = rf_levels))
-
-all_em_combined <- bind_rows(all_em_df, .id = "model") %>%
-  left_join(model_meta, by = "model")
-
-all_pairs_combined <- bind_rows(all_pairs_df, .id = "model") %>%
-  left_join(model_meta, by = "model")
+# all_models <- mget(ls(pattern = '^mod'))
+# all_em <- map(all_models, \(x)(emmeans(x, ~media|set:pair_id, pbkrtest.limit = 5800)))
+# all_em_df <- map(all_em, data.frame)
+# 
+# all_pairs <- map(all_em, pairs)
+# all_pairs_df <- map(all_pairs, data.frame)
+# 
+# # Parse model names into metadata
+# parse_model_meta <- function(name) {
+#   parts <- str_split(name, "\\.")[[1]]
+#   if (parts[2] == "cm") {
+#     tibble(scale = "Log (CM)", participant_filter = parts[3], response_filter = parts[4])
+#   } else {
+#     tibble(scale = "Slider", participant_filter = parts[2], response_filter = parts[3])
+#   }
+# }
+# 
+# pf_levels <- c("all" = "All participants", "q1" = "Q1 filtered", "fm" = "FlexMix filtered")
+# rf_levels <- c("all" = "All responses", "xq1" = "Excl. wrong Q1",
+#                "xp5" = "Excl. pair 5", "xq1xq5" = "Excl. wrong Q1 & pair 5")
+# 
+# model_meta <- map_dfr(names(all_em_df), parse_model_meta, .id = "model") %>%
+#   mutate(model = names(all_em_df)[as.integer(model)],
+#          participant_filter = factor(participant_filter, levels = names(pf_levels), labels = pf_levels),
+#          response_filter    = factor(response_filter,    levels = names(rf_levels), labels = rf_levels))
+# 
+# all_em_combined <- bind_rows(all_em_df, .id = "model") %>%
+#   left_join(model_meta, by = "model")
+# 
+# all_pairs_combined <- bind_rows(all_pairs_df, .id = "model") %>%
+#   left_join(model_meta, by = "model")
 ```
 
 To look at the differences of the models, separating by the response filter would probably be the most meaningful. This is because these exclusions have conceptual meaning. For example, removing incorrect Q1 responses could be used as an attention check for most trials, similar to Cleveland and McGill. 
@@ -427,47 +427,47 @@ To look at the differences of the models, separating by the response filter woul
 ### Slider Error
 
 ```{r}
-all_em_combined %>% 
-  filter(scale == 'Slider', response_filter == 'All responses') %>% 
-  ggplot(mapping = aes(x = media, y = emmean, color = participant_filter, group = participant_filter)) + 
-  geom_point(position = position_dodge2()) + 
-  geom_errorbar(aes(ymin = lower.CL, ymax = upper.CL), width = 0) + 
-  facet_grid(set~pair_id) + 
-  labs(title = 'Slider Error: All responses', x = 'Media', y = 'Estimated Mean Error', color = 'Participant filter') +
-  theme(aspect.ratio = 3, axis.text.x = element_text(angle = 90, hjust = 1))
+# all_em_combined %>% 
+#   filter(scale == 'Slider', response_filter == 'All responses') %>% 
+#   ggplot(mapping = aes(x = media, y = emmean, color = participant_filter, group = participant_filter)) + 
+#   geom_point(position = position_dodge2()) + 
+#   geom_errorbar(aes(ymin = lower.CL, ymax = upper.CL), width = 0) + 
+#   facet_grid(set~pair_id) + 
+#   labs(title = 'Slider Error: All responses', x = 'Media', y = 'Estimated Mean Error', color = 'Participant filter') +
+#   theme(aspect.ratio = 3, axis.text.x = element_text(angle = 90, hjust = 1))
 ```
 
 ```{r}
-all_em_combined %>% 
-  filter(scale == 'Slider', response_filter == 'Excl. wrong Q1') %>% 
-  ggplot(mapping = aes(x = media, y = emmean, color = participant_filter, group = participant_filter)) + 
-  geom_point(position = position_dodge2()) + 
-  geom_errorbar(aes(ymin = lower.CL, ymax = upper.CL), width = 0) + 
-  facet_grid(set~pair_id) + 
-  labs(title = 'Slider Error: Excluding incorrect Q1 responses', x = 'Media', y = 'Estimated Mean Error', color = 'Participant filter') +
-  theme(aspect.ratio = 3, axis.text.x = element_text(angle = 90, hjust = 1))
+# all_em_combined %>% 
+#   filter(scale == 'Slider', response_filter == 'Excl. wrong Q1') %>% 
+#   ggplot(mapping = aes(x = media, y = emmean, color = participant_filter, group = participant_filter)) + 
+#   geom_point(position = position_dodge2()) + 
+#   geom_errorbar(aes(ymin = lower.CL, ymax = upper.CL), width = 0) + 
+#   facet_grid(set~pair_id) + 
+#   labs(title = 'Slider Error: Excluding incorrect Q1 responses', x = 'Media', y = 'Estimated Mean Error', color = 'Participant filter') +
+#   theme(aspect.ratio = 3, axis.text.x = element_text(angle = 90, hjust = 1))
 ```
 
 ```{r}
-all_em_combined %>% 
-  filter(scale == 'Slider', response_filter == 'Excl. pair 5') %>% 
-  ggplot(mapping = aes(x = media, y = emmean, color = participant_filter, group = participant_filter)) + 
-  geom_point(position = position_dodge2()) + 
-  geom_errorbar(aes(ymin = lower.CL, ymax = upper.CL), width = 0) + 
-  facet_grid(set~pair_id) + 
-  labs(title = 'Slider Error: Excluding pair 5', x = 'Media', y = 'Estimated Mean Error', color = 'Participant filter') +
-  theme(aspect.ratio = 3, axis.text.x = element_text(angle = 90, hjust = 1))
+# all_em_combined %>% 
+#   filter(scale == 'Slider', response_filter == 'Excl. pair 5') %>% 
+#   ggplot(mapping = aes(x = media, y = emmean, color = participant_filter, group = participant_filter)) + 
+#   geom_point(position = position_dodge2()) + 
+#   geom_errorbar(aes(ymin = lower.CL, ymax = upper.CL), width = 0) + 
+#   facet_grid(set~pair_id) + 
+#   labs(title = 'Slider Error: Excluding pair 5', x = 'Media', y = 'Estimated Mean Error', color = 'Participant filter') +
+#   theme(aspect.ratio = 3, axis.text.x = element_text(angle = 90, hjust = 1))
 ```
 
 ```{r}
-all_em_combined %>% 
-  filter(scale == 'Slider', response_filter == 'Excl. wrong Q1 & pair 5') %>% 
-  ggplot(mapping = aes(x = media, y = emmean, color = participant_filter, group = participant_filter)) + 
-  geom_point(position = position_dodge2()) + 
-  geom_errorbar(aes(ymin = lower.CL, ymax = upper.CL), width = 0) + 
-  facet_grid(set~pair_id) + 
-  labs(title = 'Slider Error: Excluding incorrect Q1 responses and pair 5', x = 'Media', y = 'Estimated Mean Error', color = 'Participant filter') +
-  theme(aspect.ratio = 3, axis.text.x = element_text(angle = 90, hjust = 1))
+# all_em_combined %>% 
+#   filter(scale == 'Slider', response_filter == 'Excl. wrong Q1 & pair 5') %>% 
+#   ggplot(mapping = aes(x = media, y = emmean, color = participant_filter, group = participant_filter)) + 
+#   geom_point(position = position_dodge2()) + 
+#   geom_errorbar(aes(ymin = lower.CL, ymax = upper.CL), width = 0) + 
+#   facet_grid(set~pair_id) + 
+#   labs(title = 'Slider Error: Excluding incorrect Q1 responses and pair 5', x = 'Media', y = 'Estimated Mean Error', color = 'Participant filter') +
+#   theme(aspect.ratio = 3, axis.text.x = element_text(angle = 90, hjust = 1))
 ```
 
 
@@ -478,47 +478,47 @@ The main takeaway from the models above is that there is more down-weighted erro
 ### Log error
 
 ```{r}
-all_em_combined %>% 
-  filter(scale == 'Log (CM)', response_filter == 'All responses') %>% 
-  ggplot(mapping = aes(x = media, y = emmean, color = participant_filter, group = participant_filter)) + 
-  geom_point(position = position_dodge2()) + 
-  geom_errorbar(aes(ymin = lower.CL, ymax = upper.CL), width = 0) + 
-  facet_grid(set~pair_id) + 
-  labs(title = 'Log (CM) Error: All responses', x = 'Media', y = 'Estimated Mean Error (log scale)', color = 'Participant filter') +
-  theme(aspect.ratio = 3, axis.text.x = element_text(angle = 90, hjust = 1))
+# all_em_combined %>% 
+#   filter(scale == 'Log (CM)', response_filter == 'All responses') %>% 
+#   ggplot(mapping = aes(x = media, y = emmean, color = participant_filter, group = participant_filter)) + 
+#   geom_point(position = position_dodge2()) + 
+#   geom_errorbar(aes(ymin = lower.CL, ymax = upper.CL), width = 0) + 
+#   facet_grid(set~pair_id) + 
+#   labs(title = 'Log (CM) Error: All responses', x = 'Media', y = 'Estimated Mean Error (log scale)', color = 'Participant filter') +
+#   theme(aspect.ratio = 3, axis.text.x = element_text(angle = 90, hjust = 1))
 ```
 
 ```{r}
-all_em_combined %>% 
-  filter(scale == 'Log (CM)', response_filter == 'Excl. wrong Q1') %>% 
-  ggplot(mapping = aes(x = media, y = emmean, color = participant_filter, group = participant_filter)) + 
-  geom_point(position = position_dodge2()) + 
-  geom_errorbar(aes(ymin = lower.CL, ymax = upper.CL), width = 0) + 
-  facet_grid(set~pair_id) + 
-  labs(title = 'Log (CM) Error: Excluding incorrect Q1 responses', x = 'Media', y = 'Estimated Mean Error (log scale)', color = 'Participant filter') +
-  theme(aspect.ratio = 3, axis.text.x = element_text(angle = 90, hjust = 1))
+# all_em_combined %>% 
+#   filter(scale == 'Log (CM)', response_filter == 'Excl. wrong Q1') %>% 
+#   ggplot(mapping = aes(x = media, y = emmean, color = participant_filter, group = participant_filter)) + 
+#   geom_point(position = position_dodge2()) + 
+#   geom_errorbar(aes(ymin = lower.CL, ymax = upper.CL), width = 0) + 
+#   facet_grid(set~pair_id) + 
+#   labs(title = 'Log (CM) Error: Excluding incorrect Q1 responses', x = 'Media', y = 'Estimated Mean Error (log scale)', color = 'Participant filter') +
+#   theme(aspect.ratio = 3, axis.text.x = element_text(angle = 90, hjust = 1))
 ```
 
 ```{r}
-all_em_combined %>% 
-  filter(scale == 'Log (CM)', response_filter == 'Excl. pair 5') %>% 
-  ggplot(mapping = aes(x = media, y = emmean, color = participant_filter, group = participant_filter)) + 
-  geom_point(position = position_dodge2()) + 
-  geom_errorbar(aes(ymin = lower.CL, ymax = upper.CL), width = 0) + 
-  facet_grid(set~pair_id) + 
-  labs(title = 'Log (CM) Error: Excluding pair 5', x = 'Media', y = 'Estimated Mean Error (log scale)', color = 'Participant filter') +
-  theme(aspect.ratio = 3, axis.text.x = element_text(angle = 90, hjust = 1))
+# all_em_combined %>% 
+#   filter(scale == 'Log (CM)', response_filter == 'Excl. pair 5') %>% 
+#   ggplot(mapping = aes(x = media, y = emmean, color = participant_filter, group = participant_filter)) + 
+#   geom_point(position = position_dodge2()) + 
+#   geom_errorbar(aes(ymin = lower.CL, ymax = upper.CL), width = 0) + 
+#   facet_grid(set~pair_id) + 
+#   labs(title = 'Log (CM) Error: Excluding pair 5', x = 'Media', y = 'Estimated Mean Error (log scale)', color = 'Participant filter') +
+#   theme(aspect.ratio = 3, axis.text.x = element_text(angle = 90, hjust = 1))
 ```
 
 ```{r}
-all_em_combined %>% 
-  filter(scale == 'Log (CM)', response_filter == 'Excl. wrong Q1 & pair 5') %>% 
-  ggplot(mapping = aes(x = media, y = emmean, color = participant_filter, group = participant_filter)) + 
-  geom_point(position = position_dodge2()) + 
-  geom_errorbar(aes(ymin = lower.CL, ymax = upper.CL), width = 0) + 
-  facet_grid(set~pair_id) + 
-  labs(title = 'Log (CM) Error: Excluding incorrect Q1 responses and pair 5', x = 'Media', y = 'Estimated Mean Error (log scale)', color = 'Participant filter') +
-  theme(aspect.ratio = 3, axis.text.x = element_text(angle = 90, hjust = 1))
+# all_em_combined %>% 
+#   filter(scale == 'Log (CM)', response_filter == 'Excl. wrong Q1 & pair 5') %>% 
+#   ggplot(mapping = aes(x = media, y = emmean, color = participant_filter, group = participant_filter)) + 
+#   geom_point(position = position_dodge2()) + 
+#   geom_errorbar(aes(ymin = lower.CL, ymax = upper.CL), width = 0) + 
+#   facet_grid(set~pair_id) + 
+#   labs(title = 'Log (CM) Error: Excluding incorrect Q1 responses and pair 5', x = 'Media', y = 'Estimated Mean Error (log scale)', color = 'Participant filter') +
+#   theme(aspect.ratio = 3, axis.text.x = element_text(angle = 90, hjust = 1))
 ```
 
 
@@ -529,22 +529,22 @@ Again, we see similar patterns to that of slider error. By filtering based on cl
 In the following tables, the counts of significant simple effects for media types are constructed. Significance is defined in the usual fashion with $\alpha=0.05$
 
 ```{r}
-sig_summary <- all_pairs_combined %>%
-  group_by(scale, contrast, set, pair_id) %>%
-  summarise(
-    n_pos  = sum(p.value < 0.05 & estimate > 0),
-    n_neg  = sum(p.value < 0.05 & estimate < 0),
-    n_total = n(),
-    .groups = "drop"
-  ) %>%
-  mutate(label = paste0(n_pos, '(+) | ', n_neg, ' (-) | n = ', n_total)) %>%
-  select(scale, contrast, set, pair_id, label) %>%
-  pivot_wider(names_from = contrast, values_from = label)
-
-sig_summary %>%
-  filter(scale == "Slider") %>%
-  select(-scale) %>%
-  knitr::kable(caption = "Slider error: significant media contrasts out of 12 models. (+) = contrast estimate > 0, (-) = estimate < 0.")
+# sig_summary <- all_pairs_combined %>%
+#   group_by(scale, contrast, set, pair_id) %>%
+#   summarise(
+#     n_pos  = sum(p.value < 0.05 & estimate > 0),
+#     n_neg  = sum(p.value < 0.05 & estimate < 0),
+#     n_total = n(),
+#     .groups = "drop"
+#   ) %>%
+#   mutate(label = paste0(n_pos, '(+) | ', n_neg, ' (-) | n = ', n_total)) %>%
+#   select(scale, contrast, set, pair_id, label) %>%
+#   pivot_wider(names_from = contrast, values_from = label)
+# 
+# sig_summary %>%
+#   filter(scale == "Slider") %>%
+#   select(-scale) %>%
+#   knitr::kable(caption = "Slider error: significant media contrasts out of 12 models. (+) = contrast estimate > 0, (-) = estimate < 0.")
 ```
 
 An immediate observation is that 2dd had larger errors for all 12 models in set 1 with pair_id 3, as well as for set 2 with pair_id 2. 
@@ -552,17 +552,17 @@ An immediate observation is that 2dd had larger errors for all 12 models in set 
 Set 2 with pair 9 has an interesting result. In 4 of the models, 2dd had smaller error than 3dp. That is, 2dd was underestimated more than 3dp. These models were in all cases where `flexmix` picked out components that were likely to be ratio estimation strategies. 
 
 ```{r}
-all_pairs_combined %>% 
-  filter(set == 'set2' & pair_id == 9 & p.value < 0.05 & contrast == '2dd - 3dp' & scale == 'Slider')
+# all_pairs_combined %>% 
+#   filter(set == 'set2' & pair_id == 9 & p.value < 0.05 & contrast == '2dd - 3dp' & scale == 'Slider')
 ```
 
 
 
 ```{r}
-sig_summary %>%
-  filter(scale == "Log (CM)") %>%
-  select(-scale) %>%
-  knitr::kable(caption = "Slider error: significant media contrasts out of 12 models. (+) = contrast estimate > 0, (-) = estimate < 0.")
+# sig_summary %>%
+#   filter(scale == "Log (CM)") %>%
+#   select(-scale) %>%
+#   knitr::kable(caption = "Slider error: significant media contrasts out of 12 models. (+) = contrast estimate > 0, (-) = estimate < 0.")
 ```
 
 
@@ -583,15 +583,19 @@ The purpose for excluding with the flexmix model is that two clusters are clearl
 
 
 ```{r}
-car::Anova(mod.cm.q1.xq1xq5, type = '3', test = 'F')
-car::Anova(mod.cm.fm.xq1xq5, type = '3', test = 'F')
+# car::Anova(mod.cm.q1.xq1xq5, type = '3', test = 'F')
+# car::Anova(mod.cm.fm.xq1xq5, type = '3', test = 'F')
 ```
 
 
 In both of these models, there is a significant two-way interaction between pair_id and set. There is also a significant main effect for media. For media types, 2dd has larger errors than both 3d charts in both models. 
 
 ```{r}
-emmeans(mod.cm.q1.xq1xq5, ~media, pbkrtest.limit = 5800)
-emmeans(mod.cm.fm.xq1xq5, ~media, pbkrtest.limit = 5800)
+# emmeans(mod.cm.q1.xq1xq5, ~media, pbkrtest.limit = 5800)
+# emmeans(mod.cm.fm.xq1xq5, ~media, pbkrtest.limit = 5800)
+```
+
+```{r}
+map(mget(ls()), dim)
 ```
 

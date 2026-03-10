@@ -304,7 +304,7 @@ H_0: \pi\leq0.5 \text{ vs. } H_1: \pi&gt;0.5
 <span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">p.val =</span> <span class="fu">pbinom</span>(n_correct, n_total, <span class="fl">0.5</span>, <span class="at">lower.tail =</span> F)) <span class="sc">%&gt;%</span> </span>
 <span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(p.val <span class="sc">&lt;</span> <span class="fl">0.05</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<p>At <span class="math inline">\(\alpha=0.05\)</span>, 65 out of 260 participants can be excluded for random guessing for Q1. Of course this isn’t a perfect approach since trials are not i.i.d. However, if we frame this from a careless guesser standpoint, people who are actually contributing would show evidence of more correct solutions than randomly guessing.</p>
+<p>At <span class="math inline">\(\alpha=0.05\)</span>, 68 out of 282 participants can be excluded for random guessing for Q1. Of course this isn’t a perfect approach since trials are not i.i.d. However, if we frame this from a careless guesser standpoint, people who are actually contributing would show evidence of more correct solutions than randomly guessing.</p>
 <div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>res_q2_flt <span class="ot">&lt;-</span> <span class="fu">inner_join</span>(res_q2, more_than_chance, <span class="at">by =</span> <span class="st">'user_id'</span>)</span>
 <span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>res_q2 <span class="sc">%&gt;%</span> </span>
 <span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(user_id) <span class="sc">%&gt;%</span> </span>
@@ -406,13 +406,13 @@ H_0: \pi\leq0.5 \text{ vs. } H_1: \pi&gt;0.5
 <div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="fu">parameters</span>(fm.mod)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>                                       Comp.1     Comp.2     Comp.3    Comp.4
-coef.target_ratio:media2dd:setset1  0.7234727  0.9994536  0.3099996 1.0062862
-coef.target_ratio:media3dd:setset1  0.7268455  0.9434990  0.3570906 0.9709844
-coef.target_ratio:media3dp:setset1  0.7126619  0.9048571  0.3943348 0.9845186
-coef.target_ratio:media2dd:setset2  0.6636093  0.9451501  0.3589483 0.9931466
-coef.target_ratio:media3dd:setset2  0.6753886  0.9058314  0.4020054 0.9764530
-coef.target_ratio:media3dp:setset2  0.6515198  0.9346635  0.3393424 0.9862567
-sigma                              26.8537961 18.0470591 26.9258230 9.3928229</code></pre>
+coef.target_ratio:media2dd:setset1  0.8391822  1.0106539  0.3596102 1.0203818
+coef.target_ratio:media3dd:setset1  0.7974449  0.9568400  0.4300306 0.9803218
+coef.target_ratio:media3dp:setset1  0.7515058  0.9431329  0.4555521 0.9908924
+coef.target_ratio:media2dd:setset2  0.7529970  0.9605038  0.4146399 1.0049195
+coef.target_ratio:media3dd:setset2  0.7399249  0.9269279  0.4364578 0.9923111
+coef.target_ratio:media3dp:setset2  0.7103479  0.9567530  0.4253524 0.9975614
+sigma                              25.6088016 15.3671047 27.0060543 8.0399233</code></pre>
 </div>
 <div class="sourceCode cell-code" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(fm.mod)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
@@ -422,13 +422,13 @@ flexmix(formula = user_slider ~ 0 + target_ratio:media:set |
     user_id, data = res_q2_flt, k = 4)
 
        prior size post&gt;0 ratio
-Comp.1 0.245 1016   2040 0.498
-Comp.2 0.312 1272   2432 0.523
-Comp.3 0.148  592   1168 0.507
-Comp.4 0.295 1304   1680 0.776
+Comp.1 0.244 1056   2480 0.426
+Comp.2 0.342 1536   2568 0.598
+Comp.3 0.230 1048   1456 0.720
+Comp.4 0.185  888   1464 0.607
 
-'log Lik.' -18102.12 (df=31)
-AIC: 36266.25   BIC: 36462.76 </code></pre>
+'log Lik.' -19621 (df=31)
+AIC: 39304   BIC: 39502.95 </code></pre>
 </div>
 </div>
 <div class="sourceCode cell-code" id="cb12"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>res_q2_flt <span class="sc">%&gt;%</span> </span>
@@ -523,55 +523,28 @@ AIC: 36125.39   BIC: 36423.32 </code></pre>
 </div>
 </div>
 <p>Using BIC, 6 components are selected. Here, components 1, 3, and 5 appear to be ratio estimations, with components 2 and 4 being different strategies or random noise. Component 6 looks like a wildcard, where it is mostly ratios, but with some carelessness. However, pure random stategies are not captured. Perhaps simply focusing on the ratio strategy is the best approach?</p>
-<div class="sourceCode cell-code" id="cb20"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a>res_q2_flt <span class="sc">%&gt;%</span> </span>
-<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">cluster =</span> <span class="fu">clusters</span>(sfm.mod)) <span class="sc">%&gt;%</span> </span>
-<span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="at">mapping =</span> <span class="fu">aes</span>(<span class="at">x =</span> user_slider <span class="sc">-</span> target_ratio, <span class="at">group =</span> user_id)) <span class="sc">+</span> </span>
-<span id="cb20-4"><a href="#cb20-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_density</span>(<span class="fu">aes</span>(<span class="at">color =</span> <span class="fu">alpha</span>(<span class="fu">factor</span>(cluster), <span class="at">alpha =</span> <span class="fl">0.15</span>))) <span class="sc">+</span></span>
-<span id="cb20-5"><a href="#cb20-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_y_continuous</span>(<span class="at">limits =</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="fl">0.08</span>)) <span class="sc">+</span> <span class="fu">scale_x_continuous</span>(<span class="at">limits =</span> <span class="fu">c</span>(<span class="sc">-</span><span class="dv">100</span>, <span class="dv">100</span>)) <span class="sc">+</span> </span>
-<span id="cb20-6"><a href="#cb20-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">facet_wrap</span>(<span class="sc">~</span>cluster)</span>
-<span id="cb20-7"><a href="#cb20-7" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb20-8"><a href="#cb20-8" aria-hidden="true" tabindex="-1"></a>res_q2_flt <span class="sc">%&gt;%</span> </span>
-<span id="cb20-9"><a href="#cb20-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">cluster =</span> <span class="fu">clusters</span>(sfm.mod)) <span class="sc">%&gt;%</span> </span>
-<span id="cb20-10"><a href="#cb20-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="at">mapping =</span> <span class="fu">aes</span>(<span class="at">x =</span> user_slider <span class="sc">-</span> target_diff, <span class="at">group =</span> user_id)) <span class="sc">+</span> </span>
-<span id="cb20-11"><a href="#cb20-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_density</span>(<span class="fu">aes</span>(<span class="at">color =</span> <span class="fu">alpha</span>(<span class="fu">factor</span>(cluster), <span class="at">alpha =</span> <span class="fl">0.15</span>))) <span class="sc">+</span></span>
-<span id="cb20-12"><a href="#cb20-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_y_continuous</span>(<span class="at">limits =</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="fl">0.08</span>)) <span class="sc">+</span> <span class="fu">scale_x_continuous</span>(<span class="at">limits =</span> <span class="fu">c</span>(<span class="sc">-</span><span class="dv">100</span>, <span class="dv">100</span>)) <span class="sc">+</span> </span>
-<span id="cb20-13"><a href="#cb20-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">facet_wrap</span>(<span class="sc">~</span>cluster)</span>
-<span id="cb20-14"><a href="#cb20-14" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb20-15"><a href="#cb20-15" aria-hidden="true" tabindex="-1"></a>res_q2_flt <span class="sc">%&gt;%</span> </span>
-<span id="cb20-16"><a href="#cb20-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">cluster =</span> <span class="fu">clusters</span>(sfm.mod)) <span class="sc">%&gt;%</span> </span>
-<span id="cb20-17"><a href="#cb20-17" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="at">mapping =</span> <span class="fu">aes</span>(<span class="at">x =</span> user_slider, <span class="at">group =</span> user_id)) <span class="sc">+</span> </span>
-<span id="cb20-18"><a href="#cb20-18" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_density</span>(<span class="fu">aes</span>(<span class="at">color =</span> <span class="fu">alpha</span>(<span class="fu">factor</span>(cluster), <span class="at">alpha =</span> <span class="fl">0.15</span>))) <span class="sc">+</span></span>
-<span id="cb20-19"><a href="#cb20-19" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_y_continuous</span>(<span class="at">limits =</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="fl">0.08</span>)) <span class="sc">+</span> <span class="fu">scale_x_continuous</span>(<span class="at">limits =</span> <span class="fu">c</span>(<span class="sc">-</span><span class="dv">100</span>, <span class="dv">100</span>)) <span class="sc">+</span> </span>
-<span id="cb20-20"><a href="#cb20-20" aria-hidden="true" tabindex="-1"></a>  <span class="fu">facet_wrap</span>(<span class="sc">~</span>cluster)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb20"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="co"># res_q2_flt %&gt;% </span></span>
+<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a><span class="co">#   mutate(cluster = clusters(sfm.mod)) %&gt;% </span></span>
+<span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a><span class="co">#   ggplot(mapping = aes(x = user_slider - target_ratio, group = user_id)) + </span></span>
+<span id="cb20-4"><a href="#cb20-4" aria-hidden="true" tabindex="-1"></a><span class="co">#   geom_density(aes(color = alpha(factor(cluster), alpha = 0.15))) +</span></span>
+<span id="cb20-5"><a href="#cb20-5" aria-hidden="true" tabindex="-1"></a><span class="co">#   scale_y_continuous(limits = c(0, 0.08)) + scale_x_continuous(limits = c(-100, 100)) + </span></span>
+<span id="cb20-6"><a href="#cb20-6" aria-hidden="true" tabindex="-1"></a><span class="co">#   facet_wrap(~cluster)</span></span>
+<span id="cb20-7"><a href="#cb20-7" aria-hidden="true" tabindex="-1"></a><span class="co"># </span></span>
+<span id="cb20-8"><a href="#cb20-8" aria-hidden="true" tabindex="-1"></a><span class="co"># res_q2_flt %&gt;% </span></span>
+<span id="cb20-9"><a href="#cb20-9" aria-hidden="true" tabindex="-1"></a><span class="co">#   mutate(cluster = clusters(sfm.mod)) %&gt;% </span></span>
+<span id="cb20-10"><a href="#cb20-10" aria-hidden="true" tabindex="-1"></a><span class="co">#   ggplot(mapping = aes(x = user_slider - target_diff, group = user_id)) + </span></span>
+<span id="cb20-11"><a href="#cb20-11" aria-hidden="true" tabindex="-1"></a><span class="co">#   geom_density(aes(color = alpha(factor(cluster), alpha = 0.15))) +</span></span>
+<span id="cb20-12"><a href="#cb20-12" aria-hidden="true" tabindex="-1"></a><span class="co">#   scale_y_continuous(limits = c(0, 0.08)) + scale_x_continuous(limits = c(-100, 100)) + </span></span>
+<span id="cb20-13"><a href="#cb20-13" aria-hidden="true" tabindex="-1"></a><span class="co">#   facet_wrap(~cluster)</span></span>
+<span id="cb20-14"><a href="#cb20-14" aria-hidden="true" tabindex="-1"></a><span class="co"># </span></span>
+<span id="cb20-15"><a href="#cb20-15" aria-hidden="true" tabindex="-1"></a><span class="co"># res_q2_flt %&gt;% </span></span>
+<span id="cb20-16"><a href="#cb20-16" aria-hidden="true" tabindex="-1"></a><span class="co">#   mutate(cluster = clusters(sfm.mod)) %&gt;% </span></span>
+<span id="cb20-17"><a href="#cb20-17" aria-hidden="true" tabindex="-1"></a><span class="co">#   ggplot(mapping = aes(x = user_slider, group = user_id)) + </span></span>
+<span id="cb20-18"><a href="#cb20-18" aria-hidden="true" tabindex="-1"></a><span class="co">#   geom_density(aes(color = alpha(factor(cluster), alpha = 0.15))) +</span></span>
+<span id="cb20-19"><a href="#cb20-19" aria-hidden="true" tabindex="-1"></a><span class="co">#   scale_y_continuous(limits = c(0, 0.08)) + scale_x_continuous(limits = c(-100, 100)) + </span></span>
+<span id="cb20-20"><a href="#cb20-20" aria-hidden="true" tabindex="-1"></a><span class="co">#   facet_wrap(~cluster)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell quarto-layout-panel" data-layout-ncol="2">
-<div class="quarto-layout-row">
-<div class="quarto-layout-cell" style="flex-basis: 50.0%;justify-content: flex-start;">
-<div class="quarto-figure quarto-figure-center">
-<figure class="figure">
-<p><img src="models_files/figure-html/unnamed-chunk-10-1.png" class="img-fluid figure-img" width="672"></p>
-<figcaption>Ratio strategy</figcaption>
-</figure>
-</div>
-</div>
-<div class="quarto-layout-cell" style="flex-basis: 50.0%;justify-content: flex-start;">
-<div class="quarto-figure quarto-figure-center">
-<figure class="figure">
-<p><img src="models_files/figure-html/unnamed-chunk-10-2.png" class="img-fluid figure-img" width="672"></p>
-<figcaption>Difference strategy</figcaption>
-</figure>
-</div>
-</div>
-</div>
-<div class="quarto-layout-row">
-<div class="quarto-layout-cell" style="flex-basis: 50.0%;justify-content: flex-start;">
-<div class="quarto-figure quarto-figure-center">
-<figure class="figure">
-<p><img src="models_files/figure-html/unnamed-chunk-10-3.png" class="img-fluid figure-img" width="672"></p>
-<figcaption>No strategy</figcaption>
-</figure>
-</div>
-</div>
-</div>
+
 </div>
 </section>
 <section id="analyzing-error" class="level2">
@@ -607,17 +580,17 @@ Y_{CM}=\log_2(|\text{Slider}-\text{True Ratio}|+1/8)
 <span id="cb22-8"><a href="#cb22-8" aria-hidden="true" tabindex="-1"></a>     <span class="at">data =</span> <span class="fu">filter</span>(res_q2_flt, user_larger <span class="sc">==</span> true_larger <span class="sc">&amp;</span> pair_id <span class="sc">!=</span> <span class="dv">5</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb23"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a>res_q2_fm <span class="ot">&lt;-</span> res_q2_flt <span class="sc">%&gt;%</span> </span>
-<span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">cluster =</span> <span class="fu">clusters</span>(sfm.mod)) <span class="sc">%&gt;%</span> </span>
-<span id="cb23-3"><a href="#cb23-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(cluster <span class="sc">%in%</span> <span class="fu">c</span>(<span class="dv">1</span>,<span class="dv">3</span>,<span class="dv">5</span>,<span class="dv">6</span>))</span>
-<span id="cb23-4"><a href="#cb23-4" aria-hidden="true" tabindex="-1"></a>mod.fm.all <span class="ot">&lt;-</span> <span class="fu">lmer</span>(q2_error <span class="sc">~</span> set<span class="sc">*</span>media<span class="sc">*</span>pair_id <span class="sc">+</span> (<span class="dv">1</span><span class="sc">|</span>user_id<span class="sc">/</span>set<span class="sc">:</span>media),</span>
-<span id="cb23-5"><a href="#cb23-5" aria-hidden="true" tabindex="-1"></a>     <span class="at">data =</span> res_q2_fm)</span>
-<span id="cb23-6"><a href="#cb23-6" aria-hidden="true" tabindex="-1"></a>mod.fm.xq1 <span class="ot">&lt;-</span> <span class="fu">lmer</span>(q2_error <span class="sc">~</span> set<span class="sc">*</span>media<span class="sc">*</span>pair_id <span class="sc">+</span> (<span class="dv">1</span><span class="sc">|</span>user_id<span class="sc">/</span>set<span class="sc">:</span>media),</span>
-<span id="cb23-7"><a href="#cb23-7" aria-hidden="true" tabindex="-1"></a>     <span class="at">data =</span> <span class="fu">filter</span>(res_q2_fm, user_larger <span class="sc">==</span> true_larger))</span>
-<span id="cb23-8"><a href="#cb23-8" aria-hidden="true" tabindex="-1"></a>mod.fm.xp5 <span class="ot">&lt;-</span> <span class="fu">lmer</span>(q2_error <span class="sc">~</span> set<span class="sc">*</span>media<span class="sc">*</span>pair_id <span class="sc">+</span> (<span class="dv">1</span><span class="sc">|</span>user_id<span class="sc">/</span>set<span class="sc">:</span>media),</span>
-<span id="cb23-9"><a href="#cb23-9" aria-hidden="true" tabindex="-1"></a>     <span class="at">data =</span> <span class="fu">filter</span>(res_q2_fm, pair_id <span class="sc">!=</span> <span class="dv">5</span>))</span>
-<span id="cb23-10"><a href="#cb23-10" aria-hidden="true" tabindex="-1"></a>mod.fm.xq1xq5 <span class="ot">&lt;-</span> <span class="fu">lmer</span>(q2_error <span class="sc">~</span> set<span class="sc">*</span>media<span class="sc">*</span>pair_id <span class="sc">+</span> (<span class="dv">1</span><span class="sc">|</span>user_id<span class="sc">/</span>set<span class="sc">:</span>media),</span>
-<span id="cb23-11"><a href="#cb23-11" aria-hidden="true" tabindex="-1"></a>     <span class="at">data =</span> <span class="fu">filter</span>(res_q2_fm, user_larger <span class="sc">==</span> true_larger <span class="sc">&amp;</span> pair_id <span class="sc">!=</span> <span class="dv">5</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb23"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a><span class="co"># res_q2_fm &lt;- res_q2_flt %&gt;% </span></span>
+<span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a><span class="co">#   mutate(cluster = clusters(sfm.mod)) %&gt;% </span></span>
+<span id="cb23-3"><a href="#cb23-3" aria-hidden="true" tabindex="-1"></a><span class="co">#   filter(cluster %in% c(1,3,5,6))</span></span>
+<span id="cb23-4"><a href="#cb23-4" aria-hidden="true" tabindex="-1"></a><span class="co"># mod.fm.all &lt;- lmer(q2_error ~ set*media*pair_id + (1|user_id/set:media),</span></span>
+<span id="cb23-5"><a href="#cb23-5" aria-hidden="true" tabindex="-1"></a><span class="co">#      data = res_q2_fm)</span></span>
+<span id="cb23-6"><a href="#cb23-6" aria-hidden="true" tabindex="-1"></a><span class="co"># mod.fm.xq1 &lt;- lmer(q2_error ~ set*media*pair_id + (1|user_id/set:media),</span></span>
+<span id="cb23-7"><a href="#cb23-7" aria-hidden="true" tabindex="-1"></a><span class="co">#      data = filter(res_q2_fm, user_larger == true_larger))</span></span>
+<span id="cb23-8"><a href="#cb23-8" aria-hidden="true" tabindex="-1"></a><span class="co"># mod.fm.xp5 &lt;- lmer(q2_error ~ set*media*pair_id + (1|user_id/set:media),</span></span>
+<span id="cb23-9"><a href="#cb23-9" aria-hidden="true" tabindex="-1"></a><span class="co">#      data = filter(res_q2_fm, pair_id != 5))</span></span>
+<span id="cb23-10"><a href="#cb23-10" aria-hidden="true" tabindex="-1"></a><span class="co"># mod.fm.xq1xq5 &lt;- lmer(q2_error ~ set*media*pair_id + (1|user_id/set:media),</span></span>
+<span id="cb23-11"><a href="#cb23-11" aria-hidden="true" tabindex="-1"></a><span class="co">#      data = filter(res_q2_fm, user_larger == true_larger &amp; pair_id != 5))</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section>
 <section id="error-on-log-scale" class="level3">
@@ -643,195 +616,139 @@ Y_{CM}=\log_2(|\text{Slider}-\text{True Ratio}|+1/8)
 <span id="cb25-8"><a href="#cb25-8" aria-hidden="true" tabindex="-1"></a>     <span class="at">data =</span> <span class="fu">filter</span>(res_q2_flt, user_larger <span class="sc">==</span> true_larger <span class="sc">&amp;</span> pair_id <span class="sc">!=</span> <span class="dv">5</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb26"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a>res_q2_fm <span class="ot">&lt;-</span> res_q2_flt <span class="sc">%&gt;%</span> </span>
-<span id="cb26-2"><a href="#cb26-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">cluster =</span> <span class="fu">clusters</span>(sfm.mod)) <span class="sc">%&gt;%</span> </span>
-<span id="cb26-3"><a href="#cb26-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(cluster <span class="sc">%in%</span> <span class="fu">c</span>(<span class="dv">1</span>,<span class="dv">3</span>,<span class="dv">5</span>,<span class="dv">6</span>))</span>
-<span id="cb26-4"><a href="#cb26-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb26-5"><a href="#cb26-5" aria-hidden="true" tabindex="-1"></a>mod.cm.fm.all <span class="ot">&lt;-</span> <span class="fu">lmer</span>(q2_error_cm <span class="sc">~</span> set<span class="sc">*</span>media<span class="sc">*</span>pair_id <span class="sc">+</span> (<span class="dv">1</span><span class="sc">|</span>user_id<span class="sc">/</span>set<span class="sc">:</span>media),</span>
-<span id="cb26-6"><a href="#cb26-6" aria-hidden="true" tabindex="-1"></a>     <span class="at">data =</span> res_q2_fm)</span>
-<span id="cb26-7"><a href="#cb26-7" aria-hidden="true" tabindex="-1"></a>mod.cm.fm.xq1 <span class="ot">&lt;-</span> <span class="fu">lmer</span>(q2_error_cm <span class="sc">~</span> set<span class="sc">*</span>media<span class="sc">*</span>pair_id <span class="sc">+</span> (<span class="dv">1</span><span class="sc">|</span>user_id<span class="sc">/</span>set<span class="sc">:</span>media),</span>
-<span id="cb26-8"><a href="#cb26-8" aria-hidden="true" tabindex="-1"></a>     <span class="at">data =</span> <span class="fu">filter</span>(res_q2_fm, user_larger <span class="sc">==</span> true_larger))</span>
-<span id="cb26-9"><a href="#cb26-9" aria-hidden="true" tabindex="-1"></a>mod.cm.fm.xp5 <span class="ot">&lt;-</span> <span class="fu">lmer</span>(q2_error_cm <span class="sc">~</span> set<span class="sc">*</span>media<span class="sc">*</span>pair_id <span class="sc">+</span> (<span class="dv">1</span><span class="sc">|</span>user_id<span class="sc">/</span>set<span class="sc">:</span>media),</span>
-<span id="cb26-10"><a href="#cb26-10" aria-hidden="true" tabindex="-1"></a>     <span class="at">data =</span> <span class="fu">filter</span>(res_q2_fm, pair_id <span class="sc">!=</span> <span class="dv">5</span>))</span>
-<span id="cb26-11"><a href="#cb26-11" aria-hidden="true" tabindex="-1"></a>mod.cm.fm.xq1xq5 <span class="ot">&lt;-</span> <span class="fu">lmer</span>(q2_error_cm <span class="sc">~</span> set<span class="sc">*</span>media<span class="sc">*</span>pair_id <span class="sc">+</span> (<span class="dv">1</span><span class="sc">|</span>user_id<span class="sc">/</span>set<span class="sc">:</span>media),</span>
-<span id="cb26-12"><a href="#cb26-12" aria-hidden="true" tabindex="-1"></a>     <span class="at">data =</span> <span class="fu">filter</span>(res_q2_fm, user_larger <span class="sc">==</span> true_larger <span class="sc">&amp;</span> pair_id <span class="sc">!=</span> <span class="dv">5</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb26"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a><span class="co"># res_q2_fm &lt;- res_q2_flt %&gt;% </span></span>
+<span id="cb26-2"><a href="#cb26-2" aria-hidden="true" tabindex="-1"></a><span class="co">#   mutate(cluster = clusters(sfm.mod)) %&gt;% </span></span>
+<span id="cb26-3"><a href="#cb26-3" aria-hidden="true" tabindex="-1"></a><span class="co">#   filter(cluster %in% c(1,3,5,6))</span></span>
+<span id="cb26-4"><a href="#cb26-4" aria-hidden="true" tabindex="-1"></a><span class="co"># </span></span>
+<span id="cb26-5"><a href="#cb26-5" aria-hidden="true" tabindex="-1"></a><span class="co"># mod.cm.fm.all &lt;- lmer(q2_error_cm ~ set*media*pair_id + (1|user_id/set:media),</span></span>
+<span id="cb26-6"><a href="#cb26-6" aria-hidden="true" tabindex="-1"></a><span class="co">#      data = res_q2_fm)</span></span>
+<span id="cb26-7"><a href="#cb26-7" aria-hidden="true" tabindex="-1"></a><span class="co"># mod.cm.fm.xq1 &lt;- lmer(q2_error_cm ~ set*media*pair_id + (1|user_id/set:media),</span></span>
+<span id="cb26-8"><a href="#cb26-8" aria-hidden="true" tabindex="-1"></a><span class="co">#      data = filter(res_q2_fm, user_larger == true_larger))</span></span>
+<span id="cb26-9"><a href="#cb26-9" aria-hidden="true" tabindex="-1"></a><span class="co"># mod.cm.fm.xp5 &lt;- lmer(q2_error_cm ~ set*media*pair_id + (1|user_id/set:media),</span></span>
+<span id="cb26-10"><a href="#cb26-10" aria-hidden="true" tabindex="-1"></a><span class="co">#      data = filter(res_q2_fm, pair_id != 5))</span></span>
+<span id="cb26-11"><a href="#cb26-11" aria-hidden="true" tabindex="-1"></a><span class="co"># mod.cm.fm.xq1xq5 &lt;- lmer(q2_error_cm ~ set*media*pair_id + (1|user_id/set:media),</span></span>
+<span id="cb26-12"><a href="#cb26-12" aria-hidden="true" tabindex="-1"></a><span class="co">#      data = filter(res_q2_fm, user_larger == true_larger &amp; pair_id != 5))</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb27"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a>all_models <span class="ot">&lt;-</span> <span class="fu">mget</span>(<span class="fu">ls</span>(<span class="at">pattern =</span> <span class="st">'^mod'</span>))</span>
-<span id="cb27-2"><a href="#cb27-2" aria-hidden="true" tabindex="-1"></a>all_em <span class="ot">&lt;-</span> <span class="fu">map</span>(all_models, \(x)(<span class="fu">emmeans</span>(x, <span class="sc">~</span>media<span class="sc">|</span>set<span class="sc">:</span>pair_id, <span class="at">pbkrtest.limit =</span> <span class="dv">5800</span>)))</span>
-<span id="cb27-3"><a href="#cb27-3" aria-hidden="true" tabindex="-1"></a>all_em_df <span class="ot">&lt;-</span> <span class="fu">map</span>(all_em, data.frame)</span>
-<span id="cb27-4"><a href="#cb27-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb27-5"><a href="#cb27-5" aria-hidden="true" tabindex="-1"></a>all_pairs <span class="ot">&lt;-</span> <span class="fu">map</span>(all_em, pairs)</span>
-<span id="cb27-6"><a href="#cb27-6" aria-hidden="true" tabindex="-1"></a>all_pairs_df <span class="ot">&lt;-</span> <span class="fu">map</span>(all_pairs, data.frame)</span>
-<span id="cb27-7"><a href="#cb27-7" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb27-8"><a href="#cb27-8" aria-hidden="true" tabindex="-1"></a><span class="co"># Parse model names into metadata</span></span>
-<span id="cb27-9"><a href="#cb27-9" aria-hidden="true" tabindex="-1"></a>parse_model_meta <span class="ot">&lt;-</span> <span class="cf">function</span>(name) {</span>
-<span id="cb27-10"><a href="#cb27-10" aria-hidden="true" tabindex="-1"></a>  parts <span class="ot">&lt;-</span> <span class="fu">str_split</span>(name, <span class="st">"</span><span class="sc">\\</span><span class="st">."</span>)[[<span class="dv">1</span>]]</span>
-<span id="cb27-11"><a href="#cb27-11" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> (parts[<span class="dv">2</span>] <span class="sc">==</span> <span class="st">"cm"</span>) {</span>
-<span id="cb27-12"><a href="#cb27-12" aria-hidden="true" tabindex="-1"></a>    <span class="fu">tibble</span>(<span class="at">scale =</span> <span class="st">"Log (CM)"</span>, <span class="at">participant_filter =</span> parts[<span class="dv">3</span>], <span class="at">response_filter =</span> parts[<span class="dv">4</span>])</span>
-<span id="cb27-13"><a href="#cb27-13" aria-hidden="true" tabindex="-1"></a>  } <span class="cf">else</span> {</span>
-<span id="cb27-14"><a href="#cb27-14" aria-hidden="true" tabindex="-1"></a>    <span class="fu">tibble</span>(<span class="at">scale =</span> <span class="st">"Slider"</span>, <span class="at">participant_filter =</span> parts[<span class="dv">2</span>], <span class="at">response_filter =</span> parts[<span class="dv">3</span>])</span>
-<span id="cb27-15"><a href="#cb27-15" aria-hidden="true" tabindex="-1"></a>  }</span>
-<span id="cb27-16"><a href="#cb27-16" aria-hidden="true" tabindex="-1"></a>}</span>
-<span id="cb27-17"><a href="#cb27-17" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb27-18"><a href="#cb27-18" aria-hidden="true" tabindex="-1"></a>pf_levels <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">"all"</span> <span class="ot">=</span> <span class="st">"All participants"</span>, <span class="st">"q1"</span> <span class="ot">=</span> <span class="st">"Q1 filtered"</span>, <span class="st">"fm"</span> <span class="ot">=</span> <span class="st">"FlexMix filtered"</span>)</span>
-<span id="cb27-19"><a href="#cb27-19" aria-hidden="true" tabindex="-1"></a>rf_levels <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">"all"</span> <span class="ot">=</span> <span class="st">"All responses"</span>, <span class="st">"xq1"</span> <span class="ot">=</span> <span class="st">"Excl. wrong Q1"</span>,</span>
-<span id="cb27-20"><a href="#cb27-20" aria-hidden="true" tabindex="-1"></a>               <span class="st">"xp5"</span> <span class="ot">=</span> <span class="st">"Excl. pair 5"</span>, <span class="st">"xq1xq5"</span> <span class="ot">=</span> <span class="st">"Excl. wrong Q1 &amp; pair 5"</span>)</span>
-<span id="cb27-21"><a href="#cb27-21" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb27-22"><a href="#cb27-22" aria-hidden="true" tabindex="-1"></a>model_meta <span class="ot">&lt;-</span> <span class="fu">map_dfr</span>(<span class="fu">names</span>(all_em_df), parse_model_meta, <span class="at">.id =</span> <span class="st">"model"</span>) <span class="sc">%&gt;%</span></span>
-<span id="cb27-23"><a href="#cb27-23" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">model =</span> <span class="fu">names</span>(all_em_df)[<span class="fu">as.integer</span>(model)],</span>
-<span id="cb27-24"><a href="#cb27-24" aria-hidden="true" tabindex="-1"></a>         <span class="at">participant_filter =</span> <span class="fu">factor</span>(participant_filter, <span class="at">levels =</span> <span class="fu">names</span>(pf_levels), <span class="at">labels =</span> pf_levels),</span>
-<span id="cb27-25"><a href="#cb27-25" aria-hidden="true" tabindex="-1"></a>         <span class="at">response_filter    =</span> <span class="fu">factor</span>(response_filter,    <span class="at">levels =</span> <span class="fu">names</span>(rf_levels), <span class="at">labels =</span> rf_levels))</span>
-<span id="cb27-26"><a href="#cb27-26" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb27-27"><a href="#cb27-27" aria-hidden="true" tabindex="-1"></a>all_em_combined <span class="ot">&lt;-</span> <span class="fu">bind_rows</span>(all_em_df, <span class="at">.id =</span> <span class="st">"model"</span>) <span class="sc">%&gt;%</span></span>
-<span id="cb27-28"><a href="#cb27-28" aria-hidden="true" tabindex="-1"></a>  <span class="fu">left_join</span>(model_meta, <span class="at">by =</span> <span class="st">"model"</span>)</span>
-<span id="cb27-29"><a href="#cb27-29" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb27-30"><a href="#cb27-30" aria-hidden="true" tabindex="-1"></a>all_pairs_combined <span class="ot">&lt;-</span> <span class="fu">bind_rows</span>(all_pairs_df, <span class="at">.id =</span> <span class="st">"model"</span>) <span class="sc">%&gt;%</span></span>
-<span id="cb27-31"><a href="#cb27-31" aria-hidden="true" tabindex="-1"></a>  <span class="fu">left_join</span>(model_meta, <span class="at">by =</span> <span class="st">"model"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb27"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a><span class="co"># all_models &lt;- mget(ls(pattern = '^mod'))</span></span>
+<span id="cb27-2"><a href="#cb27-2" aria-hidden="true" tabindex="-1"></a><span class="co"># all_em &lt;- map(all_models, \(x)(emmeans(x, ~media|set:pair_id, pbkrtest.limit = 5800)))</span></span>
+<span id="cb27-3"><a href="#cb27-3" aria-hidden="true" tabindex="-1"></a><span class="co"># all_em_df &lt;- map(all_em, data.frame)</span></span>
+<span id="cb27-4"><a href="#cb27-4" aria-hidden="true" tabindex="-1"></a><span class="co"># </span></span>
+<span id="cb27-5"><a href="#cb27-5" aria-hidden="true" tabindex="-1"></a><span class="co"># all_pairs &lt;- map(all_em, pairs)</span></span>
+<span id="cb27-6"><a href="#cb27-6" aria-hidden="true" tabindex="-1"></a><span class="co"># all_pairs_df &lt;- map(all_pairs, data.frame)</span></span>
+<span id="cb27-7"><a href="#cb27-7" aria-hidden="true" tabindex="-1"></a><span class="co"># </span></span>
+<span id="cb27-8"><a href="#cb27-8" aria-hidden="true" tabindex="-1"></a><span class="co"># # Parse model names into metadata</span></span>
+<span id="cb27-9"><a href="#cb27-9" aria-hidden="true" tabindex="-1"></a><span class="co"># parse_model_meta &lt;- function(name) {</span></span>
+<span id="cb27-10"><a href="#cb27-10" aria-hidden="true" tabindex="-1"></a><span class="co">#   parts &lt;- str_split(name, "\\.")[[1]]</span></span>
+<span id="cb27-11"><a href="#cb27-11" aria-hidden="true" tabindex="-1"></a><span class="co">#   if (parts[2] == "cm") {</span></span>
+<span id="cb27-12"><a href="#cb27-12" aria-hidden="true" tabindex="-1"></a><span class="co">#     tibble(scale = "Log (CM)", participant_filter = parts[3], response_filter = parts[4])</span></span>
+<span id="cb27-13"><a href="#cb27-13" aria-hidden="true" tabindex="-1"></a><span class="co">#   } else {</span></span>
+<span id="cb27-14"><a href="#cb27-14" aria-hidden="true" tabindex="-1"></a><span class="co">#     tibble(scale = "Slider", participant_filter = parts[2], response_filter = parts[3])</span></span>
+<span id="cb27-15"><a href="#cb27-15" aria-hidden="true" tabindex="-1"></a><span class="co">#   }</span></span>
+<span id="cb27-16"><a href="#cb27-16" aria-hidden="true" tabindex="-1"></a><span class="co"># }</span></span>
+<span id="cb27-17"><a href="#cb27-17" aria-hidden="true" tabindex="-1"></a><span class="co"># </span></span>
+<span id="cb27-18"><a href="#cb27-18" aria-hidden="true" tabindex="-1"></a><span class="co"># pf_levels &lt;- c("all" = "All participants", "q1" = "Q1 filtered", "fm" = "FlexMix filtered")</span></span>
+<span id="cb27-19"><a href="#cb27-19" aria-hidden="true" tabindex="-1"></a><span class="co"># rf_levels &lt;- c("all" = "All responses", "xq1" = "Excl. wrong Q1",</span></span>
+<span id="cb27-20"><a href="#cb27-20" aria-hidden="true" tabindex="-1"></a><span class="co">#                "xp5" = "Excl. pair 5", "xq1xq5" = "Excl. wrong Q1 &amp; pair 5")</span></span>
+<span id="cb27-21"><a href="#cb27-21" aria-hidden="true" tabindex="-1"></a><span class="co"># </span></span>
+<span id="cb27-22"><a href="#cb27-22" aria-hidden="true" tabindex="-1"></a><span class="co"># model_meta &lt;- map_dfr(names(all_em_df), parse_model_meta, .id = "model") %&gt;%</span></span>
+<span id="cb27-23"><a href="#cb27-23" aria-hidden="true" tabindex="-1"></a><span class="co">#   mutate(model = names(all_em_df)[as.integer(model)],</span></span>
+<span id="cb27-24"><a href="#cb27-24" aria-hidden="true" tabindex="-1"></a><span class="co">#          participant_filter = factor(participant_filter, levels = names(pf_levels), labels = pf_levels),</span></span>
+<span id="cb27-25"><a href="#cb27-25" aria-hidden="true" tabindex="-1"></a><span class="co">#          response_filter    = factor(response_filter,    levels = names(rf_levels), labels = rf_levels))</span></span>
+<span id="cb27-26"><a href="#cb27-26" aria-hidden="true" tabindex="-1"></a><span class="co"># </span></span>
+<span id="cb27-27"><a href="#cb27-27" aria-hidden="true" tabindex="-1"></a><span class="co"># all_em_combined &lt;- bind_rows(all_em_df, .id = "model") %&gt;%</span></span>
+<span id="cb27-28"><a href="#cb27-28" aria-hidden="true" tabindex="-1"></a><span class="co">#   left_join(model_meta, by = "model")</span></span>
+<span id="cb27-29"><a href="#cb27-29" aria-hidden="true" tabindex="-1"></a><span class="co"># </span></span>
+<span id="cb27-30"><a href="#cb27-30" aria-hidden="true" tabindex="-1"></a><span class="co"># all_pairs_combined &lt;- bind_rows(all_pairs_df, .id = "model") %&gt;%</span></span>
+<span id="cb27-31"><a href="#cb27-31" aria-hidden="true" tabindex="-1"></a><span class="co">#   left_join(model_meta, by = "model")</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>To look at the differences of the models, separating by the response filter would probably be the most meaningful. This is because these exclusions have conceptual meaning. For example, removing incorrect Q1 responses could be used as an attention check for most trials, similar to Cleveland and McGill.</p>
 </section>
 <section id="slider-error" class="level3">
 <h3 class="anchored" data-anchor-id="slider-error">Slider Error</h3>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb28"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a>all_em_combined <span class="sc">%&gt;%</span> </span>
-<span id="cb28-2"><a href="#cb28-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(scale <span class="sc">==</span> <span class="st">'Slider'</span>, response_filter <span class="sc">==</span> <span class="st">'All responses'</span>) <span class="sc">%&gt;%</span> </span>
-<span id="cb28-3"><a href="#cb28-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="at">mapping =</span> <span class="fu">aes</span>(<span class="at">x =</span> media, <span class="at">y =</span> emmean, <span class="at">color =</span> participant_filter, <span class="at">group =</span> participant_filter)) <span class="sc">+</span> </span>
-<span id="cb28-4"><a href="#cb28-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="at">position =</span> <span class="fu">position_dodge2</span>()) <span class="sc">+</span> </span>
-<span id="cb28-5"><a href="#cb28-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_errorbar</span>(<span class="fu">aes</span>(<span class="at">ymin =</span> lower.CL, <span class="at">ymax =</span> upper.CL), <span class="at">width =</span> <span class="dv">0</span>) <span class="sc">+</span> </span>
-<span id="cb28-6"><a href="#cb28-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">facet_grid</span>(set<span class="sc">~</span>pair_id) <span class="sc">+</span> </span>
-<span id="cb28-7"><a href="#cb28-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">'Slider Error: All responses'</span>, <span class="at">x =</span> <span class="st">'Media'</span>, <span class="at">y =</span> <span class="st">'Estimated Mean Error'</span>, <span class="at">color =</span> <span class="st">'Participant filter'</span>) <span class="sc">+</span></span>
-<span id="cb28-8"><a href="#cb28-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">aspect.ratio =</span> <span class="dv">3</span>, <span class="at">axis.text.x =</span> <span class="fu">element_text</span>(<span class="at">angle =</span> <span class="dv">90</span>, <span class="at">hjust =</span> <span class="dv">1</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output-display">
-<div>
-<figure class="figure">
-<p><img src="models_files/figure-html/unnamed-chunk-18-1.png" class="img-fluid figure-img" width="672"></p>
-</figure>
-</div>
-</div>
+<div class="sourceCode cell-code" id="cb28"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a><span class="co"># all_em_combined %&gt;% </span></span>
+<span id="cb28-2"><a href="#cb28-2" aria-hidden="true" tabindex="-1"></a><span class="co">#   filter(scale == 'Slider', response_filter == 'All responses') %&gt;% </span></span>
+<span id="cb28-3"><a href="#cb28-3" aria-hidden="true" tabindex="-1"></a><span class="co">#   ggplot(mapping = aes(x = media, y = emmean, color = participant_filter, group = participant_filter)) + </span></span>
+<span id="cb28-4"><a href="#cb28-4" aria-hidden="true" tabindex="-1"></a><span class="co">#   geom_point(position = position_dodge2()) + </span></span>
+<span id="cb28-5"><a href="#cb28-5" aria-hidden="true" tabindex="-1"></a><span class="co">#   geom_errorbar(aes(ymin = lower.CL, ymax = upper.CL), width = 0) + </span></span>
+<span id="cb28-6"><a href="#cb28-6" aria-hidden="true" tabindex="-1"></a><span class="co">#   facet_grid(set~pair_id) + </span></span>
+<span id="cb28-7"><a href="#cb28-7" aria-hidden="true" tabindex="-1"></a><span class="co">#   labs(title = 'Slider Error: All responses', x = 'Media', y = 'Estimated Mean Error', color = 'Participant filter') +</span></span>
+<span id="cb28-8"><a href="#cb28-8" aria-hidden="true" tabindex="-1"></a><span class="co">#   theme(aspect.ratio = 3, axis.text.x = element_text(angle = 90, hjust = 1))</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb29"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a>all_em_combined <span class="sc">%&gt;%</span> </span>
-<span id="cb29-2"><a href="#cb29-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(scale <span class="sc">==</span> <span class="st">'Slider'</span>, response_filter <span class="sc">==</span> <span class="st">'Excl. wrong Q1'</span>) <span class="sc">%&gt;%</span> </span>
-<span id="cb29-3"><a href="#cb29-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="at">mapping =</span> <span class="fu">aes</span>(<span class="at">x =</span> media, <span class="at">y =</span> emmean, <span class="at">color =</span> participant_filter, <span class="at">group =</span> participant_filter)) <span class="sc">+</span> </span>
-<span id="cb29-4"><a href="#cb29-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="at">position =</span> <span class="fu">position_dodge2</span>()) <span class="sc">+</span> </span>
-<span id="cb29-5"><a href="#cb29-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_errorbar</span>(<span class="fu">aes</span>(<span class="at">ymin =</span> lower.CL, <span class="at">ymax =</span> upper.CL), <span class="at">width =</span> <span class="dv">0</span>) <span class="sc">+</span> </span>
-<span id="cb29-6"><a href="#cb29-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">facet_grid</span>(set<span class="sc">~</span>pair_id) <span class="sc">+</span> </span>
-<span id="cb29-7"><a href="#cb29-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">'Slider Error: Excluding incorrect Q1 responses'</span>, <span class="at">x =</span> <span class="st">'Media'</span>, <span class="at">y =</span> <span class="st">'Estimated Mean Error'</span>, <span class="at">color =</span> <span class="st">'Participant filter'</span>) <span class="sc">+</span></span>
-<span id="cb29-8"><a href="#cb29-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">aspect.ratio =</span> <span class="dv">3</span>, <span class="at">axis.text.x =</span> <span class="fu">element_text</span>(<span class="at">angle =</span> <span class="dv">90</span>, <span class="at">hjust =</span> <span class="dv">1</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output-display">
-<div>
-<figure class="figure">
-<p><img src="models_files/figure-html/unnamed-chunk-19-1.png" class="img-fluid figure-img" width="672"></p>
-</figure>
-</div>
-</div>
+<div class="sourceCode cell-code" id="cb29"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a><span class="co"># all_em_combined %&gt;% </span></span>
+<span id="cb29-2"><a href="#cb29-2" aria-hidden="true" tabindex="-1"></a><span class="co">#   filter(scale == 'Slider', response_filter == 'Excl. wrong Q1') %&gt;% </span></span>
+<span id="cb29-3"><a href="#cb29-3" aria-hidden="true" tabindex="-1"></a><span class="co">#   ggplot(mapping = aes(x = media, y = emmean, color = participant_filter, group = participant_filter)) + </span></span>
+<span id="cb29-4"><a href="#cb29-4" aria-hidden="true" tabindex="-1"></a><span class="co">#   geom_point(position = position_dodge2()) + </span></span>
+<span id="cb29-5"><a href="#cb29-5" aria-hidden="true" tabindex="-1"></a><span class="co">#   geom_errorbar(aes(ymin = lower.CL, ymax = upper.CL), width = 0) + </span></span>
+<span id="cb29-6"><a href="#cb29-6" aria-hidden="true" tabindex="-1"></a><span class="co">#   facet_grid(set~pair_id) + </span></span>
+<span id="cb29-7"><a href="#cb29-7" aria-hidden="true" tabindex="-1"></a><span class="co">#   labs(title = 'Slider Error: Excluding incorrect Q1 responses', x = 'Media', y = 'Estimated Mean Error', color = 'Participant filter') +</span></span>
+<span id="cb29-8"><a href="#cb29-8" aria-hidden="true" tabindex="-1"></a><span class="co">#   theme(aspect.ratio = 3, axis.text.x = element_text(angle = 90, hjust = 1))</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb30"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a>all_em_combined <span class="sc">%&gt;%</span> </span>
-<span id="cb30-2"><a href="#cb30-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(scale <span class="sc">==</span> <span class="st">'Slider'</span>, response_filter <span class="sc">==</span> <span class="st">'Excl. pair 5'</span>) <span class="sc">%&gt;%</span> </span>
-<span id="cb30-3"><a href="#cb30-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="at">mapping =</span> <span class="fu">aes</span>(<span class="at">x =</span> media, <span class="at">y =</span> emmean, <span class="at">color =</span> participant_filter, <span class="at">group =</span> participant_filter)) <span class="sc">+</span> </span>
-<span id="cb30-4"><a href="#cb30-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="at">position =</span> <span class="fu">position_dodge2</span>()) <span class="sc">+</span> </span>
-<span id="cb30-5"><a href="#cb30-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_errorbar</span>(<span class="fu">aes</span>(<span class="at">ymin =</span> lower.CL, <span class="at">ymax =</span> upper.CL), <span class="at">width =</span> <span class="dv">0</span>) <span class="sc">+</span> </span>
-<span id="cb30-6"><a href="#cb30-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">facet_grid</span>(set<span class="sc">~</span>pair_id) <span class="sc">+</span> </span>
-<span id="cb30-7"><a href="#cb30-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">'Slider Error: Excluding pair 5'</span>, <span class="at">x =</span> <span class="st">'Media'</span>, <span class="at">y =</span> <span class="st">'Estimated Mean Error'</span>, <span class="at">color =</span> <span class="st">'Participant filter'</span>) <span class="sc">+</span></span>
-<span id="cb30-8"><a href="#cb30-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">aspect.ratio =</span> <span class="dv">3</span>, <span class="at">axis.text.x =</span> <span class="fu">element_text</span>(<span class="at">angle =</span> <span class="dv">90</span>, <span class="at">hjust =</span> <span class="dv">1</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output-display">
-<div>
-<figure class="figure">
-<p><img src="models_files/figure-html/unnamed-chunk-20-1.png" class="img-fluid figure-img" width="672"></p>
-</figure>
-</div>
-</div>
+<div class="sourceCode cell-code" id="cb30"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a><span class="co"># all_em_combined %&gt;% </span></span>
+<span id="cb30-2"><a href="#cb30-2" aria-hidden="true" tabindex="-1"></a><span class="co">#   filter(scale == 'Slider', response_filter == 'Excl. pair 5') %&gt;% </span></span>
+<span id="cb30-3"><a href="#cb30-3" aria-hidden="true" tabindex="-1"></a><span class="co">#   ggplot(mapping = aes(x = media, y = emmean, color = participant_filter, group = participant_filter)) + </span></span>
+<span id="cb30-4"><a href="#cb30-4" aria-hidden="true" tabindex="-1"></a><span class="co">#   geom_point(position = position_dodge2()) + </span></span>
+<span id="cb30-5"><a href="#cb30-5" aria-hidden="true" tabindex="-1"></a><span class="co">#   geom_errorbar(aes(ymin = lower.CL, ymax = upper.CL), width = 0) + </span></span>
+<span id="cb30-6"><a href="#cb30-6" aria-hidden="true" tabindex="-1"></a><span class="co">#   facet_grid(set~pair_id) + </span></span>
+<span id="cb30-7"><a href="#cb30-7" aria-hidden="true" tabindex="-1"></a><span class="co">#   labs(title = 'Slider Error: Excluding pair 5', x = 'Media', y = 'Estimated Mean Error', color = 'Participant filter') +</span></span>
+<span id="cb30-8"><a href="#cb30-8" aria-hidden="true" tabindex="-1"></a><span class="co">#   theme(aspect.ratio = 3, axis.text.x = element_text(angle = 90, hjust = 1))</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb31"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a>all_em_combined <span class="sc">%&gt;%</span> </span>
-<span id="cb31-2"><a href="#cb31-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(scale <span class="sc">==</span> <span class="st">'Slider'</span>, response_filter <span class="sc">==</span> <span class="st">'Excl. wrong Q1 &amp; pair 5'</span>) <span class="sc">%&gt;%</span> </span>
-<span id="cb31-3"><a href="#cb31-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="at">mapping =</span> <span class="fu">aes</span>(<span class="at">x =</span> media, <span class="at">y =</span> emmean, <span class="at">color =</span> participant_filter, <span class="at">group =</span> participant_filter)) <span class="sc">+</span> </span>
-<span id="cb31-4"><a href="#cb31-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="at">position =</span> <span class="fu">position_dodge2</span>()) <span class="sc">+</span> </span>
-<span id="cb31-5"><a href="#cb31-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_errorbar</span>(<span class="fu">aes</span>(<span class="at">ymin =</span> lower.CL, <span class="at">ymax =</span> upper.CL), <span class="at">width =</span> <span class="dv">0</span>) <span class="sc">+</span> </span>
-<span id="cb31-6"><a href="#cb31-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">facet_grid</span>(set<span class="sc">~</span>pair_id) <span class="sc">+</span> </span>
-<span id="cb31-7"><a href="#cb31-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">'Slider Error: Excluding incorrect Q1 responses and pair 5'</span>, <span class="at">x =</span> <span class="st">'Media'</span>, <span class="at">y =</span> <span class="st">'Estimated Mean Error'</span>, <span class="at">color =</span> <span class="st">'Participant filter'</span>) <span class="sc">+</span></span>
-<span id="cb31-8"><a href="#cb31-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">aspect.ratio =</span> <span class="dv">3</span>, <span class="at">axis.text.x =</span> <span class="fu">element_text</span>(<span class="at">angle =</span> <span class="dv">90</span>, <span class="at">hjust =</span> <span class="dv">1</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output-display">
-<div>
-<figure class="figure">
-<p><img src="models_files/figure-html/unnamed-chunk-21-1.png" class="img-fluid figure-img" width="672"></p>
-</figure>
-</div>
-</div>
+<div class="sourceCode cell-code" id="cb31"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a><span class="co"># all_em_combined %&gt;% </span></span>
+<span id="cb31-2"><a href="#cb31-2" aria-hidden="true" tabindex="-1"></a><span class="co">#   filter(scale == 'Slider', response_filter == 'Excl. wrong Q1 &amp; pair 5') %&gt;% </span></span>
+<span id="cb31-3"><a href="#cb31-3" aria-hidden="true" tabindex="-1"></a><span class="co">#   ggplot(mapping = aes(x = media, y = emmean, color = participant_filter, group = participant_filter)) + </span></span>
+<span id="cb31-4"><a href="#cb31-4" aria-hidden="true" tabindex="-1"></a><span class="co">#   geom_point(position = position_dodge2()) + </span></span>
+<span id="cb31-5"><a href="#cb31-5" aria-hidden="true" tabindex="-1"></a><span class="co">#   geom_errorbar(aes(ymin = lower.CL, ymax = upper.CL), width = 0) + </span></span>
+<span id="cb31-6"><a href="#cb31-6" aria-hidden="true" tabindex="-1"></a><span class="co">#   facet_grid(set~pair_id) + </span></span>
+<span id="cb31-7"><a href="#cb31-7" aria-hidden="true" tabindex="-1"></a><span class="co">#   labs(title = 'Slider Error: Excluding incorrect Q1 responses and pair 5', x = 'Media', y = 'Estimated Mean Error', color = 'Participant filter') +</span></span>
+<span id="cb31-8"><a href="#cb31-8" aria-hidden="true" tabindex="-1"></a><span class="co">#   theme(aspect.ratio = 3, axis.text.x = element_text(angle = 90, hjust = 1))</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>The main takeaway from the models above is that there is more down-weighted error when using all participants and filtering out the likely random guessers from Q1. Not much difference exists between those groups. However, trends do appear to be mostly similar across the models.</p>
 </section>
 <section id="log-error" class="level3">
 <h3 class="anchored" data-anchor-id="log-error">Log error</h3>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb32"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a>all_em_combined <span class="sc">%&gt;%</span> </span>
-<span id="cb32-2"><a href="#cb32-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(scale <span class="sc">==</span> <span class="st">'Log (CM)'</span>, response_filter <span class="sc">==</span> <span class="st">'All responses'</span>) <span class="sc">%&gt;%</span> </span>
-<span id="cb32-3"><a href="#cb32-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="at">mapping =</span> <span class="fu">aes</span>(<span class="at">x =</span> media, <span class="at">y =</span> emmean, <span class="at">color =</span> participant_filter, <span class="at">group =</span> participant_filter)) <span class="sc">+</span> </span>
-<span id="cb32-4"><a href="#cb32-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="at">position =</span> <span class="fu">position_dodge2</span>()) <span class="sc">+</span> </span>
-<span id="cb32-5"><a href="#cb32-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_errorbar</span>(<span class="fu">aes</span>(<span class="at">ymin =</span> lower.CL, <span class="at">ymax =</span> upper.CL), <span class="at">width =</span> <span class="dv">0</span>) <span class="sc">+</span> </span>
-<span id="cb32-6"><a href="#cb32-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">facet_grid</span>(set<span class="sc">~</span>pair_id) <span class="sc">+</span> </span>
-<span id="cb32-7"><a href="#cb32-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">'Log (CM) Error: All responses'</span>, <span class="at">x =</span> <span class="st">'Media'</span>, <span class="at">y =</span> <span class="st">'Estimated Mean Error (log scale)'</span>, <span class="at">color =</span> <span class="st">'Participant filter'</span>) <span class="sc">+</span></span>
-<span id="cb32-8"><a href="#cb32-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">aspect.ratio =</span> <span class="dv">3</span>, <span class="at">axis.text.x =</span> <span class="fu">element_text</span>(<span class="at">angle =</span> <span class="dv">90</span>, <span class="at">hjust =</span> <span class="dv">1</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output-display">
-<div>
-<figure class="figure">
-<p><img src="models_files/figure-html/unnamed-chunk-22-1.png" class="img-fluid figure-img" width="672"></p>
-</figure>
-</div>
-</div>
+<div class="sourceCode cell-code" id="cb32"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a><span class="co"># all_em_combined %&gt;% </span></span>
+<span id="cb32-2"><a href="#cb32-2" aria-hidden="true" tabindex="-1"></a><span class="co">#   filter(scale == 'Log (CM)', response_filter == 'All responses') %&gt;% </span></span>
+<span id="cb32-3"><a href="#cb32-3" aria-hidden="true" tabindex="-1"></a><span class="co">#   ggplot(mapping = aes(x = media, y = emmean, color = participant_filter, group = participant_filter)) + </span></span>
+<span id="cb32-4"><a href="#cb32-4" aria-hidden="true" tabindex="-1"></a><span class="co">#   geom_point(position = position_dodge2()) + </span></span>
+<span id="cb32-5"><a href="#cb32-5" aria-hidden="true" tabindex="-1"></a><span class="co">#   geom_errorbar(aes(ymin = lower.CL, ymax = upper.CL), width = 0) + </span></span>
+<span id="cb32-6"><a href="#cb32-6" aria-hidden="true" tabindex="-1"></a><span class="co">#   facet_grid(set~pair_id) + </span></span>
+<span id="cb32-7"><a href="#cb32-7" aria-hidden="true" tabindex="-1"></a><span class="co">#   labs(title = 'Log (CM) Error: All responses', x = 'Media', y = 'Estimated Mean Error (log scale)', color = 'Participant filter') +</span></span>
+<span id="cb32-8"><a href="#cb32-8" aria-hidden="true" tabindex="-1"></a><span class="co">#   theme(aspect.ratio = 3, axis.text.x = element_text(angle = 90, hjust = 1))</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb33"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb33-1"><a href="#cb33-1" aria-hidden="true" tabindex="-1"></a>all_em_combined <span class="sc">%&gt;%</span> </span>
-<span id="cb33-2"><a href="#cb33-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(scale <span class="sc">==</span> <span class="st">'Log (CM)'</span>, response_filter <span class="sc">==</span> <span class="st">'Excl. wrong Q1'</span>) <span class="sc">%&gt;%</span> </span>
-<span id="cb33-3"><a href="#cb33-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="at">mapping =</span> <span class="fu">aes</span>(<span class="at">x =</span> media, <span class="at">y =</span> emmean, <span class="at">color =</span> participant_filter, <span class="at">group =</span> participant_filter)) <span class="sc">+</span> </span>
-<span id="cb33-4"><a href="#cb33-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="at">position =</span> <span class="fu">position_dodge2</span>()) <span class="sc">+</span> </span>
-<span id="cb33-5"><a href="#cb33-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_errorbar</span>(<span class="fu">aes</span>(<span class="at">ymin =</span> lower.CL, <span class="at">ymax =</span> upper.CL), <span class="at">width =</span> <span class="dv">0</span>) <span class="sc">+</span> </span>
-<span id="cb33-6"><a href="#cb33-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">facet_grid</span>(set<span class="sc">~</span>pair_id) <span class="sc">+</span> </span>
-<span id="cb33-7"><a href="#cb33-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">'Log (CM) Error: Excluding incorrect Q1 responses'</span>, <span class="at">x =</span> <span class="st">'Media'</span>, <span class="at">y =</span> <span class="st">'Estimated Mean Error (log scale)'</span>, <span class="at">color =</span> <span class="st">'Participant filter'</span>) <span class="sc">+</span></span>
-<span id="cb33-8"><a href="#cb33-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">aspect.ratio =</span> <span class="dv">3</span>, <span class="at">axis.text.x =</span> <span class="fu">element_text</span>(<span class="at">angle =</span> <span class="dv">90</span>, <span class="at">hjust =</span> <span class="dv">1</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output-display">
-<div>
-<figure class="figure">
-<p><img src="models_files/figure-html/unnamed-chunk-23-1.png" class="img-fluid figure-img" width="672"></p>
-</figure>
-</div>
-</div>
+<div class="sourceCode cell-code" id="cb33"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb33-1"><a href="#cb33-1" aria-hidden="true" tabindex="-1"></a><span class="co"># all_em_combined %&gt;% </span></span>
+<span id="cb33-2"><a href="#cb33-2" aria-hidden="true" tabindex="-1"></a><span class="co">#   filter(scale == 'Log (CM)', response_filter == 'Excl. wrong Q1') %&gt;% </span></span>
+<span id="cb33-3"><a href="#cb33-3" aria-hidden="true" tabindex="-1"></a><span class="co">#   ggplot(mapping = aes(x = media, y = emmean, color = participant_filter, group = participant_filter)) + </span></span>
+<span id="cb33-4"><a href="#cb33-4" aria-hidden="true" tabindex="-1"></a><span class="co">#   geom_point(position = position_dodge2()) + </span></span>
+<span id="cb33-5"><a href="#cb33-5" aria-hidden="true" tabindex="-1"></a><span class="co">#   geom_errorbar(aes(ymin = lower.CL, ymax = upper.CL), width = 0) + </span></span>
+<span id="cb33-6"><a href="#cb33-6" aria-hidden="true" tabindex="-1"></a><span class="co">#   facet_grid(set~pair_id) + </span></span>
+<span id="cb33-7"><a href="#cb33-7" aria-hidden="true" tabindex="-1"></a><span class="co">#   labs(title = 'Log (CM) Error: Excluding incorrect Q1 responses', x = 'Media', y = 'Estimated Mean Error (log scale)', color = 'Participant filter') +</span></span>
+<span id="cb33-8"><a href="#cb33-8" aria-hidden="true" tabindex="-1"></a><span class="co">#   theme(aspect.ratio = 3, axis.text.x = element_text(angle = 90, hjust = 1))</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb34"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb34-1"><a href="#cb34-1" aria-hidden="true" tabindex="-1"></a>all_em_combined <span class="sc">%&gt;%</span> </span>
-<span id="cb34-2"><a href="#cb34-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(scale <span class="sc">==</span> <span class="st">'Log (CM)'</span>, response_filter <span class="sc">==</span> <span class="st">'Excl. pair 5'</span>) <span class="sc">%&gt;%</span> </span>
-<span id="cb34-3"><a href="#cb34-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="at">mapping =</span> <span class="fu">aes</span>(<span class="at">x =</span> media, <span class="at">y =</span> emmean, <span class="at">color =</span> participant_filter, <span class="at">group =</span> participant_filter)) <span class="sc">+</span> </span>
-<span id="cb34-4"><a href="#cb34-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="at">position =</span> <span class="fu">position_dodge2</span>()) <span class="sc">+</span> </span>
-<span id="cb34-5"><a href="#cb34-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_errorbar</span>(<span class="fu">aes</span>(<span class="at">ymin =</span> lower.CL, <span class="at">ymax =</span> upper.CL), <span class="at">width =</span> <span class="dv">0</span>) <span class="sc">+</span> </span>
-<span id="cb34-6"><a href="#cb34-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">facet_grid</span>(set<span class="sc">~</span>pair_id) <span class="sc">+</span> </span>
-<span id="cb34-7"><a href="#cb34-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">'Log (CM) Error: Excluding pair 5'</span>, <span class="at">x =</span> <span class="st">'Media'</span>, <span class="at">y =</span> <span class="st">'Estimated Mean Error (log scale)'</span>, <span class="at">color =</span> <span class="st">'Participant filter'</span>) <span class="sc">+</span></span>
-<span id="cb34-8"><a href="#cb34-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">aspect.ratio =</span> <span class="dv">3</span>, <span class="at">axis.text.x =</span> <span class="fu">element_text</span>(<span class="at">angle =</span> <span class="dv">90</span>, <span class="at">hjust =</span> <span class="dv">1</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output-display">
-<div>
-<figure class="figure">
-<p><img src="models_files/figure-html/unnamed-chunk-24-1.png" class="img-fluid figure-img" width="672"></p>
-</figure>
-</div>
-</div>
+<div class="sourceCode cell-code" id="cb34"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb34-1"><a href="#cb34-1" aria-hidden="true" tabindex="-1"></a><span class="co"># all_em_combined %&gt;% </span></span>
+<span id="cb34-2"><a href="#cb34-2" aria-hidden="true" tabindex="-1"></a><span class="co">#   filter(scale == 'Log (CM)', response_filter == 'Excl. pair 5') %&gt;% </span></span>
+<span id="cb34-3"><a href="#cb34-3" aria-hidden="true" tabindex="-1"></a><span class="co">#   ggplot(mapping = aes(x = media, y = emmean, color = participant_filter, group = participant_filter)) + </span></span>
+<span id="cb34-4"><a href="#cb34-4" aria-hidden="true" tabindex="-1"></a><span class="co">#   geom_point(position = position_dodge2()) + </span></span>
+<span id="cb34-5"><a href="#cb34-5" aria-hidden="true" tabindex="-1"></a><span class="co">#   geom_errorbar(aes(ymin = lower.CL, ymax = upper.CL), width = 0) + </span></span>
+<span id="cb34-6"><a href="#cb34-6" aria-hidden="true" tabindex="-1"></a><span class="co">#   facet_grid(set~pair_id) + </span></span>
+<span id="cb34-7"><a href="#cb34-7" aria-hidden="true" tabindex="-1"></a><span class="co">#   labs(title = 'Log (CM) Error: Excluding pair 5', x = 'Media', y = 'Estimated Mean Error (log scale)', color = 'Participant filter') +</span></span>
+<span id="cb34-8"><a href="#cb34-8" aria-hidden="true" tabindex="-1"></a><span class="co">#   theme(aspect.ratio = 3, axis.text.x = element_text(angle = 90, hjust = 1))</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb35"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb35-1"><a href="#cb35-1" aria-hidden="true" tabindex="-1"></a>all_em_combined <span class="sc">%&gt;%</span> </span>
-<span id="cb35-2"><a href="#cb35-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(scale <span class="sc">==</span> <span class="st">'Log (CM)'</span>, response_filter <span class="sc">==</span> <span class="st">'Excl. wrong Q1 &amp; pair 5'</span>) <span class="sc">%&gt;%</span> </span>
-<span id="cb35-3"><a href="#cb35-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="at">mapping =</span> <span class="fu">aes</span>(<span class="at">x =</span> media, <span class="at">y =</span> emmean, <span class="at">color =</span> participant_filter, <span class="at">group =</span> participant_filter)) <span class="sc">+</span> </span>
-<span id="cb35-4"><a href="#cb35-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="at">position =</span> <span class="fu">position_dodge2</span>()) <span class="sc">+</span> </span>
-<span id="cb35-5"><a href="#cb35-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_errorbar</span>(<span class="fu">aes</span>(<span class="at">ymin =</span> lower.CL, <span class="at">ymax =</span> upper.CL), <span class="at">width =</span> <span class="dv">0</span>) <span class="sc">+</span> </span>
-<span id="cb35-6"><a href="#cb35-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">facet_grid</span>(set<span class="sc">~</span>pair_id) <span class="sc">+</span> </span>
-<span id="cb35-7"><a href="#cb35-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">'Log (CM) Error: Excluding incorrect Q1 responses and pair 5'</span>, <span class="at">x =</span> <span class="st">'Media'</span>, <span class="at">y =</span> <span class="st">'Estimated Mean Error (log scale)'</span>, <span class="at">color =</span> <span class="st">'Participant filter'</span>) <span class="sc">+</span></span>
-<span id="cb35-8"><a href="#cb35-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">aspect.ratio =</span> <span class="dv">3</span>, <span class="at">axis.text.x =</span> <span class="fu">element_text</span>(<span class="at">angle =</span> <span class="dv">90</span>, <span class="at">hjust =</span> <span class="dv">1</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output-display">
-<div>
-<figure class="figure">
-<p><img src="models_files/figure-html/unnamed-chunk-25-1.png" class="img-fluid figure-img" width="672"></p>
-</figure>
-</div>
-</div>
+<div class="sourceCode cell-code" id="cb35"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb35-1"><a href="#cb35-1" aria-hidden="true" tabindex="-1"></a><span class="co"># all_em_combined %&gt;% </span></span>
+<span id="cb35-2"><a href="#cb35-2" aria-hidden="true" tabindex="-1"></a><span class="co">#   filter(scale == 'Log (CM)', response_filter == 'Excl. wrong Q1 &amp; pair 5') %&gt;% </span></span>
+<span id="cb35-3"><a href="#cb35-3" aria-hidden="true" tabindex="-1"></a><span class="co">#   ggplot(mapping = aes(x = media, y = emmean, color = participant_filter, group = participant_filter)) + </span></span>
+<span id="cb35-4"><a href="#cb35-4" aria-hidden="true" tabindex="-1"></a><span class="co">#   geom_point(position = position_dodge2()) + </span></span>
+<span id="cb35-5"><a href="#cb35-5" aria-hidden="true" tabindex="-1"></a><span class="co">#   geom_errorbar(aes(ymin = lower.CL, ymax = upper.CL), width = 0) + </span></span>
+<span id="cb35-6"><a href="#cb35-6" aria-hidden="true" tabindex="-1"></a><span class="co">#   facet_grid(set~pair_id) + </span></span>
+<span id="cb35-7"><a href="#cb35-7" aria-hidden="true" tabindex="-1"></a><span class="co">#   labs(title = 'Log (CM) Error: Excluding incorrect Q1 responses and pair 5', x = 'Media', y = 'Estimated Mean Error (log scale)', color = 'Participant filter') +</span></span>
+<span id="cb35-8"><a href="#cb35-8" aria-hidden="true" tabindex="-1"></a><span class="co">#   theme(aspect.ratio = 3, axis.text.x = element_text(angle = 90, hjust = 1))</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>Again, we see similar patterns to that of slider error. By filtering based on clustering, there is smaller error.</p>
 </section>
@@ -839,344 +756,34 @@ Y_{CM}=\log_2(|\text{Slider}-\text{True Ratio}|+1/8)
 <h3 class="anchored" data-anchor-id="significance-of-results">Significance of results</h3>
 <p>In the following tables, the counts of significant simple effects for media types are constructed. Significance is defined in the usual fashion with <span class="math inline">\(\alpha=0.05\)</span></p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb36"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb36-1"><a href="#cb36-1" aria-hidden="true" tabindex="-1"></a>sig_summary <span class="ot">&lt;-</span> all_pairs_combined <span class="sc">%&gt;%</span></span>
-<span id="cb36-2"><a href="#cb36-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(scale, contrast, set, pair_id) <span class="sc">%&gt;%</span></span>
-<span id="cb36-3"><a href="#cb36-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(</span>
-<span id="cb36-4"><a href="#cb36-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">n_pos  =</span> <span class="fu">sum</span>(p.value <span class="sc">&lt;</span> <span class="fl">0.05</span> <span class="sc">&amp;</span> estimate <span class="sc">&gt;</span> <span class="dv">0</span>),</span>
-<span id="cb36-5"><a href="#cb36-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">n_neg  =</span> <span class="fu">sum</span>(p.value <span class="sc">&lt;</span> <span class="fl">0.05</span> <span class="sc">&amp;</span> estimate <span class="sc">&lt;</span> <span class="dv">0</span>),</span>
-<span id="cb36-6"><a href="#cb36-6" aria-hidden="true" tabindex="-1"></a>    <span class="at">n_total =</span> <span class="fu">n</span>(),</span>
-<span id="cb36-7"><a href="#cb36-7" aria-hidden="true" tabindex="-1"></a>    <span class="at">.groups =</span> <span class="st">"drop"</span></span>
-<span id="cb36-8"><a href="#cb36-8" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">%&gt;%</span></span>
-<span id="cb36-9"><a href="#cb36-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">label =</span> <span class="fu">paste0</span>(n_pos, <span class="st">'(+) | '</span>, n_neg, <span class="st">' (-) | n = '</span>, n_total)) <span class="sc">%&gt;%</span></span>
-<span id="cb36-10"><a href="#cb36-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(scale, contrast, set, pair_id, label) <span class="sc">%&gt;%</span></span>
-<span id="cb36-11"><a href="#cb36-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pivot_wider</span>(<span class="at">names_from =</span> contrast, <span class="at">values_from =</span> label)</span>
-<span id="cb36-12"><a href="#cb36-12" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb36-13"><a href="#cb36-13" aria-hidden="true" tabindex="-1"></a>sig_summary <span class="sc">%&gt;%</span></span>
-<span id="cb36-14"><a href="#cb36-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(scale <span class="sc">==</span> <span class="st">"Slider"</span>) <span class="sc">%&gt;%</span></span>
-<span id="cb36-15"><a href="#cb36-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="sc">-</span>scale) <span class="sc">%&gt;%</span></span>
-<span id="cb36-16"><a href="#cb36-16" aria-hidden="true" tabindex="-1"></a>  knitr<span class="sc">::</span><span class="fu">kable</span>(<span class="at">caption =</span> <span class="st">"Slider error: significant media contrasts out of 12 models. (+) = contrast estimate &gt; 0, (-) = estimate &lt; 0."</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output-display">
-<table class="caption-top table table-sm table-striped small">
-<caption>Slider error: significant media contrasts out of 12 models. (+) = contrast estimate &gt; 0, (-) = estimate &lt; 0.</caption>
-<colgroup>
-<col style="width: 4%">
-<col style="width: 7%">
-<col style="width: 29%">
-<col style="width: 29%">
-<col style="width: 28%">
-</colgroup>
-<thead>
-<tr class="header">
-<th style="text-align: left;">set</th>
-<th style="text-align: left;">pair_id</th>
-<th style="text-align: left;">2dd - 3dd</th>
-<th style="text-align: left;">2dd - 3dp</th>
-<th style="text-align: left;">3dd - 3dp</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td style="text-align: left;">set1</td>
-<td style="text-align: left;">1</td>
-<td style="text-align: left;">0(+) | 0 (-) | n = 12</td>
-<td style="text-align: left;">2(+) | 0 (-) | n = 12</td>
-<td style="text-align: left;">0(+) | 0 (-) | n = 12</td>
-</tr>
-<tr class="even">
-<td style="text-align: left;">set1</td>
-<td style="text-align: left;">2</td>
-<td style="text-align: left;">4(+) | 0 (-) | n = 12</td>
-<td style="text-align: left;">4(+) | 0 (-) | n = 12</td>
-<td style="text-align: left;">0(+) | 0 (-) | n = 12</td>
-</tr>
-<tr class="odd">
-<td style="text-align: left;">set1</td>
-<td style="text-align: left;">3</td>
-<td style="text-align: left;">12(+) | 0 (-) | n = 12</td>
-<td style="text-align: left;">4(+) | 0 (-) | n = 12</td>
-<td style="text-align: left;">0(+) | 0 (-) | n = 12</td>
-</tr>
-<tr class="even">
-<td style="text-align: left;">set1</td>
-<td style="text-align: left;">4</td>
-<td style="text-align: left;">0(+) | 0 (-) | n = 12</td>
-<td style="text-align: left;">0(+) | 0 (-) | n = 12</td>
-<td style="text-align: left;">0(+) | 0 (-) | n = 12</td>
-</tr>
-<tr class="odd">
-<td style="text-align: left;">set1</td>
-<td style="text-align: left;">5</td>
-<td style="text-align: left;">0(+) | 0 (-) | n = 6</td>
-<td style="text-align: left;">0(+) | 0 (-) | n = 6</td>
-<td style="text-align: left;">0(+) | 0 (-) | n = 6</td>
-</tr>
-<tr class="even">
-<td style="text-align: left;">set1</td>
-<td style="text-align: left;">6</td>
-<td style="text-align: left;">0(+) | 0 (-) | n = 12</td>
-<td style="text-align: left;">0(+) | 0 (-) | n = 12</td>
-<td style="text-align: left;">0(+) | 0 (-) | n = 12</td>
-</tr>
-<tr class="odd">
-<td style="text-align: left;">set1</td>
-<td style="text-align: left;">7</td>
-<td style="text-align: left;">0(+) | 0 (-) | n = 12</td>
-<td style="text-align: left;">0(+) | 0 (-) | n = 12</td>
-<td style="text-align: left;">0(+) | 0 (-) | n = 12</td>
-</tr>
-<tr class="even">
-<td style="text-align: left;">set1</td>
-<td style="text-align: left;">8</td>
-<td style="text-align: left;">4(+) | 0 (-) | n = 12</td>
-<td style="text-align: left;">10(+) | 0 (-) | n = 12</td>
-<td style="text-align: left;">0(+) | 0 (-) | n = 12</td>
-</tr>
-<tr class="odd">
-<td style="text-align: left;">set1</td>
-<td style="text-align: left;">9</td>
-<td style="text-align: left;">0(+) | 0 (-) | n = 12</td>
-<td style="text-align: left;">0(+) | 0 (-) | n = 12</td>
-<td style="text-align: left;">0(+) | 0 (-) | n = 12</td>
-</tr>
-<tr class="even">
-<td style="text-align: left;">set2</td>
-<td style="text-align: left;">1</td>
-<td style="text-align: left;">0(+) | 0 (-) | n = 12</td>
-<td style="text-align: left;">4(+) | 0 (-) | n = 12</td>
-<td style="text-align: left;">2(+) | 0 (-) | n = 12</td>
-</tr>
-<tr class="odd">
-<td style="text-align: left;">set2</td>
-<td style="text-align: left;">2</td>
-<td style="text-align: left;">7(+) | 0 (-) | n = 12</td>
-<td style="text-align: left;">12(+) | 0 (-) | n = 12</td>
-<td style="text-align: left;">0(+) | 0 (-) | n = 12</td>
-</tr>
-<tr class="even">
-<td style="text-align: left;">set2</td>
-<td style="text-align: left;">3</td>
-<td style="text-align: left;">4(+) | 0 (-) | n = 12</td>
-<td style="text-align: left;">0(+) | 0 (-) | n = 12</td>
-<td style="text-align: left;">0(+) | 0 (-) | n = 12</td>
-</tr>
-<tr class="odd">
-<td style="text-align: left;">set2</td>
-<td style="text-align: left;">4</td>
-<td style="text-align: left;">0(+) | 0 (-) | n = 12</td>
-<td style="text-align: left;">0(+) | 0 (-) | n = 12</td>
-<td style="text-align: left;">0(+) | 0 (-) | n = 12</td>
-</tr>
-<tr class="even">
-<td style="text-align: left;">set2</td>
-<td style="text-align: left;">5</td>
-<td style="text-align: left;">0(+) | 0 (-) | n = 6</td>
-<td style="text-align: left;">0(+) | 0 (-) | n = 6</td>
-<td style="text-align: left;">0(+) | 0 (-) | n = 6</td>
-</tr>
-<tr class="odd">
-<td style="text-align: left;">set2</td>
-<td style="text-align: left;">6</td>
-<td style="text-align: left;">0(+) | 0 (-) | n = 12</td>
-<td style="text-align: left;">0(+) | 0 (-) | n = 12</td>
-<td style="text-align: left;">0(+) | 0 (-) | n = 12</td>
-</tr>
-<tr class="even">
-<td style="text-align: left;">set2</td>
-<td style="text-align: left;">7</td>
-<td style="text-align: left;">0(+) | 0 (-) | n = 12</td>
-<td style="text-align: left;">0(+) | 0 (-) | n = 12</td>
-<td style="text-align: left;">0(+) | 0 (-) | n = 12</td>
-</tr>
-<tr class="odd">
-<td style="text-align: left;">set2</td>
-<td style="text-align: left;">8</td>
-<td style="text-align: left;">0(+) | 0 (-) | n = 12</td>
-<td style="text-align: left;">0(+) | 0 (-) | n = 12</td>
-<td style="text-align: left;">0(+) | 0 (-) | n = 12</td>
-</tr>
-<tr class="even">
-<td style="text-align: left;">set2</td>
-<td style="text-align: left;">9</td>
-<td style="text-align: left;">0(+) | 0 (-) | n = 12</td>
-<td style="text-align: left;">0(+) | 4 (-) | n = 12</td>
-<td style="text-align: left;">0(+) | 0 (-) | n = 12</td>
-</tr>
-</tbody>
-</table>
-</div>
+<div class="sourceCode cell-code" id="cb36"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb36-1"><a href="#cb36-1" aria-hidden="true" tabindex="-1"></a><span class="co"># sig_summary &lt;- all_pairs_combined %&gt;%</span></span>
+<span id="cb36-2"><a href="#cb36-2" aria-hidden="true" tabindex="-1"></a><span class="co">#   group_by(scale, contrast, set, pair_id) %&gt;%</span></span>
+<span id="cb36-3"><a href="#cb36-3" aria-hidden="true" tabindex="-1"></a><span class="co">#   summarise(</span></span>
+<span id="cb36-4"><a href="#cb36-4" aria-hidden="true" tabindex="-1"></a><span class="co">#     n_pos  = sum(p.value &lt; 0.05 &amp; estimate &gt; 0),</span></span>
+<span id="cb36-5"><a href="#cb36-5" aria-hidden="true" tabindex="-1"></a><span class="co">#     n_neg  = sum(p.value &lt; 0.05 &amp; estimate &lt; 0),</span></span>
+<span id="cb36-6"><a href="#cb36-6" aria-hidden="true" tabindex="-1"></a><span class="co">#     n_total = n(),</span></span>
+<span id="cb36-7"><a href="#cb36-7" aria-hidden="true" tabindex="-1"></a><span class="co">#     .groups = "drop"</span></span>
+<span id="cb36-8"><a href="#cb36-8" aria-hidden="true" tabindex="-1"></a><span class="co">#   ) %&gt;%</span></span>
+<span id="cb36-9"><a href="#cb36-9" aria-hidden="true" tabindex="-1"></a><span class="co">#   mutate(label = paste0(n_pos, '(+) | ', n_neg, ' (-) | n = ', n_total)) %&gt;%</span></span>
+<span id="cb36-10"><a href="#cb36-10" aria-hidden="true" tabindex="-1"></a><span class="co">#   select(scale, contrast, set, pair_id, label) %&gt;%</span></span>
+<span id="cb36-11"><a href="#cb36-11" aria-hidden="true" tabindex="-1"></a><span class="co">#   pivot_wider(names_from = contrast, values_from = label)</span></span>
+<span id="cb36-12"><a href="#cb36-12" aria-hidden="true" tabindex="-1"></a><span class="co"># </span></span>
+<span id="cb36-13"><a href="#cb36-13" aria-hidden="true" tabindex="-1"></a><span class="co"># sig_summary %&gt;%</span></span>
+<span id="cb36-14"><a href="#cb36-14" aria-hidden="true" tabindex="-1"></a><span class="co">#   filter(scale == "Slider") %&gt;%</span></span>
+<span id="cb36-15"><a href="#cb36-15" aria-hidden="true" tabindex="-1"></a><span class="co">#   select(-scale) %&gt;%</span></span>
+<span id="cb36-16"><a href="#cb36-16" aria-hidden="true" tabindex="-1"></a><span class="co">#   knitr::kable(caption = "Slider error: significant media contrasts out of 12 models. (+) = contrast estimate &gt; 0, (-) = estimate &lt; 0.")</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>An immediate observation is that 2dd had larger errors for all 12 models in set 1 with pair_id 3, as well as for set 2 with pair_id 2.</p>
 <p>Set 2 with pair 9 has an interesting result. In 4 of the models, 2dd had smaller error than 3dp. That is, 2dd was underestimated more than 3dp. These models were in all cases where <code>flexmix</code> picked out components that were likely to be ratio estimation strategies.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb37"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb37-1"><a href="#cb37-1" aria-hidden="true" tabindex="-1"></a>all_pairs_combined <span class="sc">%&gt;%</span> </span>
-<span id="cb37-2"><a href="#cb37-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(set <span class="sc">==</span> <span class="st">'set2'</span> <span class="sc">&amp;</span> pair_id <span class="sc">==</span> <span class="dv">9</span> <span class="sc">&amp;</span> p.value <span class="sc">&lt;</span> <span class="fl">0.05</span> <span class="sc">&amp;</span> contrast <span class="sc">==</span> <span class="st">'2dd - 3dp'</span> <span class="sc">&amp;</span> scale <span class="sc">==</span> <span class="st">'Slider'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-stdout">
-<pre><code>          model  contrast  set pair_id   estimate       SE       df   t.ratio
-1    mod.fm.all 2dd - 3dp set2       9  -9.708939 3.059961 2685.405 -3.172897
-2    mod.fm.xp5 2dd - 3dp set2       9  -9.841270 3.005325 2380.569 -3.274611
-3    mod.fm.xq1 2dd - 3dp set2       9  -9.931715 2.946946 2404.360 -3.370172
-4 mod.fm.xq1xq5 2dd - 3dp set2       9 -10.025937 2.867563 2189.580 -3.496327
-      p.value  scale participant_filter         response_filter
-1 0.004352887 Slider   FlexMix filtered           All responses
-2 0.003079954 Slider   FlexMix filtered            Excl. pair 5
-3 0.002201517 Slider   FlexMix filtered          Excl. wrong Q1
-4 0.001396518 Slider   FlexMix filtered Excl. wrong Q1 &amp; pair 5</code></pre>
-</div>
+<div class="sourceCode cell-code" id="cb37"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb37-1"><a href="#cb37-1" aria-hidden="true" tabindex="-1"></a><span class="co"># all_pairs_combined %&gt;% </span></span>
+<span id="cb37-2"><a href="#cb37-2" aria-hidden="true" tabindex="-1"></a><span class="co">#   filter(set == 'set2' &amp; pair_id == 9 &amp; p.value &lt; 0.05 &amp; contrast == '2dd - 3dp' &amp; scale == 'Slider')</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb39"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb39-1"><a href="#cb39-1" aria-hidden="true" tabindex="-1"></a>sig_summary <span class="sc">%&gt;%</span></span>
-<span id="cb39-2"><a href="#cb39-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(scale <span class="sc">==</span> <span class="st">"Log (CM)"</span>) <span class="sc">%&gt;%</span></span>
-<span id="cb39-3"><a href="#cb39-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="sc">-</span>scale) <span class="sc">%&gt;%</span></span>
-<span id="cb39-4"><a href="#cb39-4" aria-hidden="true" tabindex="-1"></a>  knitr<span class="sc">::</span><span class="fu">kable</span>(<span class="at">caption =</span> <span class="st">"Slider error: significant media contrasts out of 12 models. (+) = contrast estimate &gt; 0, (-) = estimate &lt; 0."</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output-display">
-<table class="caption-top table table-sm table-striped small">
-<caption>Slider error: significant media contrasts out of 12 models. (+) = contrast estimate &gt; 0, (-) = estimate &lt; 0.</caption>
-<colgroup>
-<col style="width: 4%">
-<col style="width: 7%">
-<col style="width: 30%">
-<col style="width: 29%">
-<col style="width: 29%">
-</colgroup>
-<thead>
-<tr class="header">
-<th style="text-align: left;">set</th>
-<th style="text-align: left;">pair_id</th>
-<th style="text-align: left;">2dd - 3dd</th>
-<th style="text-align: left;">2dd - 3dp</th>
-<th style="text-align: left;">3dd - 3dp</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td style="text-align: left;">set1</td>
-<td style="text-align: left;">1</td>
-<td style="text-align: left;">11(+) | 0 (-) | n = 12</td>
-<td style="text-align: left;">2(+) | 0 (-) | n = 12</td>
-<td style="text-align: left;">0(+) | 0 (-) | n = 12</td>
-</tr>
-<tr class="even">
-<td style="text-align: left;">set1</td>
-<td style="text-align: left;">2</td>
-<td style="text-align: left;">0(+) | 0 (-) | n = 12</td>
-<td style="text-align: left;">0(+) | 0 (-) | n = 12</td>
-<td style="text-align: left;">0(+) | 0 (-) | n = 12</td>
-</tr>
-<tr class="odd">
-<td style="text-align: left;">set1</td>
-<td style="text-align: left;">3</td>
-<td style="text-align: left;">2(+) | 0 (-) | n = 12</td>
-<td style="text-align: left;">7(+) | 0 (-) | n = 12</td>
-<td style="text-align: left;">0(+) | 0 (-) | n = 12</td>
-</tr>
-<tr class="even">
-<td style="text-align: left;">set1</td>
-<td style="text-align: left;">4</td>
-<td style="text-align: left;">0(+) | 0 (-) | n = 12</td>
-<td style="text-align: left;">0(+) | 0 (-) | n = 12</td>
-<td style="text-align: left;">0(+) | 0 (-) | n = 12</td>
-</tr>
-<tr class="odd">
-<td style="text-align: left;">set1</td>
-<td style="text-align: left;">5</td>
-<td style="text-align: left;">0(+) | 0 (-) | n = 6</td>
-<td style="text-align: left;">0(+) | 0 (-) | n = 6</td>
-<td style="text-align: left;">0(+) | 0 (-) | n = 6</td>
-</tr>
-<tr class="even">
-<td style="text-align: left;">set1</td>
-<td style="text-align: left;">6</td>
-<td style="text-align: left;">0(+) | 0 (-) | n = 12</td>
-<td style="text-align: left;">2(+) | 0 (-) | n = 12</td>
-<td style="text-align: left;">0(+) | 0 (-) | n = 12</td>
-</tr>
-<tr class="odd">
-<td style="text-align: left;">set1</td>
-<td style="text-align: left;">7</td>
-<td style="text-align: left;">0(+) | 0 (-) | n = 12</td>
-<td style="text-align: left;">0(+) | 0 (-) | n = 12</td>
-<td style="text-align: left;">0(+) | 0 (-) | n = 12</td>
-</tr>
-<tr class="even">
-<td style="text-align: left;">set1</td>
-<td style="text-align: left;">8</td>
-<td style="text-align: left;">6(+) | 0 (-) | n = 12</td>
-<td style="text-align: left;">0(+) | 0 (-) | n = 12</td>
-<td style="text-align: left;">0(+) | 0 (-) | n = 12</td>
-</tr>
-<tr class="odd">
-<td style="text-align: left;">set1</td>
-<td style="text-align: left;">9</td>
-<td style="text-align: left;">0(+) | 0 (-) | n = 12</td>
-<td style="text-align: left;">1(+) | 0 (-) | n = 12</td>
-<td style="text-align: left;">0(+) | 0 (-) | n = 12</td>
-</tr>
-<tr class="even">
-<td style="text-align: left;">set2</td>
-<td style="text-align: left;">1</td>
-<td style="text-align: left;">0(+) | 0 (-) | n = 12</td>
-<td style="text-align: left;">0(+) | 0 (-) | n = 12</td>
-<td style="text-align: left;">0(+) | 0 (-) | n = 12</td>
-</tr>
-<tr class="odd">
-<td style="text-align: left;">set2</td>
-<td style="text-align: left;">2</td>
-<td style="text-align: left;">4(+) | 0 (-) | n = 12</td>
-<td style="text-align: left;">0(+) | 0 (-) | n = 12</td>
-<td style="text-align: left;">0(+) | 0 (-) | n = 12</td>
-</tr>
-<tr class="even">
-<td style="text-align: left;">set2</td>
-<td style="text-align: left;">3</td>
-<td style="text-align: left;">0(+) | 0 (-) | n = 12</td>
-<td style="text-align: left;">0(+) | 0 (-) | n = 12</td>
-<td style="text-align: left;">0(+) | 0 (-) | n = 12</td>
-</tr>
-<tr class="odd">
-<td style="text-align: left;">set2</td>
-<td style="text-align: left;">4</td>
-<td style="text-align: left;">0(+) | 0 (-) | n = 12</td>
-<td style="text-align: left;">0(+) | 0 (-) | n = 12</td>
-<td style="text-align: left;">0(+) | 0 (-) | n = 12</td>
-</tr>
-<tr class="even">
-<td style="text-align: left;">set2</td>
-<td style="text-align: left;">5</td>
-<td style="text-align: left;">3(+) | 0 (-) | n = 6</td>
-<td style="text-align: left;">3(+) | 0 (-) | n = 6</td>
-<td style="text-align: left;">0(+) | 0 (-) | n = 6</td>
-</tr>
-<tr class="odd">
-<td style="text-align: left;">set2</td>
-<td style="text-align: left;">6</td>
-<td style="text-align: left;">8(+) | 0 (-) | n = 12</td>
-<td style="text-align: left;">8(+) | 0 (-) | n = 12</td>
-<td style="text-align: left;">0(+) | 0 (-) | n = 12</td>
-</tr>
-<tr class="even">
-<td style="text-align: left;">set2</td>
-<td style="text-align: left;">7</td>
-<td style="text-align: left;">0(+) | 0 (-) | n = 12</td>
-<td style="text-align: left;">0(+) | 0 (-) | n = 12</td>
-<td style="text-align: left;">0(+) | 0 (-) | n = 12</td>
-</tr>
-<tr class="odd">
-<td style="text-align: left;">set2</td>
-<td style="text-align: left;">8</td>
-<td style="text-align: left;">0(+) | 0 (-) | n = 12</td>
-<td style="text-align: left;">0(+) | 0 (-) | n = 12</td>
-<td style="text-align: left;">0(+) | 0 (-) | n = 12</td>
-</tr>
-<tr class="even">
-<td style="text-align: left;">set2</td>
-<td style="text-align: left;">9</td>
-<td style="text-align: left;">10(+) | 0 (-) | n = 12</td>
-<td style="text-align: left;">5(+) | 0 (-) | n = 12</td>
-<td style="text-align: left;">0(+) | 0 (-) | n = 12</td>
-</tr>
-</tbody>
-</table>
-</div>
+<div class="sourceCode cell-code" id="cb38"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb38-1"><a href="#cb38-1" aria-hidden="true" tabindex="-1"></a><span class="co"># sig_summary %&gt;%</span></span>
+<span id="cb38-2"><a href="#cb38-2" aria-hidden="true" tabindex="-1"></a><span class="co">#   filter(scale == "Log (CM)") %&gt;%</span></span>
+<span id="cb38-3"><a href="#cb38-3" aria-hidden="true" tabindex="-1"></a><span class="co">#   select(-scale) %&gt;%</span></span>
+<span id="cb38-4"><a href="#cb38-4" aria-hidden="true" tabindex="-1"></a><span class="co">#   knitr::kable(caption = "Slider error: significant media contrasts out of 12 models. (+) = contrast estimate &gt; 0, (-) = estimate &lt; 0.")</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>With log absolute errors, we are considering the magnitude of the error rather than direction. Here, no differences were detected between the 3d medias across all 12 models. In all cases, 2dd charts did not have significant smaller errors than either 3d chart.</p>
 </section>
@@ -1191,64 +798,109 @@ Y_{CM}=\log_2(|\text{Slider}-\text{True Ratio}|+1/8)
 <p>The reason for excluding random guessers to Q1 is to make sure that the people included were following instructions correctly. Removing Q1 trials serves as an attention check. In most cases, there is a difference between the two values in the stimuli pairs. This also follows the procedure of Cleveland and McGill. As for Pair 5, correct slider positions when Q1 is correct should be 100. This means that to be correct here to Q1 is to have a constant value for the slider. If analyzed, it should be as a binary response.</p>
 <p>The purpose for excluding with the flexmix model is that two clusters are clearly off task according to the slope of <code>target_ratio</code>.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb40"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb40-1"><a href="#cb40-1" aria-hidden="true" tabindex="-1"></a>car<span class="sc">::</span><span class="fu">Anova</span>(mod.cm.q1.xq1xq5, <span class="at">type =</span> <span class="st">'3'</span>, <span class="at">test =</span> <span class="st">'F'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-stdout">
-<pre><code>Analysis of Deviance Table (Type III Wald F tests with Kenward-Roger df)
-
-Response: q2_error_cm
-                         F Df Df.res    Pr(&gt;F)    
-(Intercept)       425.4703  1 2884.0 &lt; 2.2e-16 ***
-set                 0.0005  1 3135.7  0.981889    
-media               4.8615  2 3151.0  0.007797 ** 
-pair_id             1.7418  7 3027.4  0.094855 .  
-set:media           0.2335  2 3136.2  0.791748    
-set:pair_id         2.0315  7 3082.7  0.047748 *  
-media:pair_id       0.6069 14 3058.1  0.861617    
-set:media:pair_id   0.7068 14 3067.6  0.769526    
----
-Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1</code></pre>
-</div>
-<div class="sourceCode cell-code" id="cb42"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb42-1"><a href="#cb42-1" aria-hidden="true" tabindex="-1"></a>car<span class="sc">::</span><span class="fu">Anova</span>(mod.cm.fm.xq1xq5, <span class="at">type =</span> <span class="st">'3'</span>, <span class="at">test =</span> <span class="st">'F'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-stdout">
-<pre><code>Analysis of Deviance Table (Type III Wald F tests with Kenward-Roger df)
-
-Response: q2_error_cm
-                         F Df Df.res    Pr(&gt;F)    
-(Intercept)       291.8994  1 2289.8 &lt; 2.2e-16 ***
-set                 0.2364  1 2181.8  0.626832    
-media               4.8831  2 2200.0  0.007656 ** 
-pair_id             6.3013  7 2094.6 2.439e-07 ***
-set:media           0.3239  2 2182.7  0.723379    
-set:pair_id         2.1363  7 2118.2  0.037055 *  
-media:pair_id       0.8707 14 2093.9  0.591129    
-set:media:pair_id   0.9449 14 2101.5  0.508915    
----
-Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1</code></pre>
-</div>
+<div class="sourceCode cell-code" id="cb39"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb39-1"><a href="#cb39-1" aria-hidden="true" tabindex="-1"></a><span class="co"># car::Anova(mod.cm.q1.xq1xq5, type = '3', test = 'F')</span></span>
+<span id="cb39-2"><a href="#cb39-2" aria-hidden="true" tabindex="-1"></a><span class="co"># car::Anova(mod.cm.fm.xq1xq5, type = '3', test = 'F')</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>In both of these models, there is a significant two-way interaction between pair_id and set. There is also a significant main effect for media. For media types, 2dd has larger errors than both 3d charts in both models.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb44"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb44-1"><a href="#cb44-1" aria-hidden="true" tabindex="-1"></a><span class="fu">emmeans</span>(mod.cm.q1.xq1xq5, <span class="sc">~</span>media, <span class="at">pbkrtest.limit =</span> <span class="dv">5800</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-stdout">
-<pre><code> media emmean     SE  df lower.CL upper.CL
- 2dd     3.65 0.0808 309     3.49     3.81
- 3dd     3.24 0.0788 280     3.09     3.40
- 3dp     3.24 0.0867 385     3.07     3.41
-
-Results are averaged over the levels of: set, pair_id 
-Degrees-of-freedom method: kenward-roger 
-Confidence level used: 0.95 </code></pre>
+<div class="sourceCode cell-code" id="cb40"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb40-1"><a href="#cb40-1" aria-hidden="true" tabindex="-1"></a><span class="co"># emmeans(mod.cm.q1.xq1xq5, ~media, pbkrtest.limit = 5800)</span></span>
+<span id="cb40-2"><a href="#cb40-2" aria-hidden="true" tabindex="-1"></a><span class="co"># emmeans(mod.cm.fm.xq1xq5, ~media, pbkrtest.limit = 5800)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<div class="sourceCode cell-code" id="cb46"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb46-1"><a href="#cb46-1" aria-hidden="true" tabindex="-1"></a><span class="fu">emmeans</span>(mod.cm.fm.xq1xq5, <span class="sc">~</span>media, <span class="at">pbkrtest.limit =</span> <span class="dv">5800</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb41"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb41-1"><a href="#cb41-1" aria-hidden="true" tabindex="-1"></a><span class="fu">map</span>(<span class="fu">mget</span>(<span class="fu">ls</span>()), dim)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code> media emmean     SE  df lower.CL upper.CL
- 2dd     3.16 0.0719 336     3.01     3.30
- 3dd     2.70 0.0688 286     2.57     2.84
- 3dp     2.67 0.0805 406     2.52     2.83
+<pre><code>$blocks
+[1] 386   3
 
-Results are averaged over the levels of: set, pair_id 
-Degrees-of-freedom method: kenward-roger 
-Confidence level used: 0.95 </code></pre>
+$conn
+NULL
+
+$exp_results
+[1] 7708   13
+
+$fm.mod
+NULL
+
+$full_completions
+[1] 297   4
+
+$mod.all.all
+NULL
+
+$mod.all.xp5
+NULL
+
+$mod.all.xq1
+NULL
+
+$mod.all.xq1xq5
+NULL
+
+$mod.cm.all.all
+NULL
+
+$mod.cm.all.xp5
+NULL
+
+$mod.cm.all.xq1
+NULL
+
+$mod.cm.all.xq1xq5
+NULL
+
+$mod.cm.q1.all
+NULL
+
+$mod.cm.q1.xp5
+NULL
+
+$mod.cm.q1.xq1
+NULL
+
+$mod.cm.q1.xq1xq5
+NULL
+
+$mod.q1.all
+NULL
+
+$mod.q1.xp5
+NULL
+
+$mod.q1.xq1
+NULL
+
+$mod.q1.xq1xq5
+NULL
+
+$more_than_chance
+[1] 214   4
+
+$res_q2
+[1] 5848   26
+
+$res_q2_flt
+[1] 4528   29
+
+$results
+[1] 5848   19
+
+$sfm
+NULL
+
+$sfm.mod
+NULL
+
+$solutions
+[1] 27  5
+
+$users
+[1] 366   9
+
+$users_clean
+[1] 278   6
+
+$users_in_person
+[1] 168   1</code></pre>
 </div>
 </div>
 
