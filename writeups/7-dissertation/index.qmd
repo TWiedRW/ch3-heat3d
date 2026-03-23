@@ -12,6 +12,8 @@ format:
       - left=1.5in
       - right=1in
     linestretch: 2
+    include: true
+    keep-tex: true
     include-in-header: 
       text: '\usepackage{lineno}\linenumbers'
 execute:
@@ -39,7 +41,7 @@ In the 20th century, advancements in technology made data visualizations increas
 
 In many disciplines, 3D-printed visualizations have shown mixed or promising results compared to alternative rendering formats. Although a comprehensive review of 3D-printing in scientific fields is beyond the scope of this paper, we highlight several examples of its use for visualization. @katsioloudis2018 conducted a study with engineering students and found no statistically significant difference between computer-rendered and 3D-printed models when students were asked to draw a cross-section of a dodecahedron, suggesting similar levels of spatial understanding between digital and physical representations. In contrast, other applications have highlighted advantages of 3D-printed models. For example, @holloway2019 reported positive feedback from visually impaired individuals when 3D-printed maps were used to support navigation. Similarly, in clinical education, @muff2022 found that 3D-printed anatomical structures were well accepted alongside VR glasses and 3D computer renderings. As 3D-printed visualizations become increasingly common across scientific fields, we explore their potential use in communicating statistical graphics.
 
-At this time, there are few studies that evaluate 3D-printed charts for the purpose of displaying statistical information. This may in part be due to the cost of materials and rendering times as compared to charts produced on a computer. A single chart can take up to a day to print, limiting the ability to quickly produce visualizations. Additionally, there are few options for producing such charts from statistical software. In R, the `rgl` package [@rgl] can export STL files that can be used by 3D-printing software, and similarly for the `rayshader` package [@rayshader]. However, these options are not optimized for essential considerations required of 3D-printed charts, such as embossed labels. Given the nature of 3-dimensional data, viewing a 3D realization of statistical information in a 3D environment is a realistic scenario that could increase the ability for information extraction.
+At this time, there are few studies that evaluate 3D-printed charts for the purpose of displaying statistical information [@jansen2013; @stusak2015; @stusakIfYourMind2016; @huExploringNewParadigms2015b]. This may in part be due to the cost of materials and rendering times as compared to charts produced on a computer. A single chart can take up to a day to print, limiting the ability to quickly produce visualizations. Additionally, there are few options for producing such charts from statistical software. In R, the `rgl` package [@rgl] can export STL files that can be used by 3D-printing software, and similarly for the `rayshader` package [@rayshader]. However, these options are not optimized for essential considerations required of 3D-printed charts, such as embossed labels. Given the nature of 3-dimensional data, viewing a 3D realization of statistical information in a 3D environment is a realistic scenario that could increase the ability for information extraction.
 
 ### Literature Review
 
@@ -49,24 +51,9 @@ Using an identical dataset across multiple chart types does not ensure that the 
 
 There are mixed results in regard to the use of 3D charts, mostly attributable to the use of the third dimension. When the extra dimension does not convey meaningful information, estimates of accuracy decrease and solution times increase as compared to equivalent 2D charts [@fisher1997; @zacks1998; @fischer2000]. The same increase in solution time is seen when the third dimension is utilized for displaying data, but can sometimes produce better error rates than 2D charts [@barfield1989; @kraus2020]. Additionally, when given the option of 2D or 3D charts for extracting numerical information, the 2D charts showed increased preference and confidence than their 3D counterparts [@barfield1989; @fisher1997]. It is worth noting that all of these studies use 2D or virtual reality renderings of 3D charts and not physical 3D charts.
 
-PARAGRAPH ON DIFFERENCE IN SEEING BETWEEN THE CHART TYPES.
+Many studies that assess 3D charts use computer-rendered displays that leverage high levels of precision in their output. Digital renderings allow for exact control over visual properties, whereas physical charts are subject to factors such as chart materials, lighting conditions, interactivity, and viewing distance. Some of these factors have already been suggested to have a measureable effect within computer renderings [@tarr2001; @wang2022]. While virtual reality can offer similar interactions with 3D objects compared to the real world, perceptual judgements can be distorted in virtual environments [@kelly2018; @park2021]. The result is that many findings for the perception of 3D statistical graphics are limited to the method in which they were rendered.
 
-```{=html}
-<!---
-
-:::{#fig-3d-charts layout-ncol=2}
-
-![3D bar chart](../_images/preferance-example1.png){#fig-bar3d}
-
-![3D heatmap](../_images/heatmap3d.png){#fig-heat3d}
-
-Two examples of 3D charts. @fig-bar3d uses the third dimension as an artistic choice and was optional. On the other hand, @fig-heat3d uses all three dimensions to convey information simultaneously. 
-:::
-
---->
-```
-
-To date, few empirical studies have investigated 3D-printed charts, and it is unclear if they follow the framework of existing theories on data visualizations. Unlike paper and computer-rendered charts, constructing true 3D charts inherently contains many additional factors that could affect perception, such as chart materials, natural lighting, interactivity, and viewing distance. Some of these factors have already been shown to have an effect on computer renderings [@tarr2001; @wang2022].
+To date, few empirical studies have investigated 3D-printed charts, and it is unclear if they follow the framework of existing theories on data visualizations. One of the first studies to examine digital and physical renderings primarily focused on information retrieval times, where physical 3D heatmaps had lower completion times than digitized 2D and 3D alternatives [@jansen2013]. In their study, error rates were also collected, but had small effect sizes due to the 2D, digital 3D, and physical 3D charts. Other studies on physical statistical graphics tend to focus on bar charts, where the third dimension is not used for information. Physical 3D bar charts are suggested to have conditionally improved memorability, subject to specific datasets [@stusak2015; @stusakIfYourMind2016]. @huExploringNewParadigms2015b discussed the construction of 3D-printed bar charts with accessibility features, though these designs do not appear to have been empirically evaluated.
 
 We hypothesize that 3D charts in 3D environments will produce better information extraction than their computer-rendered counterparts. Specifically, we compare 3D-printed charts to digital renderings of 2D static charts and 3D interactive charts. We suspect that this difference will hold across multiple data sets and different magnitudes of stimuli. In this paper, we evaluate the accuracy of numerical estimations on true 3D charts by conducting a factorial experiment that assessed chart types and ratios of pairs of stimuli. We discuss the construction of the stimuli and how we closely matched the charts to compare 2D, 3D-digital, and 3D-printed renderings of heatmap data.
 
@@ -76,7 +63,7 @@ Our study was designed to evaluate and expand the literature on numerical estima
 
 ### Stimuli
 
-We denote "stimuli" to represent the magnitude of our chosen values. In a 3D Cartesian space, the X- and Y- axes represent the coordinates of the stimuli, and the Z-axis represents the value for the stimuli. Each X and Y coordinate is represented by a square tile with a 1:1 aspect ratio. In a 2D space, the Z variable is mapped to fill with a monochromatic gradient. All stimuli and remaining randomly generated values range between 0 and 100 units. In this experiment, $X=1, 2, \dots,10$ and $Y=1, 2,\dots,10$.
+We define stimuli as the magnitude of our selected values. In a 3D Cartesian space, the X- and Y- axes represent the coordinates of the stimuli, and the Z-axis represents the value for the stimuli. Each X and Y coordinate is represented by a square tile with a 1:1 aspect ratio. In a 2D space, the Z variable is mapped to fill with a monochromatic gradient. All stimuli and remaining randomly generated values range between 0 and 100 units. In this experiment, $X=1, 2, \dots,10$ and $Y=1, 2,\dots,10$.
 
 Our experiment is designed using the method of constant stimuli, where comparisons between stimuli are with respect to a stimulus that remains the same magnitude [@kingdom2016 chap. 3]. We set the constant stimuli at 50 units. For stimuli between 50 and 100, we set the maximum stimuli value at 90 and equally partitioned the ratios of stimuli with the constant stimuli, $\frac{50}{90}=0.556$ to $\frac{50}{50}=1.0$, resulting in 4 varying stimuli values where 50 is the smallest value. The same ratios obtained with stimuli between 50 and 90 were used to create 4 stimuli varying between 0 and 50, where 50 is the largest value. Additionally, we also included a stimulus pair where both values are 50, resulting in nine total pairs of stimuli. All stimuli values can be found in @fig-stimuli-values.
 
@@ -123,7 +110,6 @@ Mixture distribution of @eq-random-z using the formula for the top half of a sph
 
 The placement of stimuli values onto the randomly generated heatmap data was done via simulation to try to make their placement look as natural as possible. Twenty random heatmaps were generated. For each heatmap, the non-constant stimuli was placed onto the coordinate such that the difference between the stimuli and randomly generated value is minimized. The constant stimuli was then placed onto a coordinate within a Manhattan distance of three or four that minimizes the difference between the constant stimuli and randomly generated values, where the Manhattan distance is given by $|X_i - X_j| + |Y_i - Y_j|$ for stimuli $i$ and $j$. To ensure that stimuli placement is evenly positioned across the heatmap, the count of stimuli was computed separately across the X and Y axes. For example, in Data Set 1, the X-axis has four stimuli in $X=1$, three stimuli in $X=2$, and so forth. Chi-squared statistics were calculated for each axis and the heatmap with the smallest average Chi-squared statistic was selected as the final dataset. A visual inspection of this process showed that the stimuli were not clustered in any one area of the chart and that the stimuli look natural with respect to the random mixture distribution.
 
-
 ```{r}
 #| label: fig-placement
 #| layout-ncol: 2
@@ -157,7 +143,6 @@ data2 %>%
   theme_minimal() + 
   theme(aspect.ratio = 1, legend.position = 'none', panel.grid = element_blank()) 
 ```
-
 
 ### Charts
 
@@ -197,7 +182,7 @@ STAT 218 is a general education statistics course at the University of Nebraska.
 
 Our experiment was designed with a 3 media type x 2 datasest x 9 comparison treatment structure. Media type is our main interest, with 2D-digital, 3D-digital, and 3D-printed charts. To ensure that results are not confounded with datasets, we used two datasets, with a total of 9 stimuli pairs in each dataset. The order of treatments was given so that media and dataset combinations were grouped together randomly in the sequence with stimuli pairs randomized within the groupings. This meant participants did not have to switch charts as frequently, reducing the risk of using the wrong chart. For students enrolled in online sections of STAT 218, the 3D-printed charts were removed from their trials as they were not required to be on campus.
 
-Due to practical constraints, stimuli pairs were incompletely blocked. A full factorial design would result in 54 trials per participant, which could lead to a decrease in quality responses [@herzog1981]. Therefore, we selected four out of the nine possible stimuli pairs to create incomplete blocks for each chart. This resulted in 18 blocks for a balanced incomplete block design. Within each block, media type is fully crossed with dataset. Using the incomplete block structure, participants completed a total of 24 trials, which is more practical than the full factorial design. 
+Due to practical constraints, stimuli pairs were incompletely blocked. A full factorial design would result in 54 trials per participant, which could lead to a decrease in quality responses [@herzog1981]. Therefore, we selected four out of the nine possible stimuli pairs to create incomplete blocks for each chart. This resulted in 18 blocks for a balanced incomplete block design. Within each block, media type is fully crossed with dataset. Using the incomplete block structure, participants completed a total of 24 trials, which is more practical than the full factorial design.
 
 Following the procedure of @cleveland1984, we asked participants two questions in each trial. The first question asked participants which stimuli in a specified pair is larger or if the stimuli are the same value. Next, participants were asked to estimate the magnitude of the smaller stimuli if the larger stimuli represents 100 units, which is a subtractive process [@veit]. This question is designed to estimate $A/B$, where $A\leq B$.
 
@@ -210,8 +195,6 @@ The Shiny application started with the informed consent screen, allowing partici
 If participants agreed to have their data collected, they were presented with the demographics section. This section asked participants about their age, gender identity, highest education level, and how their participation in the experiment is graded. The last question was a text box and asked participants to specify their favorite movie and/or actor. Demographic information was combined with the application start time and completion code to create a hash for an anonymized participant identifier using the `rlang` package [@rlang].
 
 Once a participant completed the demographics page or selected "No" to the data collection question, they were given a practice page. A modal dialog window was initially shown with instructions, and users could display this window again at any point during the practice trials. The practice consisted of four questions: two trials from 2dd charts and two trials from 3dd charts. Once participants provided a response to both questions in a practice trial, they were able to display the correct solution to check their answers. Since the practice trials were only to inform participants about the mechanics for answering the questions, we did not include 3D-printed charts. This eliminated the possibility of participants using a practice chart for the experiment.
-
-
 
 The experiment page was presented to participants after completion of the practice trials [@fig-exp-page]. Each page contained two questions -- one question for identifying which stimuli is larger and another question for estimating the value of the smaller stimuli if the larger stimuli is 100 units. Each trial had the initial slider position randomized in order to prevent starting position bias. For 3dd charts, the number of interactive clicks was also recorded. A trial could only be submitted if the first question is answered and if the slider was moved at least once.
 
@@ -227,7 +210,7 @@ $$
 Y_{ijklm}=\mu+S_i\times M_j\times P_k+\gamma_{lm}+\omega_{ijlm}+\epsilon_{ijklm}
 $$
 
-In our model, $Y_ijklm$ is a metric of error for participant responses to the ratio estimation question, $S_i$ is the effect of dataset $i$, $M_j$ is the effect of chart type $j$, $P_k$ is the effect of stimuli pair $k$, and $S_i\times M_j\times P_k$ includes all corresponding main effects and two-way and three-way interactions. Our random effects include $\gamma_{lm}\sim N(0,\sigma^2_A)$ for participant $m$ in block $l$, $\omega_{ijlm}\sim N(0,\sigma^2_B)$ for the ordering of dataset $i$ and chart type $j$ for participant $m$ in block $l$, and $\epsilon_{ijklm}\sim N(0, \sigma^2_C)$ for the residual error. We assume that $\gamma_{lm}$, $\omega_{ijlm}$, and $\epsilon_{ijklm}$ are independently and identically distributed.
+In our model, $Y_{ijklm}$ is a metric of error for participant responses to the ratio estimation question, $S_i$ is the effect of dataset $i$, $M_j$ is the effect of chart type $j$, $P_k$ is the effect of stimuli pair $k$, and $S_i\times M_j\times P_k$ includes all corresponding main effects and two-way and three-way interactions. Our random effects include $\gamma_{lm}\sim N(0,\sigma^2_A)$ for participant $m$ in block $l$, $\omega_{ijlm}\sim N(0,\sigma^2_B)$ for the ordering of dataset $i$ and chart type $j$ for participant $m$ in block $l$, and $\epsilon_{ijklm}\sim N(0, \sigma^2_C)$ for the residual error. We assume that $\gamma_{lm}$, $\omega_{ijlm}$, and $\epsilon_{ijklm}$ are independently and identically distributed.
 
 The first question in each trial was to indicate which value within a stimulus pair was larger, or if they were the same value. Following @cleveland1984, we use this question as an attention check to verify that participants are following the procedure and that the correct comparison is being made.
 
@@ -508,7 +491,7 @@ results %>%
   theme(panel.grid.major.x = element_blank(), panel.grid.minor.x = element_blank())
 ```
 
-It is commonly acknowledged in psychology that careless respondents should be addressed to some degree, although there is no general consensus on how to handle this without cherry picking [@jasoIdentificationCarelessResponding2021; @ward2023]. Some proposed solutions include removing participants based on observed patterns or fitting mixture models to address latent class variables. In this section, we discuss one possible subset of participant responses to address careless respondents. We also include the models of several other subsets in the appendix.
+It is commonly acknowledged in psychology that careless respondents should be addressed to some degree, although there is no general consensus on how to handle this without cherry picking [@jasoIdentificationCarelessResponding2021; @ward2023]. Some proposed solutions include removing participants based on observed patterns or fitting mixture models to address latent class variables. In this section, we discuss one possible subset of participant responses to address careless respondents. We also include several alternative models in the appendix.
 
 ```{r}
 res_q1 <- results %>% 
@@ -537,7 +520,7 @@ res_q1_filtered <- res_q1 %>%
 
 ### Addressing Random Categorical Responses {#sec-remove-random-categories}
 
-To improve the quality of our data, we started by assessing random guesses in identifying the larger value of a stimulus pair. In each trial, participants have a 1/3 probability of correctly identifying the larger value if they are randomly guessing. Since stimuli pair 5 contains identical values, we temporarily exclude those trials to focus on stimuli pairs where there was a difference between the values. For each participant, we test $H_0: \pi\leq2/3\text{ vs. }H_1:\pi>2/3$ with $\alpha=0.05$, where $\pi$ is the probability of a participant correctly answering the initial question and $\alpha$ is the level of the test. Using the first question for participant screening, `r length(unique(res_q1$user_id)) - length(unique(res_q1_filtered$user_id))` participants are excluded for suspected random selecting, leaving `r length(unique(res_q1_filtered$user_id))` participants. The effect of this exclusion can be seen in @fig-q1-eda.
+To improve the quality of our data, we started by assessing random guesses in identifying the larger value of a stimulus pair. In each trial, participants have a 1 out of 3 chance for correctly identifying the larger value if they are randomly guessing. Since stimuli pair 5 contains identical values, we temporarily exclude those trials to focus on stimuli pairs where there was a difference between the values. For each participant, we test $H_0: \pi\leq2/3\text{ vs. }H_1:\pi>2/3$ with $\alpha=0.05$, where $\pi$ is the probability of a participant correctly answering the initial question and $\alpha$ is the level of the test. That is, participants who are following instructions should select the correct option at least twice as often as either incorrect alternative. Given the lack of standardized criteria for identifying careless responding, the one-sided Binomial test should extract users who are suspected to be following the instructions. Using the first question for participant screening, `r length(unique(res_q1$user_id)) - length(unique(res_q1_filtered$user_id))` participants are excluded for suspected random selecting, leaving `r length(unique(res_q1_filtered$user_id))` participants. The effect of this exclusion can be seen in @fig-q1-eda.
 
 ```{r}
 #| label: fig-q1-eda
@@ -606,7 +589,7 @@ df_diffs <- data.frame(diffs)
 # diffs
 ```
 
-Our findings showed that the 2D heatmaps had evidence of higher log absolute error than both types of the 3D heatmaps. On the base-2 log scale, the error for 2D heatmaps was larger than the error for digital 3D heatmap by `r round(df_diffs$estimate[1],3)` (95% CI: `r round(df_diffs$lower.CL[1],3)`, `r round(df_diffs$upper.CL[1],3)`). This finding is similar for the 3D printed heatmaps, where the log absolute error for 2D heatmaps was larger by `r round(df_diffs$estimate[2],3)` (95% CI: `r round(df_diffs$lower.CL[2],3)`, `r round(df_diffs$upper.CL[2],3)`). There were no detectable differences in error between the digital and physical 3D heatmaps (p-value = `r round(df_diffs$p.value[3],3)`).
+Our findings suggest that the 2D heatmaps had evidence of higher log absolute error than either type of the 3D heatmaps. On the base-2 log scale, the error for 2D heatmaps was larger than the error for digital 3D heatmap by `r round(df_diffs$estimate[1],3)` (95% CI: `r round(df_diffs$lower.CL[1],3)`, `r round(df_diffs$upper.CL[1],3)`). This finding is similar for the 3D printed heatmaps, where the log absolute error for 2D heatmaps was larger by `r round(df_diffs$estimate[2],3)` (95% CI: `r round(df_diffs$lower.CL[2],3)`, `r round(df_diffs$upper.CL[2],3)`). There were no detectable differences in error between the digital and physical 3D heatmaps (p-value = `r round(df_diffs$p.value[3],3)`).
 
 ```{r}
 #| label: fig-em-media
@@ -911,11 +894,11 @@ res_q2_filtered %>%
 
 ## Discussion and Conclusion
 
-Our study was designed to test the numerical estimation of ratios in 2D and 3D heatmaps rendered in digital and physical environments. The current state of tangible statistical graphics is limited mainly to tactile displays, whereas 3D printed statistical graphics are largely unexplored. We found that when the third dimension is conveying meaningful information, the heights of 3D heatmaps had smaller errors than the color gradient of 2D heatmaps. No differences were detected between the digital and physical 3D heatmaps, which is perhaps attributed to the exact one-to-one design relationship between the digital display and the 3D printed chart.
+Our study was designed to test the numerical estimation of ratios in 2D and 3D heatmaps rendered in digital and physical environments. The current state of tangible statistical graphics is limited mainly to tactile displays, whereas 3D printed statistical graphics are largely unexplored. We found that when the third dimension is conveying meaningful information, the heights of 3D heatmaps had smaller errors than the color gradient of 2D heatmaps. No differences were detected between the digital and physical 3D heatmaps, which is perhaps attributed to the exact one-to-one design relationship between the digital display and the 3D printed chart. These findings were consistent across multiple levels of fitted models and participant filtering, which reaffirms our belief that 3D charts have value when meaningfully using all three dimensions.
 
 An interesting observation from the stimuli pairs and dataset interaction was from the non-detectable differences. We note that no differences were detected across datasets for a given stimuli pair. While not explicitly tested in our experiment, there have been previous studies that have investigated and found the behavior of neighboring values to have an effect [@zacks1998; @vanderplasSignsSineIllusion2015]. This effect would be worth exploring in future studies with 3D heatmaps. Another concern we had when designing our experiment was the lack of direct translation from color scales to heights. The differences between stimuli pairs of identical ratios were non-detectable, which alleviates this concern for future studies. However, this effect would likely be important to consider if assessing just noticeable differences [@luModelingJustNoticeable2022; @zhangJustNoticeableDifference2023].
 
-While our hypothesis that 3D-printed heatmaps would outperform digital 2D and 3D heatmaps in numerical estimations of ratios was not supported, we were able to show that 3D charts may have a place in the analysis of data. When the third dimension is used to display information, the mapping of that dimension to height provides better ratio estimations than a color gradient scale. This result has been observed previously in digital 3D heatmaps [@barfield1989; @kraus2020], and our findings suggests that this may hold for physical 3D heatmaps. 
+While our hypothesis that 3D-printed heatmaps would outperform digital 2D and 3D heatmaps in numerical estimations of ratios was not supported, we were able to show that 3D charts may have a place in the analysis of data. When the third dimension is used to display information, the mapping of that dimension to height provides better ratio estimations than a color gradient scale. This result has been observed previously in digital 3D heatmaps [@barfield1989; @kraus2020], and our findings suggests that this may hold for physical 3D heatmaps.
 
 ## Appendix
 
@@ -952,7 +935,7 @@ res_q2 %>%
   theme(aspect.ratio = 1, legend.position = 'bottom')
 ```
 
-There are multiple levels of participant and response filtering that we considered. For participant filtering, we consider the following levels: (1) no participant filtering and (2) remove suspected random guessers. The process of (2) was described in @sec-remove-random-categories. Filtering individual responses is a straightforward process, where we considered (i) include all responses, and (ii) remove responses with incorrect Q1 solutions.
+There are multiple levels of participant and response filtering that we considered. For participant-level filtering, we consider the following levels: (1) no participant filtering and (2) remove suspected random guessers. The process of (2) was described in @sec-remove-random-categories. Filtering individual responses is a straightforward process, where we considered (i) include all responses, and (ii) remove responses with incorrect Q1 solutions.
 
 ```{r}
 # Format: mod_(participant)_(response)
@@ -969,23 +952,11 @@ mod_q1_all <- lmer(q2_error_cm ~ set*media*pair_id + (1|user_id:block/set:media)
 mod_q1_q1 <- lmer(q2_error_cm ~ set*media*pair_id + (1|user_id:block/set:media),
      data = filter(res_q2_filtered, pair_id != 5 & user_larger == true_larger))
 
-# GAM
-library(mgcv)
-mod_gam <- gam(
-  q2_error_cm ~ 
-    set*media + 
-    s(target_ratio, k = 4, by = interaction(media, set)) + 
-    s(user_id, bs='re'),
-  data = filter(res_q2_filtered, pair_id != 5 & user_larger == true_larger) %>% 
-    mutate(set = factor(set),
-           media = factor(media),
-           user_id = factor(user_id))
-)
-# anova(mod_gam)
-# gam.check(mod_gam)
+
 ```
 
 ```{r}
+#| eval: true
 bind_rows(
   car::Anova(mod_all_all, type = 3, test = 'F') %>% 
   data.frame() %>% 
@@ -1015,7 +986,12 @@ bind_rows(
     model=='3' ~ 'Filtered participants, all responses',
     model=='4' ~ 'Filtered participants, Q1 correct'
   )) %>% 
-  knitr::kable(caption = 'ANOVA p-values for different effects')
+  column_to_rownames('model') %>% 
+  t() %>% 
+  as.data.frame() %>% 
+  rownames_to_column('Term') %>% 
+  kable(caption = 'ANOVA Table p-values for model terms', digits = 3, booktabs = T,
+        label = 'tbl-all-models-anova')
 
 
 # car::Anova(mod_all_all, type = 3, test = 'F')
@@ -1033,33 +1009,14 @@ em_q1_q1 <- emmeans(mod_q1_q1, ~media+set+pair_id, pbkrtest.limit = 5800)
 ```
 
 ```{r}
-#| eval: false
-bind_rows(
-  data.frame(em_all_all),
-  data.frame(em_all_q1),
-  data.frame(em_q1_all),
-  data.frame(em_q1_q1),
-  .id = 'model'
-) %>% 
-  mutate(model = case_when(
-    model=='1' ~ 'All participants, all responses',
-    model=='2' ~ 'All participants, Q1 correct',
-    model=='3' ~ 'Filtered participants, all responses',
-    model=='4' ~ 'Filtered participants, Q1 correct'
-  )) %>% 
-  ggplot(mapping = aes(x = media, y = emmean, fill = factor(model))) + 
-  geom_col(position = position_dodge()) + 
-  facet_wrap(~set+pair_id) +
-  # facet_grid(set ~ pair_id) + 
-  # facet_grid(pair_id ~ set) + 
-  theme_bw() +
-  theme(#aspect.ratio = 1,
-        legend.position = 'right')
-```
-
-```{r}
+#| eval: true
+#| label: fig-model-int1
+#| fig-width: 6
 #| fig-height: 6
-#| label: fig-mod-int-plots
+#| fig-dpi: 600
+#| fig-cap: "Interaction plots for media type and response filtering, facetted by stimuli pair and dataset."
+
+
 bind_rows(
   data.frame(em_all_all),
   data.frame(em_all_q1),
@@ -1073,24 +1030,31 @@ bind_rows(
     model=='3' ~ 'Filtered participants, all responses',
     model=='4' ~ 'Filtered participants, Q1 correct'
   )) %>% 
-  ggplot(mapping = aes(x = media, y = emmean, color = factor(model))) + 
-  geom_line(aes(group = factor(model))) + 
-  geom_point() + 
-  facet_wrap(~set+pair_id) +
+  ggplot(mapping = aes(x = media, y = emmean, color = model, group = model)) + 
+  geom_point(size = 1) + 
+  geom_line() + 
+  facet_wrap(~set+pair_id, labeller = label_both) +
   # facet_grid(set ~ pair_id) + 
   # facet_grid(pair_id ~ set) + 
   theme_bw() +
+  guides(color=guide_legend(nrow=2,byrow=TRUE)) + 
   theme(aspect.ratio = 1/2,
         legend.position = 'bottom')
 ```
 
 ```{r}
-#| fig-height: 6
+#| eval: true
+#| label: fig-model-int2
+#| fig-width: 6
+#| fig-dpi: 600
+#| fig-cap: "Interaction plots for dataset and response filtering, facetted by stimuli pair and media type."
+
+
 bind_rows(
-  data.frame(pairs(emmeans(mod_all_all, ~media | pair_id + set, pbkrtest.limit = 5800), infer = c(T,T))),
-  data.frame(pairs(emmeans(mod_all_q1, ~media | pair_id + set, pbkrtest.limit = 5800), infer = c(T,T))),
-  data.frame(pairs(emmeans(mod_q1_all, ~media | pair_id + set, pbkrtest.limit = 5800), infer = c(T,T))),
-  data.frame(pairs(emmeans(mod_q1_q1, ~media | pair_id + set, pbkrtest.limit = 5800), infer = c(T,T))),
+  data.frame(em_all_all),
+  data.frame(em_all_q1),
+  data.frame(em_q1_all),
+  data.frame(em_q1_q1),
   .id = 'model'
 ) %>% 
   mutate(model = case_when(
@@ -1099,29 +1063,32 @@ bind_rows(
     model=='3' ~ 'Filtered participants, all responses',
     model=='4' ~ 'Filtered participants, Q1 correct'
   )) %>% 
-  mutate(contain0 = ifelse(lower.CL < 0 & upper.CL > 0, 1, 0)) %>% 
-  ggplot(mapping = aes(x = estimate, 
-                       y = contrast,
-                       group = model,
-                       # shape = model,
-                       color = factor(model))) + 
-  geom_point(position = position_dodge(width = 1/2), size = 1/3) + 
-  geom_errorbar(aes(xmin = lower.CL, xmax = upper.CL),
-                position = position_dodge(width = 1/2), 
-                width = 1/4) + 
-  guides(color = guide_legend(nrow = 2)) + 
-  facet_grid(set ~ pair_id) + 
-  theme_bw() + 
-  theme(aspect.ratio = 1.5, legend.position = 'bottom')
+  ggplot(mapping = aes(x = set, y = emmean, color = model, group = model)) + 
+  geom_point(size = 1) + 
+  geom_line() + 
+  facet_grid(media~pair_id, labeller = label_both) +
+  # facet_grid(set ~ pair_id) + 
+  # facet_grid(pair_id ~ set) + 
+  theme_bw() +
+  guides(color=guide_legend(nrow=2,byrow=TRUE)) + 
+  theme(aspect.ratio = 1/1,
+        strip.text.y = element_text(size = 6),
+        legend.position = 'bottom')
 ```
 
 ```{r}
-#| fig-height: 8
+#| eval: true
+#| label: fig-model-int3
+#| fig-width: 6
+#| fig-dpi: 600
+#| fig-cap: "Interaction plots for stimuli pairs and response filtering, facetted by dataset and media type."
+
+
 bind_rows(
-  data.frame(pairs(emmeans(mod_all_all, ~pair_id | media + set, pbkrtest.limit = 5800), infer = c(T,T))),
-  data.frame(pairs(emmeans(mod_all_q1, ~pair_id | media + set, pbkrtest.limit = 5800), infer = c(T,T))),
-  data.frame(pairs(emmeans(mod_q1_all, ~pair_id | media + set, pbkrtest.limit = 5800), infer = c(T,T))),
-  data.frame(pairs(emmeans(mod_q1_q1, ~pair_id | media + set, pbkrtest.limit = 5800), infer = c(T,T))),
+  data.frame(em_all_all),
+  data.frame(em_all_q1),
+  data.frame(em_q1_all),
+  data.frame(em_q1_q1),
   .id = 'model'
 ) %>% 
   mutate(model = case_when(
@@ -1130,105 +1097,141 @@ bind_rows(
     model=='3' ~ 'Filtered participants, all responses',
     model=='4' ~ 'Filtered participants, Q1 correct'
   )) %>% 
-  mutate(contain0 = ifelse(lower.CL < 0 & upper.CL > 0, 1, 0)) %>% 
-  ggplot(mapping = aes(x = estimate, 
-                       y = reorder(contrast, estimate, mean),
-                       group = model,
-                       # shape = model,
-                       color = factor(model))) + 
-  geom_point(position = position_dodge(width = 1/2), size = 1/3) + 
-  geom_errorbar(aes(xmin = lower.CL, xmax = upper.CL),
-                position = position_dodge(width = 1/2), 
-                width = 1/4) + 
-  guides(color = guide_legend(nrow = 2)) + 
-  facet_wrap(~ media+set, nrow = 1) + 
-  theme_bw() + 
-  theme(aspect.ratio = 5, legend.position = 'bottom')
+  ggplot(mapping = aes(x = pair_id, y = emmean, color = model, group = model)) + 
+  geom_point(size = 1) + 
+  geom_line() + 
+  facet_grid(set~media, labeller = label_both) +
+  # facet_grid(set ~ pair_id) + 
+  # facet_grid(pair_id ~ set) + 
+  theme_bw() +
+  guides(color=guide_legend(nrow=2,byrow=TRUE)) + 
+  theme(aspect.ratio = 1/1,
+        # strip.text.y = element_text(size = 6),
+        legend.position = 'bottom')
 ```
 
-```{r}
-#| fig-height: 6
-bind_rows(
-  data.frame(pairs(emmeans(mod_all_all, ~set | media + pair_id, pbkrtest.limit = 5800), infer = c(T,T))),
-  data.frame(pairs(emmeans(mod_all_q1, ~set | media + pair_id, pbkrtest.limit = 5800), infer = c(T,T))),
-  data.frame(pairs(emmeans(mod_q1_all, ~set | media + pair_id, pbkrtest.limit = 5800), infer = c(T,T))),
-  data.frame(pairs(emmeans(mod_q1_q1, ~set | media + pair_id, pbkrtest.limit = 5800), infer = c(T,T))),
-  .id = 'model'
-) %>% 
-  mutate(model = case_when(
-    model=='1' ~ 'All participants, all responses',
-    model=='2' ~ 'All participants, Q1 correct',
-    model=='3' ~ 'Filtered participants, all responses',
-    model=='4' ~ 'Filtered participants, Q1 correct'
-  )) %>% 
-  mutate(contain0 = ifelse(lower.CL < 0 & upper.CL > 0, 1, 0)) %>% 
-  ggplot(mapping = aes(x = estimate, 
-                       y = contrast,
-                       group = model,
-                       # shape = model,
-                       color = factor(model))) + 
-  geom_point(position = position_dodge(width = 1/2), size = 1/3) + 
-  geom_errorbar(aes(xmin = lower.CL, xmax = upper.CL),
-                position = position_dodge(width = 1/2), 
-                width = 1/4) + 
-  guides(color = guide_legend(nrow = 2)) + 
-  facet_grid(media ~ pair_id) + 
-  theme_bw() + 
-  theme(aspect.ratio = 1, legend.position = 'bottom')
-```
+\newpage
 
-In addition to our parametric methods, we also present the results of a generalized additive model in @eq-gam
+:::{.callout-note}
 
-::: callout-note
-I adapted code from our first paper, but I would like a second look over this model before writing it up. The good news is that the results seem to be similar :)
+This paragraph is pushed to a new page since the ANOVA table p-values is causing formatting issues
+
 :::
 
+Visualizations of the simple effects for media types, datasets, and stimuli pairs (@fig-model-int1, @fig-model-int2, @fig-model-int3) shows that the difference between participant filtering is mostly a linear shift in log error. Removing participants deemed to be random guessers tended to have smaller errors than including all participants. The shift is less prevalent across participant filters when filtering out incorrect responses to the first question in each trial. This, in addition to the p-values from @tbl-all-models-anova, suggests that our sample size was large enough to counteract effects from careless respondents.
+
+We also attempted to fit Gaussian mixture models to the submitted responses using the `flexmix` package [@flexmix] to account for careless respondents [@jasoIdentificationCarelessResponding2021]. However, these models only reliably detected a small subset of participants who were would be considered high performers. That is, participants who had a near 1:1 relationship with the ratio estimations strategy and small variation. Visual inspections of the mixture model components did not provide reliable classifications of estimation strategies, so we opted to exclude mixture models from consideration.
+
+### Generalized Additive Model
+
+In addition to our parametric methods, we also present the results of a generalized additive model [@hastie2017generalized]. Here, we define the model similarly to the parametric models, but replace stimuli pair identifiers with their respective numerical ratio value. Thin-plate regression splines in the generalized additive model account for nonlinearity which could alleviate issues due to different estimation strategies. The formal statistical model is as follows:
+
 $$
-\text{MODEL GOES HERE}
+y=\mu+S_i\times M_j + s_i^S(R)+s_j^M(R)+P_m+\epsilon
 $$ {#eq-gam}
 
+where
+
+-   $y=\log_2(|\text{Error}|+1/8)$
+
+-   $S_i\times M_j$ is the fixed effects for main effect and two-way interactions of dataset $S_i$ and media type $M_j$
+
+-   $S_i^S(R)$ is a thin-plate spline function for ratio accounting for dataset
+
+-   $S_j^M(R)$ is a thin-plate spline function for ratio accounting for media type
+
+-   $P_m$ is the random effect of the $m^{th}$ participant
+
+-   $\epsilon$ is random error
+
+A generalized additive model was fit using the `mgcv` package [@mgcv] on the entire dataset and the filtered dataset. The data for these models remove stimuli pair 5 and incorrect responses to the initial question. In both cases, results of the generalized additive models suggest that the 2D heatmaps have larger errors than the 3D heatmaps, with no differences detected between the digital and physical heatmaps [@tbl-gam-emmeans; @tbl-gam-diffs].
+
 ```{r}
+#| cache: true
 # GAM
 library(mgcv)
+library(gratia)
 mod_gam <- gam(
   q2_error_cm ~ 
     set*media + 
     s(target_ratio, k = 4, by = media) + 
     s(target_ratio, k = 4, by = set) + 
     s(user_id, bs='re'),
+  method = 'REML',
+  data = filter(res_q2, pair_id != 5 & user_larger == true_larger) %>% 
+    mutate(set = factor(set),
+           media = factor(media),
+           user_id = factor(user_id))
+)
+gam_sum <- summary(mod_gam)
+
+```
+
+```{r}
+#| cache: true
+mod_gam_flt <- gam(
+  q2_error_cm ~ 
+    set*media + 
+    s(target_ratio, k = 4, by = media) + 
+    s(target_ratio, k = 4, by = set) + 
+    s(user_id, bs='re'),
+  method = 'REML',
   data = filter(res_q2_filtered, pair_id != 5 & user_larger == true_larger) %>% 
     mutate(set = factor(set),
            media = factor(media),
            user_id = factor(user_id))
 )
-anova(mod_gam)
+```
 
-em_gam <- emmeans(mod_gam, ~media)
-em_gam %>% 
-  data.frame() %>% 
-  ggplot(mapping = aes(x = media, y = emmean)) + 
-  geom_col()
+```{r}
+gam_sum <- summary(mod_gam)
+gam_sum2 <- summary(mod_gam_flt)
+
+gam_sum$p.table %>% knitr::kable(digits = 3, caption = "Parametric coefficients in gam model with all participants.", label = "gam-param1", booktabs = T)
+
+gam_sum$s.table %>% as.data.frame() %>% 
+  mutate(Smooth = rownames(.),
+         Smooth = str_replace(Smooth, "ratio_prop", "Ratio")) %>%
+  select(Smooth, everything()) %>%
+  knitr::kable(digits = 3, row.names = F, caption = "Approximate significance of smooth terms in gam mode with all participants.", label = "gam-smooth1", booktabs = T)
+
+gam_sum$p.table %>% knitr::kable(digits = 3, caption = "Parametric coefficients in gam model without random guessers.", label = "gam-param2", booktabs = T)
+
+gam_sum$s.table %>% as.data.frame() %>% 
+  mutate(Smooth = rownames(.),
+         Smooth = str_replace(Smooth, "ratio_prop", "Ratio")) %>%
+  select(Smooth, everything()) %>%
+  knitr::kable(digits = 3, row.names = F, caption = "Approximate significance of smooth terms in gam model without random guessers.", label = "gam-smooth2", booktabs = T)
+```
+
+```{r}
+em_gam1 <- emmeans(mod_gam, ~media|set)
+em_gam2 <- emmeans(mod_gam_flt, ~media|set)
+
+bind_rows(
+  em_gam1 %>% data.frame() %>% mutate(flt = 'All participants'),
+  em_gam2 %>% data.frame() %>% mutate(flt = 'Random guessers removed')
+) %>% 
+  select(`Data filtering` = flt, set, emmean:upper.CL) %>% 
+  kbl(caption = 'Estimated marginal means for generalized additive model', digits = 3,
+      booktabs = T, label = 'tbl-gam-emmeans') %>% 
+  collapse_rows()
+
+```
+
+```{r}
+bind_rows(
+  pairs(em_gam1) %>% data.frame() %>% mutate(flt = 'All participants'),
+  pairs(em_gam2) %>% data.frame() %>% mutate(flt = 'Random guessers removed')
+) %>% 
+  select(`Data filtering` = flt, set, contrast, estimate:p.value) %>% 
+  kbl(caption = 'Pairwise differences for generalized additive model', digits = 3,
+      booktabs = T, label = 'tbl-gam-diffs') %>% 
+  collapse_rows()
 
 ```
 
 \newpage
-
-```{r}
-library(flexmix)
-fm <- stepFlexmix(user_slider ~ 0 + target_ratio:media:set | user_id,
-        data = res_q2_filtered, k = 1:10)
-
-summary(fm)
-parameters(getModel(fm, which = 'BIC'))
-
-res_q2 %>% 
-  mutate(diff_ratio = user_slider - target_ratio,
-         diff_diff = user_slider - target_diff) %>% 
-  ggplot(mapping = aes(x = diff_ratio, y = diff_diff, color = factor(pair_id))) + 
-  geom_point()
-
-```
-
 
 ## References
 
