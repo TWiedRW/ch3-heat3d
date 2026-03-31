@@ -265,6 +265,26 @@ em2.media <- emmeans(mod.q2, ~media, pbkrtest.limit = 100000)
 
 ```
 
+```{r}
+library(brms)
+
+f_base <- bf(
+  q2 ~ set * media * factor(pair_id) + (1 | user_id)
+)
+
+mod_resmix <- brm(
+  f_base,
+  family = mixture(gaussian(), gaussian(), gaussian()),
+  data = res.q2,
+  chains = 4,
+  cores = 4,
+  iter = 4000,
+  control = list(adapt_delta = 0.95)
+)
+
+```
+
+
 The second question in each trial was to estimate the size of the smaller value in the stimuli pair if the larger value represented 100 units. Of the 4,072 completed trials, we removed all trials where participants were incorrect in their response to Question 1 (854 trials), as well as responses to stimuli pair 5 (additional 280 trials). The first question served primarily as an attention check to see if participants were correctly identifying the larger value in the pair. Both stimuli in pair 5 were the same value, meaning that correct solutions to Question 1 should give an identical answer in the ratio estimation if participants were following instructions. For these reasons, 1,134 responses were removed for Question 2. 
 
 Using a similar error metric as @cleveland1984, we model our error as $\text{Error}=\log_2(|\text{judged percent}-\text{true percent}|)$. There were significant main effects for media type (p-value < .0001) and stimuli pair (p-value = 0.0022). For media types, the log absolute error was larger for the 2D chart than both the 3D digital chart (p-value < .0001) and the 3D-printed chart (p-value < .0001). There were no detectable differences between the digital and printed 3D charts. All significant differences in stimuli pairs included pair 6, where stimuli pair 6 had significantly smaller error than stimuli pairs 1 (p-value = 0.0398) and  2 (p-value = 0.0004), and marginally smaller errors than pairs 8 (p-value = 0.0560) and 9 (p-value = 0.0809). 
