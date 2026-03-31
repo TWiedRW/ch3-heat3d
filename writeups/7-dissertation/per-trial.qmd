@@ -1,0 +1,256 @@
+---
+format: 
+  pdf:
+    fig-dpi: 600
+execute:
+    echo: false
+    warning: false
+    message: false
+---
+
+```{r}
+#| message: false
+#| warning: false
+#| echo: false
+
+library(tidyverse)
+
+set.seed(3141)
+
+# Data from Shiny app
+library(RSQLite)
+conn <- dbConnect(SQLite(), "../../shiny-apps/experiment-heat3d/data/stat218-summer2025.db")
+blocks <- dbReadTable(conn, "blocks")
+exp_results <- dbReadTable(conn, "exp_results")
+users <- dbReadTable(conn, "users")
+dbDisconnect(conn)
+
+# Solutions
+solutions <- readRDS("../../data/solutions.rda")
+
+# Pre-processing of results
+results <- exp_results %>%
+  filter(set != "practice") %>%
+  group_by(user_id) %>%
+  arrange(start_time) %>%
+  mutate(user_seq = ifelse(user_trial_order > lag(user_trial_order), 0, 1),
+         user_seq = ifelse(start_time == min(start_time), 0, user_seq)) %>%
+  mutate(user_seq = cumsum(user_seq)) %>%
+  left_join(blocks, by = "user_id", relationship = 'many-to-many') %>%
+  group_by(user_id, user_seq) %>%
+  filter(system_time < min(start_time)) %>%
+  mutate(time_diff_block = min(start_time) - system_time) %>%
+  filter(time_diff_block == min(time_diff_block)) %>%
+  filter(user_seq == min(user_seq))
+
+# Get user sequences with full completions
+full_completions <- results %>%
+  group_by(user_id, user_seq, block) %>%
+  count() %>%
+  filter(n %in% c(16,24))
+
+# Inner join to filter
+results <- inner_join(results, full_completions) %>%
+  select(-c(time_diff_block, n)) %>%
+  ungroup()
+
+# Join with results and filter so that only first completed block is there
+results <- left_join(results, solutions) %>%
+  ungroup() %>%
+  group_by(user_id) %>%
+  filter(system_time == min(system_time))
+
+results$pair_id <- factor(results$pair_id)
+
+# Prepare data for Q2
+res_q2 <- results %>%
+  mutate(target_ratio = 100*true_ratio,
+         target_size = ifelse(z > 50, 50, z*true_ratio),
+         target_diff = z-target_size,
+         q1_status = ifelse(user_larger == true_larger, 'correct', 'incorrect')) %>%
+  # filter(pair_id != 5) %>%
+  group_by(user_id, block) %>%
+  mutate(prop_correct = mean(user_larger==true_larger))
+
+# Get unique user IDs
+user_ids <- unique(res_q2$user_id)
+```
+
+# Legend
+
+```{r}
+#| echo: false
+#| fig-width: 8
+#| fig-height: 4
+
+library(cowplot)
+
+# Create a dummy plot to extract legends from - include all media types
+dummy_data <- res_q2 %>%
+  pivot_longer(cols = c(user_slider, target_ratio, target_diff, target_size),
+               names_to = 'point') %>%
+  mutate(q1_status = ifelse(point != 'user_slider', 'target', q1_status),
+         media = factor(media, levels = c('2dd', '3dd', '3dp'))) %>%
+  # Ensure all media types are represented
+  group_by(media) %>%
+  slice(1) %>%
+  ungroup()
+
+# Plot for line/color legend - use original data
+line_data <- res_q2 %>%
+  filter(user_id == user_ids[1]) %>%
+  pivot_longer(cols = c(user_slider, target_ratio, target_diff, target_size),
+               names_to = 'point') %>%
+  mutate(q1_status = ifelse(point != 'user_slider', 'target', q1_status))
+
+p_lines <- ggplot(line_data, aes(x = user_trial_order, y = value, 
+                                   linetype = point, color = point, alpha = point)) +
+  geom_line() +
+  scale_color_manual(name = "Variable",
+                     values = c(
+                       'user_slider'='black',
+                       'target_ratio'='black',
+                       'target_diff'='#1a80bb',
+                       'target_size'='#a00000'
+                     ),
+                     labels = c('user_slider' = 'User Slider',
+                                'target_ratio' = 'Target Ratio',
+                                'target_diff' = 'Target Difference',
+                                'target_size' = 'Target Size')) +
+  scale_linetype_manual(name = "Variable",
+                        values = c(
+                          'user_slider'='solid',
+                          'target_ratio'='longdash',
+                          'target_diff'='dotted',
+                          'target_size'='dotdash'
+                        ),
+                        labels = c('user_slider' = 'User Slider',
+                                   'target_ratio' = 'Target Ratio',
+                                   'target_diff' = 'Target Difference',
+                                   'target_size' = 'Target Size')) +
+  scale_alpha_manual(name = "Variable",
+                     values = c(
+                       'user_slider'=1,
+                       'target_ratio'=0.5,
+                       'target_diff'=0.5,
+                       'target_size'=0.5
+                     ),
+                     labels = c('user_slider' = 'User Slider',
+                                'target_ratio' = 'Target Ratio',
+                                'target_diff' = 'Target Difference',
+                                'target_size' = 'Target Size')) +
+  theme_minimal() +
+  theme(legend.position = "bottom")
+
+# Plot for media legend
+p_media <- ggplot(dummy_data, aes(x = user_trial_order, y = 100)) +
+  geom_col(aes(fill = media), width = 1) +
+  scale_fill_manual(name = "Media",
+                    values = c(
+                      '2dd'='#d4d4d4',
+                      '3dd'='#595959',
+                      '3dp'='#7f7f7f'
+                    ),
+                    labels = c('2dd' = '2D Digital',
+                               '3dd' = '3D Digital',
+                               '3dp' = '3D Printed'),
+                    drop = FALSE) +
+  theme_minimal() +
+  theme(legend.position = "bottom")
+
+# Plot for shape legend
+p_shape <- ggplot(line_data, aes(x = user_trial_order, y = value)) +
+  geom_point(aes(shape = q1_status)) +
+  scale_shape_manual(name = "Q1 Status",
+                     values = c('correct' = 1, 'incorrect' = 4, 'target' = 16),
+                     labels = c('correct' = 'Correct',
+                                'incorrect' = 'Incorrect',
+                                'target' = 'Target')) +
+  theme_minimal() +
+  theme(legend.position = "bottom")
+
+# Extract legends
+legend_lines <- get_legend(p_lines)
+legend_media <- get_legend(p_media)
+legend_shape <- get_legend(p_shape)
+
+# Combine legends in rows
+legend_row1 <- legend_lines
+legend_row2 <- plot_grid(legend_media, legend_shape, nrow = 1)
+
+# Final combined legend
+final_legend <- plot_grid(legend_row1, legend_row2, ncol = 1)
+
+print(final_legend)
+```
+
+\newpage
+
+# User Plots
+
+```{r}
+#| echo: false
+#| fig-width: 8
+#| fig-height: 3.5
+
+for (i in seq_along(user_ids)) {
+  uid <- user_ids[i]
+#for (i in 1:4) {
+#  uid <- user_ids[i]
+  # Get prop_correct for this user
+  prop_correct_val <- res_q2 %>%
+    filter(user_id == uid) %>%
+    pull(prop_correct) %>%
+    first() %>%
+    round(3)
+  
+  p <- res_q2 %>%
+    filter(user_id == uid) %>%
+    pivot_longer(cols = c(user_slider, target_ratio, target_diff, target_size),
+                 names_to = 'point') %>%
+    mutate(q1_status = ifelse(point != 'user_slider', 'target', q1_status)) %>% 
+    ggplot(mapping = aes(x = user_trial_order,
+                         y = value)) +
+    geom_col(aes(y = 100, fill = media), width = 1, alpha = 1/4) +
+    geom_point(aes(shape = q1_status, color = point,
+                         alpha = point)) +
+    geom_line(aes(color = point,
+                         alpha = point, linetype = point)) +
+    scale_y_continuous(limits = c(0, 100)) +
+    scale_x_continuous(breaks = seq(1,24, by = 1)) +
+    scale_shape_manual(values = c('correct' = 1, 'incorrect' = 4, 'target' = 16)) +
+    scale_color_manual(values = c(
+      'user_slider'='black',
+      'target_ratio'='black',
+      'target_diff'='#1a80bb',
+      'target_size'='#a00000'
+    )) +
+    scale_linetype_manual(values = c(
+      'user_slider'='solid',
+      'target_ratio'='longdash',
+      'target_diff'='dotted',
+      'target_size'='dotdash'
+    )) +
+    scale_alpha_manual(values = c(
+      'user_slider'=1,
+      'target_ratio'=0.5,
+      'target_diff'=0.5,
+      'target_size'=0.5
+    )) +
+    scale_fill_manual(values = c(
+      '2dd'='#d4d4d4',
+      '3dd'='#595959',
+      '3dp'='#7f7f7f'
+    )) + 
+    labs(caption = paste0("Proportion Correct: ", prop_correct_val),
+         title = paste0("User ID: ", uid),
+         x = 'Trial Number', y = 'Slider Position') +
+    theme_minimal() +
+    theme(aspect.ratio = 1/2, 
+          legend.position = 'none',
+          panel.grid.minor.x = element_blank())
+  
+  print(p)
+  
+}
+```

@@ -1,0 +1,601 @@
+---
+title: "Models"
+format: 
+  html:
+    toc: true
+execute:
+  message: false
+  warning: false
+bibliography: references.bib
+---
+
+The purpose of this document is to discuss as many plausible models as possible. There are two primary issues with the quality of the data from our experiment: 
+
+1. Many students appeared to randomly answer questions instead of the assigned task
+2. Some students may have used an alternative strategy other than ratio estimation
+
+As of 2023, there is no general consensus on how to identify careless respondents. Some methods include fitting mixture models or examining completion times [@ward2023; @jasoIdentificationCarelessResponding2021]
+
+## Data cleaning
+
+The very initial step is to clean the data. For unknown reasons, multiple `user_id` were used for several completions of the experiment. To be included in the clean data, the following conditions must be met: 
+
+1. All practice trials are excluded
+2. All trials of the experiment must have been completed in a single run
+3. If one `user_id` had multiple completions, only the first completion is included
+
+Lastly, variables are calculated for completion time and the proportion of correct responses to Q1. 
+
+```{r}
+## -----------------------------------------------------------------------
+#| message: false
+#| warning: false
+#| echo: false
+library(tidyverse)
+library(lme4)
+library(lmerTest)
+library(emmeans)
+library(flexmix)
+
+set_theme(theme_bw())
+
+set.seed(3141)
+
+# Data from Shiny app
+library(RSQLite)
+conn <- dbConnect(SQLite(), "../../shiny-apps/experiment-heat3d/data/stat218-summer2025.db")
+dbListTables(conn)
+blocks <- dbReadTable(conn, "blocks")
+exp_results <- dbReadTable(conn, "exp_results")
+users <- dbReadTable(conn, "users")
+dbDisconnect(conn)
+
+# Solutions
+solutions <- readRDS("../../data/solutions.rda")
+
+library(tidyverse)
+# Pre-processing of results
+results <- exp_results %>%
+
+  # Remove all practice trials
+  filter(set != "practice") %>%
+
+  # Arrange by user id and trial time
+  group_by(user_id) %>%
+  arrange(start_time) %>%
+
+  # Identify sequence of trials
+  mutate(user_seq = ifelse(user_trial_order > lag(user_trial_order), 0, 1),
+         user_seq = ifelse(start_time == min(start_time), 0, user_seq)) %>%
+  mutate(user_seq = cumsum(user_seq)) %>%
+
+  # Join with blocks
+  left_join(blocks, by = "user_id", relationship = 'many-to-many') %>%
+  group_by(user_id, user_seq) %>%
+
+  # Remove blocks that were assigned after the trials started
+  filter(system_time < min(start_time)) %>%
+
+  # Get time difference with block and filter for smallest difference
+  mutate(time_diff_block = min(start_time) - system_time) %>%
+  filter(time_diff_block == min(time_diff_block)) %>%
+
+  # Filter so that only the first completed trial is included
+  filter(user_seq == min(user_seq))
+
+# Get user sequences with full completions
+full_completions <- results %>%
+  group_by(user_id, user_seq, block) %>%
+  count() %>%
+  filter(n %in% c(16,24))
+
+# Inner join to filter
+results <- inner_join(results, full_completions) %>%
+  select(-c(time_diff_block, n)) %>%
+  ungroup()
+
+# Join with results and filter so that only first completed block is there
+results <- left_join(results, solutions) %>%
+  ungroup() %>%
+  group_by(user_id) %>%
+  filter(system_time == min(system_time))
+
+results$pair_id <- factor(results$pair_id)
+
+
+## -----------------------------------------------------------------------
+users_clean <- results %>%
+  inner_join(users, by = 'user_id', relationship = 'many-to-many') %>%
+  select(user_id, user_age:user_unique) %>%
+  distinct() %>%
+  dplyr::filter(!str_detect(tolower(user_unique), 'test,'))
+
+
+## -----------------------------------------------------------------------
+users_in_person <- users_clean %>%
+  inner_join(results) %>%
+  group_by(user_id, media) %>%
+  summarise(n = n()) %>%
+  filter(media == '3dp' & n > 0) %>%
+  select(user_id)
+
+
+## -----------------------------------------------------------------------
+res_q2 <- results %>%
+  mutate(target_ratio = 100*true_ratio,
+         target_size = ifelse(z > 50, 50, z*true_ratio),
+         target_diff = z-target_size) %>%
+  # filter(pair_id != 5) %>%
+  group_by(user_id, block) %>%
+  mutate(prop_correct = mean(user_larger==true_larger),
+         trial_correct = factor(user_larger==true_larger)) %>% 
+  ungroup() %>% 
+  mutate(q2_error = user_slider - target_ratio,
+         q2_error_cm = log2(abs(user_slider - target_ratio) + 1/8))
+```
+
+## Random Guessing to Q1
+
+One possible way to identify random guessing is to look at responses to Q1. If participants are randomly guessing, we could use either a Chi-square test to check deviance from expected counts of responses or a binomial distribution with $p=0.5$. However, the Chi-square test has assumptions violated since some cells could be zero. Hence a plausible way to identify random guessing from Q1 is to check if the observed number of successes is unlikely under chance. 
+
+$$
+H_0: \pi\leq0.5 \text{ vs. } H_1: \pi>0.5
+$$
+
+
+```{r}
+more_than_chance <- res_q2 %>% 
+  group_by(user_id) %>% 
+  summarise(n_correct = sum(user_larger == true_larger),
+            n_total = n()) %>% 
+  mutate(p.val = pbinom(n_correct, n_total, 0.5, lower.tail = F)) %>% 
+  filter(p.val < 0.05)
+```
+
+
+At $\alpha=0.05$, `r length(unique(res_q2$user_id)) - length(unique(more_than_chance$user_id))` out of `r length(unique(res_q2$user_id))` participants can be excluded for random guessing for Q1. Of course this isn't a perfect approach since trials are not i.i.d. However, if we frame this from a careless guesser standpoint, people who are actually contributing would show evidence of more correct solutions than randomly guessing. 
+
+```{r}
+#| layout-ncol: 2
+#| fig-subcap: 
+#| - "All participants"
+#| - "Filtered participants"
+res_q2_flt <- inner_join(res_q2, more_than_chance, by = 'user_id')
+res_q2 %>% 
+  group_by(user_id) %>% 
+  summarise(prop.correct = mean(user_larger == true_larger)) %>% 
+  ggplot(mapping = aes(x = prop.correct)) + 
+  geom_histogram(binwidth = 0.05, color = 'black') + 
+  scale_x_continuous(limits = c(0,1.2))
+
+res_q2_flt %>% 
+  group_by(user_id) %>% 
+  summarise(prop.correct = mean(user_larger == true_larger)) %>% 
+  ggplot(mapping = aes(x = prop.correct)) + 
+  geom_histogram(binwidth = 0.05, color = 'black') + 
+  scale_x_continuous(limits = c(0,1.2))
+```
+
+
+## Estimation strategies: mixture models
+
+Now, we need to examine the estimation strategies. It seemingly appears that many of the participants are estimating the ratio with some degree of bias. 
+
+```{r}
+#| layout-ncol: 2
+#| fig-subcap: 
+#| - "Error w.r.t. ratio estimation (all)"
+#| - "Error w.r.t. difference estimation (all)"
+#| - "Error w.r.t. ratio estimation (filtered)"
+#| - "Error w.r.t. difference estimation (filtered)"
+res_q2 %>% 
+  ggplot(mapping = aes(x = user_slider - target_ratio, group = user_id)) + 
+  geom_density(color = alpha('black', 0.15)) + scale_x_continuous(limits = c(-100, 100))
+
+res_q2 %>% 
+  ggplot(mapping = aes(x = user_slider - target_diff, group = user_id)) + 
+  geom_density(color = alpha('black', 0.15)) + scale_y_continuous(limits = c(0, 0.08)) + scale_x_continuous(limits = c(-100, 100))
+
+res_q2_flt %>% 
+  ggplot(mapping = aes(x = user_slider - target_ratio, group = user_id)) + 
+  geom_density(color = alpha('black', 0.15)) + scale_x_continuous(limits = c(-100, 100))
+
+res_q2_flt %>% 
+  ggplot(mapping = aes(x = user_slider - target_diff, group = user_id)) + 
+  geom_density(color = alpha('black', 0.15)) + scale_y_continuous(limits = c(0, 0.08)) + scale_x_continuous(limits = c(-100, 100))
+```
+
+One issue that I found with `flexmix` for mixture models is that clusters lose interpretability when fitting full models. Additionally, the inherent nature of target strategies is likely to cause issues due to the correlation between them. To identify those who stuck to the ratio estimations strategy, we can look at the linear relationship between the slider position and the target ratio for each media type and set. 
+
+
+
+
+```{r}
+set.seed(31234)
+fm.mod <- flexmix(user_slider ~ 0 + target_ratio:media:set | user_id,
+              data = res_q2_flt, k = 4)
+```
+
+```{r}
+parameters(fm.mod)
+summary(fm.mod)
+```
+```{r}
+#| layout-ncol: 2
+#| fig-subcap: 
+#| - "Ratio strategy"
+#| - "Difference strategy"
+
+  
+res_q2_flt %>% 
+  mutate(cluster = clusters(fm.mod)) %>% 
+  ggplot(mapping = aes(x = user_slider - target_ratio, group = user_id)) + 
+  geom_density(aes(color = alpha(factor(cluster), alpha = 0.15))) +
+  scale_y_continuous(limits = c(0, 0.08)) + scale_x_continuous(limits = c(-100, 100)) + 
+  facet_wrap(~cluster)
+
+res_q2_flt %>% 
+  mutate(cluster = clusters(fm.mod)) %>% 
+  ggplot(mapping = aes(x = user_slider - target_diff, group = user_id)) + 
+  geom_density(aes(color = alpha(factor(cluster), alpha = 0.15))) +
+  scale_y_continuous(limits = c(0, 0.08)) + scale_x_continuous(limits = c(-100, 100)) + 
+  facet_wrap(~cluster)
+```
+
+Taking this a step further, we can check for additional components. From 4 components, it's clear that even ratio strategies can differ from each other.  
+
+```{r}
+#| cache: true
+
+set.seed(4124)
+sfm <- stepFlexmix(user_slider ~ 0 + target_ratio:media:set | user_id,
+                   data = res_q2_flt, k = 1:10, nrep = 10) 
+sfm.mod <- getModel(sfm, which = 'BIC')
+```
+
+```{r}
+parameters(sfm.mod)
+summary(sfm.mod)
+```
+
+Using BIC, 6 components are selected. Here, components 1, 3, and 5 appear to be ratio estimations, with components 2 and 4 being different strategies or random noise. Component 6 looks like a wildcard, where it is mostly ratios, but with some carelessness. However, pure random stategies are not captured. Perhaps simply focusing on the ratio strategy is the best approach?
+
+
+```{r}
+#| layout-ncol: 2
+#| fig-subcap: 
+#| - "Ratio strategy"
+#| - "Difference strategy"
+#| - "No strategy"
+
+  
+# res_q2_flt %>% 
+#   mutate(cluster = clusters(sfm.mod)) %>% 
+#   ggplot(mapping = aes(x = user_slider - target_ratio, group = user_id)) + 
+#   geom_density(aes(color = alpha(factor(cluster), alpha = 0.15))) +
+#   scale_y_continuous(limits = c(0, 0.08)) + scale_x_continuous(limits = c(-100, 100)) + 
+#   facet_wrap(~cluster)
+# 
+# res_q2_flt %>% 
+#   mutate(cluster = clusters(sfm.mod)) %>% 
+#   ggplot(mapping = aes(x = user_slider - target_diff, group = user_id)) + 
+#   geom_density(aes(color = alpha(factor(cluster), alpha = 0.15))) +
+#   scale_y_continuous(limits = c(0, 0.08)) + scale_x_continuous(limits = c(-100, 100)) + 
+#   facet_wrap(~cluster)
+# 
+# res_q2_flt %>% 
+#   mutate(cluster = clusters(sfm.mod)) %>% 
+#   ggplot(mapping = aes(x = user_slider, group = user_id)) + 
+#   geom_density(aes(color = alpha(factor(cluster), alpha = 0.15))) +
+#   scale_y_continuous(limits = c(0, 0.08)) + scale_x_continuous(limits = c(-100, 100)) + 
+#   facet_wrap(~cluster)
+
+```
+
+
+
+
+## Analyzing Error
+
+With no clear approach, several models can be considered for assessing error. The models presented below represent three levels of participant filtering: (1) no filtering / all participants, (2) responses to Q1 are not by chance, and (3) participants who used the ratio estimation strategy. Additionally, there are four levels of participant response filtering that could be considered: (1) all responses, (2) exclude incorrect Q1 responses, (3) exclude pair_id 5, and (4) exclude incorrect Q1 responses and pair_id 5. The purpose for excluding pair_id 5 is that correct responses would only have the slider at 100, and hence give zero-inflated errors. 
+
+There are also two quantifications of error that are reasonable to look at. The first one is using the actual error of the slider position to the intended target. From the density plots, this measure of error may not violate normality assumptions. The second type of error is the same that Cleveland and McGill used for their 1984 study. The advantage here is that error is now on a scale that is comparable to their study, as well as having the 1/8 added to avoid $\log_2(0)$ issues. 
+
+$$
+Y=\text{Slider}-\text{True Ratio}
+$$
+
+$$
+Y_{CM}=\log_2(|\text{Slider}-\text{True Ratio}|+1/8)
+$$
+
+### Error on Slider Scale
+
+```{r}
+mod.all.all <- lmer(q2_error ~ set*media*pair_id + (1|user_id/set:media),
+     data = res_q2)
+mod.all.xq1 <- lmer(q2_error ~ set*media*pair_id + (1|user_id/set:media),
+     data = filter(res_q2, user_larger == true_larger))
+mod.all.xp5 <- lmer(q2_error ~ set*media*pair_id + (1|user_id/set:media),
+     data = filter(res_q2, pair_id != 5))
+mod.all.xq1xq5 <- lmer(q2_error ~ set*media*pair_id + (1|user_id/set:media),
+     data = filter(res_q2, user_larger == true_larger & pair_id != 5))
+```
+
+```{r}
+mod.q1.all <- lmer(q2_error ~ set*media*pair_id + (1|user_id/set:media),
+     data = res_q2_flt)
+mod.q1.xq1 <- lmer(q2_error ~ set*media*pair_id + (1|user_id/set:media),
+     data = filter(res_q2_flt, user_larger == true_larger))
+mod.q1.xp5 <- lmer(q2_error ~ set*media*pair_id + (1|user_id/set:media),
+     data = filter(res_q2_flt, pair_id != 5))
+mod.q1.xq1xq5 <- lmer(q2_error ~ set*media*pair_id + (1|user_id/set:media),
+     data = filter(res_q2_flt, user_larger == true_larger & pair_id != 5))
+```
+
+```{r}
+# res_q2_fm <- res_q2_flt %>% 
+#   mutate(cluster = clusters(sfm.mod)) %>% 
+#   filter(cluster %in% c(1,3,5,6))
+# mod.fm.all <- lmer(q2_error ~ set*media*pair_id + (1|user_id/set:media),
+#      data = res_q2_fm)
+# mod.fm.xq1 <- lmer(q2_error ~ set*media*pair_id + (1|user_id/set:media),
+#      data = filter(res_q2_fm, user_larger == true_larger))
+# mod.fm.xp5 <- lmer(q2_error ~ set*media*pair_id + (1|user_id/set:media),
+#      data = filter(res_q2_fm, pair_id != 5))
+# mod.fm.xq1xq5 <- lmer(q2_error ~ set*media*pair_id + (1|user_id/set:media),
+#      data = filter(res_q2_fm, user_larger == true_larger & pair_id != 5))
+```
+
+
+### Error on Log Scale
+
+```{r}
+mod.cm.all.all <- lmer(q2_error_cm ~ set*media*pair_id + (1|user_id/set:media),
+     data = res_q2)
+mod.cm.all.xq1 <- lmer(q2_error_cm ~ set*media*pair_id + (1|user_id/set:media),
+     data = filter(res_q2, user_larger == true_larger))
+mod.cm.all.xp5 <- lmer(q2_error_cm ~ set*media*pair_id + (1|user_id/set:media),
+     data = filter(res_q2, pair_id != 5))
+mod.cm.all.xq1xq5 <- lmer(q2_error_cm ~ set*media*pair_id + (1|user_id/set:media),
+     data = filter(res_q2, user_larger == true_larger & pair_id != 5))
+```
+
+```{r}
+mod.cm.q1.all <- lmer(q2_error_cm ~ set*media*pair_id + (1|user_id/set:media),
+     data = res_q2_flt)
+mod.cm.q1.xq1 <- lmer(q2_error_cm ~ set*media*pair_id + (1|user_id/set:media),
+     data = filter(res_q2_flt, user_larger == true_larger))
+mod.cm.q1.xp5 <- lmer(q2_error_cm ~ set*media*pair_id + (1|user_id/set:media),
+     data = filter(res_q2_flt, pair_id != 5))
+mod.cm.q1.xq1xq5 <- lmer(q2_error_cm ~ set*media*pair_id + (1|user_id/set:media),
+     data = filter(res_q2_flt, user_larger == true_larger & pair_id != 5))
+```
+
+```{r}
+# res_q2_fm <- res_q2_flt %>% 
+#   mutate(cluster = clusters(sfm.mod)) %>% 
+#   filter(cluster %in% c(1,3,5,6))
+# 
+# mod.cm.fm.all <- lmer(q2_error_cm ~ set*media*pair_id + (1|user_id/set:media),
+#      data = res_q2_fm)
+# mod.cm.fm.xq1 <- lmer(q2_error_cm ~ set*media*pair_id + (1|user_id/set:media),
+#      data = filter(res_q2_fm, user_larger == true_larger))
+# mod.cm.fm.xp5 <- lmer(q2_error_cm ~ set*media*pair_id + (1|user_id/set:media),
+#      data = filter(res_q2_fm, pair_id != 5))
+# mod.cm.fm.xq1xq5 <- lmer(q2_error_cm ~ set*media*pair_id + (1|user_id/set:media),
+#      data = filter(res_q2_fm, user_larger == true_larger & pair_id != 5))
+```
+
+
+```{r}
+# all_models <- mget(ls(pattern = '^mod'))
+# all_em <- map(all_models, \(x)(emmeans(x, ~media|set:pair_id, pbkrtest.limit = 5800)))
+# all_em_df <- map(all_em, data.frame)
+# 
+# all_pairs <- map(all_em, pairs)
+# all_pairs_df <- map(all_pairs, data.frame)
+# 
+# # Parse model names into metadata
+# parse_model_meta <- function(name) {
+#   parts <- str_split(name, "\\.")[[1]]
+#   if (parts[2] == "cm") {
+#     tibble(scale = "Log (CM)", participant_filter = parts[3], response_filter = parts[4])
+#   } else {
+#     tibble(scale = "Slider", participant_filter = parts[2], response_filter = parts[3])
+#   }
+# }
+# 
+# pf_levels <- c("all" = "All participants", "q1" = "Q1 filtered", "fm" = "FlexMix filtered")
+# rf_levels <- c("all" = "All responses", "xq1" = "Excl. wrong Q1",
+#                "xp5" = "Excl. pair 5", "xq1xq5" = "Excl. wrong Q1 & pair 5")
+# 
+# model_meta <- map_dfr(names(all_em_df), parse_model_meta, .id = "model") %>%
+#   mutate(model = names(all_em_df)[as.integer(model)],
+#          participant_filter = factor(participant_filter, levels = names(pf_levels), labels = pf_levels),
+#          response_filter    = factor(response_filter,    levels = names(rf_levels), labels = rf_levels))
+# 
+# all_em_combined <- bind_rows(all_em_df, .id = "model") %>%
+#   left_join(model_meta, by = "model")
+# 
+# all_pairs_combined <- bind_rows(all_pairs_df, .id = "model") %>%
+#   left_join(model_meta, by = "model")
+```
+
+To look at the differences of the models, separating by the response filter would probably be the most meaningful. This is because these exclusions have conceptual meaning. For example, removing incorrect Q1 responses could be used as an attention check for most trials, similar to Cleveland and McGill. 
+
+### Slider Error
+
+```{r}
+# all_em_combined %>% 
+#   filter(scale == 'Slider', response_filter == 'All responses') %>% 
+#   ggplot(mapping = aes(x = media, y = emmean, color = participant_filter, group = participant_filter)) + 
+#   geom_point(position = position_dodge2()) + 
+#   geom_errorbar(aes(ymin = lower.CL, ymax = upper.CL), width = 0) + 
+#   facet_grid(set~pair_id) + 
+#   labs(title = 'Slider Error: All responses', x = 'Media', y = 'Estimated Mean Error', color = 'Participant filter') +
+#   theme(aspect.ratio = 3, axis.text.x = element_text(angle = 90, hjust = 1))
+```
+
+```{r}
+# all_em_combined %>% 
+#   filter(scale == 'Slider', response_filter == 'Excl. wrong Q1') %>% 
+#   ggplot(mapping = aes(x = media, y = emmean, color = participant_filter, group = participant_filter)) + 
+#   geom_point(position = position_dodge2()) + 
+#   geom_errorbar(aes(ymin = lower.CL, ymax = upper.CL), width = 0) + 
+#   facet_grid(set~pair_id) + 
+#   labs(title = 'Slider Error: Excluding incorrect Q1 responses', x = 'Media', y = 'Estimated Mean Error', color = 'Participant filter') +
+#   theme(aspect.ratio = 3, axis.text.x = element_text(angle = 90, hjust = 1))
+```
+
+```{r}
+# all_em_combined %>% 
+#   filter(scale == 'Slider', response_filter == 'Excl. pair 5') %>% 
+#   ggplot(mapping = aes(x = media, y = emmean, color = participant_filter, group = participant_filter)) + 
+#   geom_point(position = position_dodge2()) + 
+#   geom_errorbar(aes(ymin = lower.CL, ymax = upper.CL), width = 0) + 
+#   facet_grid(set~pair_id) + 
+#   labs(title = 'Slider Error: Excluding pair 5', x = 'Media', y = 'Estimated Mean Error', color = 'Participant filter') +
+#   theme(aspect.ratio = 3, axis.text.x = element_text(angle = 90, hjust = 1))
+```
+
+```{r}
+# all_em_combined %>% 
+#   filter(scale == 'Slider', response_filter == 'Excl. wrong Q1 & pair 5') %>% 
+#   ggplot(mapping = aes(x = media, y = emmean, color = participant_filter, group = participant_filter)) + 
+#   geom_point(position = position_dodge2()) + 
+#   geom_errorbar(aes(ymin = lower.CL, ymax = upper.CL), width = 0) + 
+#   facet_grid(set~pair_id) + 
+#   labs(title = 'Slider Error: Excluding incorrect Q1 responses and pair 5', x = 'Media', y = 'Estimated Mean Error', color = 'Participant filter') +
+#   theme(aspect.ratio = 3, axis.text.x = element_text(angle = 90, hjust = 1))
+```
+
+
+The main takeaway from the models above is that there is more down-weighted error when using all participants and filtering out the likely random guessers from Q1. Not much difference exists between those groups. However, trends do appear to be mostly similar across the models. 
+
+
+
+### Log error
+
+```{r}
+# all_em_combined %>% 
+#   filter(scale == 'Log (CM)', response_filter == 'All responses') %>% 
+#   ggplot(mapping = aes(x = media, y = emmean, color = participant_filter, group = participant_filter)) + 
+#   geom_point(position = position_dodge2()) + 
+#   geom_errorbar(aes(ymin = lower.CL, ymax = upper.CL), width = 0) + 
+#   facet_grid(set~pair_id) + 
+#   labs(title = 'Log (CM) Error: All responses', x = 'Media', y = 'Estimated Mean Error (log scale)', color = 'Participant filter') +
+#   theme(aspect.ratio = 3, axis.text.x = element_text(angle = 90, hjust = 1))
+```
+
+```{r}
+# all_em_combined %>% 
+#   filter(scale == 'Log (CM)', response_filter == 'Excl. wrong Q1') %>% 
+#   ggplot(mapping = aes(x = media, y = emmean, color = participant_filter, group = participant_filter)) + 
+#   geom_point(position = position_dodge2()) + 
+#   geom_errorbar(aes(ymin = lower.CL, ymax = upper.CL), width = 0) + 
+#   facet_grid(set~pair_id) + 
+#   labs(title = 'Log (CM) Error: Excluding incorrect Q1 responses', x = 'Media', y = 'Estimated Mean Error (log scale)', color = 'Participant filter') +
+#   theme(aspect.ratio = 3, axis.text.x = element_text(angle = 90, hjust = 1))
+```
+
+```{r}
+# all_em_combined %>% 
+#   filter(scale == 'Log (CM)', response_filter == 'Excl. pair 5') %>% 
+#   ggplot(mapping = aes(x = media, y = emmean, color = participant_filter, group = participant_filter)) + 
+#   geom_point(position = position_dodge2()) + 
+#   geom_errorbar(aes(ymin = lower.CL, ymax = upper.CL), width = 0) + 
+#   facet_grid(set~pair_id) + 
+#   labs(title = 'Log (CM) Error: Excluding pair 5', x = 'Media', y = 'Estimated Mean Error (log scale)', color = 'Participant filter') +
+#   theme(aspect.ratio = 3, axis.text.x = element_text(angle = 90, hjust = 1))
+```
+
+```{r}
+# all_em_combined %>% 
+#   filter(scale == 'Log (CM)', response_filter == 'Excl. wrong Q1 & pair 5') %>% 
+#   ggplot(mapping = aes(x = media, y = emmean, color = participant_filter, group = participant_filter)) + 
+#   geom_point(position = position_dodge2()) + 
+#   geom_errorbar(aes(ymin = lower.CL, ymax = upper.CL), width = 0) + 
+#   facet_grid(set~pair_id) + 
+#   labs(title = 'Log (CM) Error: Excluding incorrect Q1 responses and pair 5', x = 'Media', y = 'Estimated Mean Error (log scale)', color = 'Participant filter') +
+#   theme(aspect.ratio = 3, axis.text.x = element_text(angle = 90, hjust = 1))
+```
+
+
+Again, we see similar patterns to that of slider error. By filtering based on clustering, there is smaller error. 
+
+### Significance of results
+
+In the following tables, the counts of significant simple effects for media types are constructed. Significance is defined in the usual fashion with $\alpha=0.05$
+
+```{r}
+# sig_summary <- all_pairs_combined %>%
+#   group_by(scale, contrast, set, pair_id) %>%
+#   summarise(
+#     n_pos  = sum(p.value < 0.05 & estimate > 0),
+#     n_neg  = sum(p.value < 0.05 & estimate < 0),
+#     n_total = n(),
+#     .groups = "drop"
+#   ) %>%
+#   mutate(label = paste0(n_pos, '(+) | ', n_neg, ' (-) | n = ', n_total)) %>%
+#   select(scale, contrast, set, pair_id, label) %>%
+#   pivot_wider(names_from = contrast, values_from = label)
+# 
+# sig_summary %>%
+#   filter(scale == "Slider") %>%
+#   select(-scale) %>%
+#   knitr::kable(caption = "Slider error: significant media contrasts out of 12 models. (+) = contrast estimate > 0, (-) = estimate < 0.")
+```
+
+An immediate observation is that 2dd had larger errors for all 12 models in set 1 with pair_id 3, as well as for set 2 with pair_id 2. 
+
+Set 2 with pair 9 has an interesting result. In 4 of the models, 2dd had smaller error than 3dp. That is, 2dd was underestimated more than 3dp. These models were in all cases where `flexmix` picked out components that were likely to be ratio estimation strategies. 
+
+```{r}
+# all_pairs_combined %>% 
+#   filter(set == 'set2' & pair_id == 9 & p.value < 0.05 & contrast == '2dd - 3dp' & scale == 'Slider')
+```
+
+
+
+```{r}
+# sig_summary %>%
+#   filter(scale == "Log (CM)") %>%
+#   select(-scale) %>%
+#   knitr::kable(caption = "Slider error: significant media contrasts out of 12 models. (+) = contrast estimate > 0, (-) = estimate < 0.")
+```
+
+
+With log absolute errors, we are considering the magnitude of the error rather than direction. Here, no differences were detected between the 3d medias across all 12 models. In all cases, 2dd charts did not have significant smaller errors than either 3d chart. 
+
+
+## My thoughts
+
+Personally, I think these two models for log absolute error would make the most sense. 
+
+1. Remove random guessers to Q1, remove incorrect Q1 trials and Pair 5 trials
+2. Remove random guessers to Q1, remove incorrect Q1 trials and Pair 5 trials, and use `flexmix` to pick out those who were on task
+
+The reason for excluding random guessers to Q1 is to make sure that the people included were following instructions correctly. Removing Q1 trials serves as an attention check. In most cases, there is a difference between the two values in the stimuli pairs. This also follows the procedure of Cleveland and McGill. As for Pair 5, correct slider positions when Q1 is correct should be 100. This means that to be correct here to Q1 is to have a constant value for the slider. If analyzed, it should be as a binary response. 
+
+The purpose for excluding with the flexmix model is that two clusters are clearly off task according to the slope of `target_ratio`. 
+
+
+
+```{r}
+# car::Anova(mod.cm.q1.xq1xq5, type = '3', test = 'F')
+# car::Anova(mod.cm.fm.xq1xq5, type = '3', test = 'F')
+```
+
+
+In both of these models, there is a significant two-way interaction between pair_id and set. There is also a significant main effect for media. For media types, 2dd has larger errors than both 3d charts in both models. 
+
+```{r}
+# emmeans(mod.cm.q1.xq1xq5, ~media, pbkrtest.limit = 5800)
+# emmeans(mod.cm.fm.xq1xq5, ~media, pbkrtest.limit = 5800)
+```
+
+```{r}
+map(mget(ls()), dim)
+```
+
