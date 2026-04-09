@@ -1,26 +1,5 @@
 ---
-title: "Chapter 3"
-author: Tyler Wiederich
-date: today
-date-format: long
-format: 
-  pdf:
-    abstract: "The display of 3-dimensional (3D) data is often limited by how it can be rendered. These renderings are typically presented as charts on 2-dimensional (2D) computer screens using 2D or 3D chart styles. However, computer renderings do not provide the level of interactivity of 3D charts that we experience in a 3D world, something which can be accomplished through the use of 3D printing. In this paper, we describe a study to compare 2D and 3D heatmaps rendered digitally or via 3D printing and assess the findings of 3D printed charts for the use of displaying statistical information."
-    geometry:
-      - top=1in
-      - bottom=1in
-      - left=1.5in
-      - right=1in
-    linestretch: 2
-    include: true
-    keep-tex: true
-    include-in-header: 
-      text: '\usepackage{lineno}\linenumbers'
-execute:
-  echo: false
-  warning: false
-  message: false
-  fig-dpi: 600
+title: "Graphical Perception of Heatmaps: Dimensionality, Medium, and Accuracy of Ratio Estimations"
 bibliography: references.bib
 ---
 
@@ -69,6 +48,7 @@ Our experiment is designed using the method of constant stimuli, where compariso
 
 ```{r}
 #| fig-cap: "Values for stimuli in the heatmap experiment. All values are paired with the constant stimuli of 50 units, creating nine pairs of stimuli."
+#| fig-scap: "Stimuli values paired with a fixed reference"
 #| label: fig-stimuli-values
 load('../../data/stimuli.rda')
 stimuli %>% 
@@ -94,16 +74,16 @@ $$
 Z=c\cdot U(0,100)+(1-c)\cdot g(f_i(X,Y))
 $$ {#eq-random-z}
 
-::: {#fig-random-z layout-ncol="5"}
-![$c=0$](plots/z100.png){#fig-z100}
+::: {#fig-random-z layout-ncol="5" fig-scap="Randomization parameter effects on heatmap structure"}
+![$c=0$](plots/z100.png){#fig-z100 fig-scap='Randomization parameter c equals 0'}
 
-![$c=0.25$](plots/z75.png){#fig-z75}
+![$c=0.25$](plots/z75.png){#fig-z75 fig-scap='Randomization parameter c equals 0.25'}
 
-![$c=0.5$](plots/z50.png){#fig-z50}
+![$c=0.5$](plots/z50.png){#fig-z50 fig-scap='Randomization parameter c equals 0.5'}
 
-![$c=0.75$](plots/z25.png){#fig-z25}
+![$c=0.75$](plots/z25.png){#fig-z25 fig-scap='Randomization parameter c equals 0.75'}
 
-![$c=1$](plots/z0.png){#fig-z0}
+![$c=1$](plots/z0.png){#fig-z0 fig-scap='Randomization parameter c equals 1'}
 
 Mixture distribution of @eq-random-z using the formula for the top half of a sphere. As $c$ approaches 1, the distribution resembles uniform random noise.
 :::
@@ -115,6 +95,7 @@ The placement of stimuli values onto the randomly generated heatmap data was don
 #| layout-ncol: 2
 #| out-width: 95%
 #| fig-cap: "Placement of stimuli on the two data sets. Tiles with solid fills are the fixed stimuli values, where white tiles are randomly generated."
+#| fig-scap: "Stimuli placement across two data sets"
 #| fig-subcap:
 #| - "Placement of stimuli on Set 1"
 #| - "Placement of stimuli on Set 2"
@@ -150,20 +131,21 @@ Three types of charts were considered for this study: digital and static 2D (2dd
 
 The 3D-printed charts were rendered with OpenSCAD [@kintelOpenSCADDocumentation2023]. To include plot text, a 120mm by 120mm by 10mm base was created with a solid color that was either white or black. Cells of the heatmap measured 10mm by 10mm, resulting in a heatmap that is 100mm by 100mm and is centered on the base. The upper bound of the height of heatmap values is 100mm, where 1-unit in the heatmap data is represented by 1mm of height on the heatmap. Once rendered, the heatmap was saved to 3D Manufacturing Format (3mf) and Standard Triangle Language (stl) files. A variety of solid and gradient filaments were tested for the bars of the 3D prints, and we eventually settled on a rainbow gradient. Some charts were printed with a white base and black text, and other charts had a black base with white text. An example of the 3D-printed chart is shown in @fig-3dp.
 
-::: {#fig-3dp layout-ncol="2" fig-cap="3D printed heatmaps."}
-![Data Set 1](images/3dp-gradient-set1.JPG){#fig-3dp-gradient}
+::: {#fig-3dp layout-ncol="2" fig-cap="3D printed heatmaps." fig-scap="3D-printed heatmaps for both data sets"}
+![Data Set 1](images/3dp-gradient-set1.JPG){#fig-3dp-gradient fig-scap='3D-printed heatmap for data set 1'}
 
-![Data Set 2](images/3dp-gradient-set2.JPG){#fig-3dp-solid}
+![Data Set 2](images/3dp-gradient-set2.JPG){#fig-3dp-solid fig-scap='3D-printed heatmap for data set 2'}
 :::
 
 To closely match the 3D-digital chart to the 3D-printed chart, multiple stl files were created for each colored component and combined with the RGL package [@rgl]. The base was rendered with white smoke (#F5F5F5) to slightly contrast with the default white background color (#FFFFFF). Heatmap tiles were rendered with cyan (#74CCFF) and text labels were rendered with black (#000000). Lighting was fixed at 45 degree angles at two opposite corners of the chart. The end result was a near-perfect replica of the 3D-printed charts, with the exception of different heatmap tile colors [@fig-3dd].
 
-![RGL rendering of Data Set 2 for 3dd charts.](images/chart-3dd.png){#fig-3dd fig-height="3in"}
+![RGL rendering of Data Set 2 for 3dd charts.](images/chart-3dd.png){#fig-3dd fig-height="3in" fig-scap='Interactive 3D digital rendering'}
 
 Unlike the 3D charts, the 2D charts needed a different encoding to convey heatmap values. The 2D heatmaps were created with `ggplot2` [@ggplot2] using `geom_tile()`. Fill colors for the cells use a color gradient ranging from Blue Zodiac (#0C2841) to Malibu (#66D9FF), which were selected from a color picker using shadows on our initial 3D-printed charts. The color interpolation was performed with the `scale_fill_gradient()` function from the `ggplot2` package.
 
 ```{r}
 #| fig-cap: "Color palette for 2D-digital charts. The colors are interpolated from #0C2841 to #66D9FF, which are the colors of the lighting conditions for a 3D-printed chart created with cyan filament."
+#| fig-scap: "Color palette for 2D digital heatmaps"
 #| label: fig-color-pal
 #| fig-height: 2
 ggplot(mapping = aes(x = 1:10, y = 0)) + 
@@ -198,7 +180,7 @@ Once a participant completed the demographics page or selected "No" to the data 
 
 The experiment page was presented to participants after completion of the practice trials [@fig-exp-page]. Each page contained two questions -- one question for identifying which stimuli is larger and another question for estimating the value of the smaller stimuli if the larger stimuli is 100 units. Each trial had the initial slider position randomized in order to prevent starting position bias. For 3dd charts, the number of interactive clicks was also recorded. A trial could only be submitted if the first question is answered and if the slider was moved at least once.
 
-![Graphics experiment page. Each trial contained two questions about a pair of stimuli, and a check box that displays the location of the stimuli if needed.](images/experiment-page.png){#fig-exp-page width="100%"}
+![Graphics experiment page. Each trial contained two questions about a pair of stimuli, and a check box that displays the location of the stimuli if needed.](images/experiment-page.png){#fig-exp-page width="100%" fig-scap='Experiment interface for pairwise responses'}
 
 After completing all trials, participants were given the completion code and informed to provide the code to their instructor since they would not have access to the code after closing out of the experiment.
 
@@ -431,6 +413,7 @@ bind_rows(df_time_grouped, df_time_total) %>%
 
 ```{r}
 #| fig-cap: "Histogram of experiment completion times. Online participants had generally shorter completion times due to a decreased number of trials."
+#| fig-scap: "Distribution of participant completion times"
 #| label: fig-total-time
 
 df_time %>% 
@@ -451,6 +434,7 @@ During our initial exploration of the results, we discovered a non-negligible nu
 #| fig-height: 4
 #| fig-dpi: 600
 #| fig-cap: "Three potential estimation strategies from participants. Many participants followed instructions to estimate ratios. However, some participants appeared to estimate the difference between stimuli pairs or submitted random values."
+#| fig-scap: "Examples of participant estimation strategies"
 #| label: fig-user-strategies
 
 # results %>% 
@@ -527,6 +511,7 @@ To improve the quality of our data, we started by assessing random guesses in id
 #| layout-ncol: 2
 #| out-width: 90%
 #| fig-cap: "Proportion of correct responses to Question 1 across stimuli pairs and media types. For all pairs, with the exception of Pair 5, a correct answer was 'Larger value'. Stimuli Pair 5 had two identical values, meaning that options other than 'Both values are the same' were incorrect."
+#| fig-scap: "Question 1 accuracy by stimuli pair and media"
 #| fig-subcap:
 #| - "No participant filtering"
 #| - "Exclude random guessers"
@@ -594,6 +579,7 @@ Our findings suggest that the 2D heatmaps had evidence of higher log absolute er
 ```{r}
 #| label: fig-em-media
 #| fig-cap: "Distributions of log error overlayed with estimated marginal means and their 95% confidence intervals. Differences were only detected between 2D heatmap and both types of 3D heatmaps, where the 2D heatmap had evidence of larger errors."
+#| fig-scap: "Marginal means of log error by media type"
 library(ggsignif)
 res_q2_filtered %>% 
   ggplot(mapping = aes(x = media)) + 
@@ -646,6 +632,7 @@ When examining the interaction between stimuli pairs and underlying datasets, `r
 
 ```{r}
 #| fig-cap: "Estimated marginal means of stimuli pair and dataset. Bars sharing the same letter are not significantly different from one another."
+#| fig-scap: "Marginal means by stimuli pair and data set"
 #| label: fig-em-set-pair
 multcomp::cld(em2, Letters = letters) %>% 
   data.frame() %>% 
@@ -702,6 +689,7 @@ for(i in 1:1000) {
 #| fig-height: 4
 #| fig-dpi: 1200
 #| fig-cap: "Log absolute error means and 95% confidence intervals using bootstrap sampling. "
+#| fig-scap: "Bootstrap means and 95 percent confidence intervals"
 #| label: fig-bootstrap-95
 bootstrap %>% 
   group_by(media, pair_id, set) %>% 
@@ -801,6 +789,7 @@ Many participants completed each trial in under 20 seconds. The median completio
 
 ```{r}
 #| fig-cap: "Visual summary of time spent on each trial. 137 trials are omitted due to lasting longer than 60 seconds."
+#| fig-scap: "Trial-level time distribution and error relationship"
 #| fig-subcap:
 #| - "Frequency plot"
 #| - "Time vs. Error"
@@ -833,6 +822,7 @@ time %>%
 #| label: fig-clicks3dd
 #| out-width: 90%
 #| fig-cap: "Participant interactions with the digital 3D heatmaps."
+#| fig-scap: "Interactions with digital 3D heatmaps"
 #| fig-subcap: 
 #| - "Histogram"
 #| - "WebGL clicks vs. Error"
@@ -860,6 +850,7 @@ clicks %>%
 #| layout-ncol: 2
 #| label: fig-slider-clicks
 #| fig-cap: "Participant interactions with the slider. "
+#| fig-scap: "Slider interaction behavior and error"
 #| fig-subcap: 
 #| - "Histogram"
 #| - "Slider clicks vs. Error"
@@ -883,6 +874,7 @@ res_q2_filtered %>%
 ```{r}
 #| label: fig-slider-start
 #| fig-cap: "Effect of initial slider position on the submitted slider value. "
+#| fig-scap: "Initial slider position versus submitted value"
 res_q2_filtered %>% 
   ggplot(mapping = aes(x = slider_start, y = user_slider)) + 
   geom_point(alpha = 1/10) +
@@ -909,6 +901,7 @@ For each model, we exclude stimuli pair 5. In theory, participants who answer th
 ```{r}
 #| fig-height: 3
 #| fig-cap: "Counts of response behavior for Stimuli Pair 5. This pair had identical values, which means that true solutions indicates marking that they were the same value and positioning the slider at 100."
+#| fig-scap: "Response behavior for identical-value stimuli pair"
 #| label: fig-pair5-issues
 infilter.labs <- c('Included Participants', 'Excluded Participants')
 names(infilter.labs) <- c(TRUE, FALSE)
@@ -1015,6 +1008,7 @@ em_q1_q1 <- emmeans(mod_q1_q1, ~media+set+pair_id, pbkrtest.limit = 5800)
 #| fig-height: 6
 #| fig-dpi: 600
 #| fig-cap: "Interaction plots for media type and response filtering, facetted by stimuli pair and dataset."
+#| fig-scap: "Media by filtering interaction effects"
 
 
 bind_rows(
@@ -1048,6 +1042,7 @@ bind_rows(
 #| fig-width: 6
 #| fig-dpi: 600
 #| fig-cap: "Interaction plots for dataset and response filtering, facetted by stimuli pair and media type."
+#| fig-scap: "Data set by filtering interaction effects"
 
 
 bind_rows(
@@ -1082,6 +1077,7 @@ bind_rows(
 #| fig-width: 6
 #| fig-dpi: 600
 #| fig-cap: "Interaction plots for stimuli pairs and response filtering, facetted by dataset and media type."
+#| fig-scap: "Stimuli pair by filtering interaction effects"
 
 
 bind_rows(
