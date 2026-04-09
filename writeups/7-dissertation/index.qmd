@@ -1,6 +1,7 @@
 ---
 title: "Graphical Perception of Heatmaps: Dimensionality, Medium, and Accuracy of Ratio Estimations"
-bibliography: references.bib
+execute:
+  cache: true
 ---
 
 ```{r}
@@ -892,7 +893,7 @@ An interesting observation from the stimuli pairs and dataset interaction was fr
 
 While our hypothesis that 3D-printed heatmaps would outperform digital 2D and 3D heatmaps in numerical estimations of ratios was not supported, we were able to show that 3D charts may have a place in the analysis of data. When the third dimension is used to display information, the mapping of that dimension to height provides better ratio estimations than a color gradient scale. This result has been observed previously in digital 3D heatmaps [@barfield1989; @kraus2020], and our findings suggests that this may hold for physical 3D heatmaps.
 
-## Appendix
+#  {.appendix}
 
 In this section, we include multiple models for the transparency of model selection. Visual inspections of participant responses indicate that several participants clearly did not follow instructions by either using alternate estimation strategies or by carelessly responding [@fig-q1-eda]. While we should take these cases into consideration, there is no singular solution to suggest a "best" model [@jasoIdentificationCarelessResponding2021; @ward2023]. Our purpose for including these alternate models is to examine model sensitivity to results through various levels of participant and response filtering.
 
@@ -1226,10 +1227,3 @@ bind_rows(
   collapse_rows()
 
 ```
-
-\newpage
-
-## References
-
-::: {#refs}
-:::
