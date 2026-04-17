@@ -11,8 +11,8 @@
   <meta name="generator" content="quarto-1.5.57">
 
   <meta name="author" content="Tyler Wiederich">
-  <meta name="dcterms.date" content="2026-03-24">
-  <title>Heat to Height</title>
+  <meta name="dcterms.date" content="2026-04-17">
+  <title>Heat to Height: Comparing the Physical Dimensionality of Heat Maps</title>
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, minimal-ui">
@@ -341,16 +341,23 @@
       margin-right: 0; 
     }
   </style>
-  <script src="index_files/libs/kePrint-0.0.1/kePrint.js"></script>
-  <link href="index_files/libs/lightable-0.0.1/lightable.css" rel="stylesheet">
+  <link href="index_files/libs/htmltools-fill-0.5.9/fill.css" rel="stylesheet">
+  <script src="index_files/libs/htmlwidgets-1.6.4/htmlwidgets.js"></script>
+  <script src="index_files/libs/plotly-binding-4.11.0/plotly.js"></script>
+  <script src="index_files/libs/typedarray-0.1/typedarray.min.js"></script>
+  <script src="index_files/libs/jquery-3.5.1/jquery.min.js"></script>
+  <link href="index_files/libs/crosstalk-1.2.2/css/crosstalk.min.css" rel="stylesheet">
+  <script src="index_files/libs/crosstalk-1.2.2/js/crosstalk.min.js"></script>
+  <link href="index_files/libs/plotly-htmlwidgets-css-2.11.1/plotly-htmlwidgets.css" rel="stylesheet">
+  <script src="index_files/libs/plotly-main-2.11.1/plotly-latest.min.js"></script>
 </head>
 <body class="quarto-light">
   <div class="reveal">
     <div class="slides">
 
 <section id="title-slide" class="quarto-title-block center">
-  <h1 class="title">Heat to Height</h1>
-  <p class="subtitle">A study comparing the physical dimensionality of heatmaps</p>
+  <h1 class="title">Heat to Height: Comparing the Physical Dimensionality of Heat Maps</h1>
+  <p class="subtitle">Ph.D.&nbsp;Final Examination</p>
 
 <div class="quarto-title-authors">
 <div class="quarto-title-author">
@@ -360,9 +367,24 @@ Tyler Wiederich
 </div>
 </div>
 
-  <p class="date">March 24, 2026</p>
+  <p class="date">April 17, 2026</p>
 </section>
-<section id="motivation" class="slide level2">
+<section id="outline" class="slide level2">
+<h2>Outline</h2>
+<ul>
+<li>Motivation</li>
+<li>Study Design</li>
+<li>Results</li>
+<li>Conclusions</li>
+<li>Contributions and Future Work</li>
+</ul>
+</section>
+<section>
+<section id="motivation" class="title-slide slide level1 center">
+<h1>Motivation</h1>
+
+</section>
+<section id="motivation-1" class="slide level2">
 <h2>Motivation</h2>
 <p>Data is everywhere, but how do we communicate it through visualizations? We design graphics to account for:</p>
 <div class="columns">
@@ -374,6 +396,9 @@ Tyler Wiederich
 <li class="fragment">Accessibility</li>
 </ul>
 </div>
+<div class="fragment">
+<p>Many types of charts exist for displaying different types of data.</p>
+</div>
 </div><div class="column">
 <p><img data-src="images/random-chart.png"></p>
 </div></div>
@@ -383,11 +408,11 @@ Tyler Wiederich
 </blockquote>
 </div>
 </section>
-<section id="heatmaps" class="slide level2">
-<h2>Heatmaps</h2>
+<section id="heat-maps" class="slide level2">
+<h2>Heat maps</h2>
 <div class="columns">
 <div class="column">
-<p>Heatmaps are a type of data visualization that convey data in three dimensions.</p>
+<p>Heat maps are a type of data visualization that convey data in three dimensions.</p>
 <ul>
 <li><p>Two dimensions represented by spatial coordinates</p></li>
 <li><p>Other dimension (typically a continuous response variable) represented by alternative visual encoding</p>
@@ -443,7 +468,7 @@ Tyler Wiederich
 <p>To date, very few empirical studies have been conducted using physical 3D charts.</p>
 <div>
 <ul>
-<li class="fragment"><p>Physical 3D heatmaps suggested to be more efficient at estimations (<span class="math inline">\(n=16\)</span>) <span class="citation" data-cites="jansen2013">(<a href="#/references" role="doc-biblioref" onclick="">Jansen, Dragicevic, and Fekete 2013</a>)</span></p></li>
+<li class="fragment"><p>Physical 3D heat maps suggested to be more efficient at estimations (<span class="math inline">\(n=16\)</span>) <span class="citation" data-cites="jansen2013">(<a href="#/references" role="doc-biblioref" onclick="">Jansen, Dragicevic, and Fekete 2013</a>)</span></p></li>
 <li class="fragment"><p>Physical bar charts may be more memorable than digital charts (<span class="math inline">\(n=40,16\)</span>) <span class="citation" data-cites="stusak2015 stusakIfYourMind2016">(<a href="#/references" role="doc-biblioref" onclick="">Stusak, Schwarz, and Butz 2015</a>; <a href="#/references" role="doc-biblioref" onclick="">Stusak, Hobe, and Butz 2016</a>)</span></p></li>
 <li class="fragment"><p>Some studies show smaller error rates for 3D charts using virtual reality <span class="citation" data-cites="kraus2020">(e.g., <a href="#/references" role="doc-biblioref" onclick="">Kraus et al. 2020</a>)</span></p></li>
 </ul>
@@ -454,12 +479,61 @@ Tyler Wiederich
 </blockquote>
 </div>
 </section>
+<section id="examples" class="slide level2 scrollable">
+<h2>Examples</h2>
+<div>
+
+</div>
+<div class="cell quarto-layout-panel" data-layout-ncol="2" data-fig-class="center-caption">
+<div class="quarto-layout-row">
+<div class="quarto-layout-cell" style="flex-basis: 50.0%;justify-content: flex-start;">
+<div class="quarto-figure quarto-figure-center">
+<figure>
+<p><img data-src="images/jansen.jpg" style="height:7em"></p>
+<figcaption><span class="citation" data-cites="jansen2013">Jansen, Dragicevic, and Fekete (<a href="#/references" role="doc-biblioref" onclick="">2013</a>)</span></figcaption>
+</figure>
+</div>
+</div>
+<div class="quarto-layout-cell" style="flex-basis: 50.0%;justify-content: flex-start;">
+<div class="quarto-figure quarto-figure-center">
+<figure>
+<p><img data-src="images/visworld.jpg" style="height:7em"></p>
+<figcaption>Blog post from VisWorld</figcaption>
+</figure>
+</div>
+</div>
+</div>
+<div class="quarto-layout-row">
+<div class="quarto-layout-cell" style="flex-basis: 50.0%;justify-content: flex-start;">
+<div class="quarto-figure quarto-figure-center">
+<figure>
+<p><img data-src="images/treemap-3d.png" style="height:7em"></p>
+<figcaption>Tree map <span class="citation" data-cites="huronMakingDataPhysical2023">(<a href="#/references" role="doc-biblioref" onclick="">Huron et al. 2023</a>)</span></figcaption>
+</figure>
+</div>
+</div>
+<div class="quarto-layout-cell" style="flex-basis: 50.0%;justify-content: flex-start;">
+<div class="quarto-figure quarto-figure-center">
+<figure>
+<p><img data-src="images/first-3d-printed-chart.jpg" style="height:7em"></p>
+<figcaption>Wall Street Journal</figcaption>
+</figure>
+</div>
+</div>
+</div>
+<div class="quarto-layout-row">
+<div class="quarto-layout-cell" style="flex-basis: 50.0%;justify-content: flex-start;">
+<p>Examples of 3D-printed charts</p>
+</div>
+</div>
+</div>
+</section>
 <section id="overview-of-our-research" class="slide level2">
 <h2>Overview of Our Research</h2>
 <p>Previous research suggests that 3D charts may perform better when all three dimensions are used for displaying information <span class="citation" data-cites="barfield1989 fisher1997 kraus2020">(<a href="#/references" role="doc-biblioref" onclick="">Barfield and Robless 1989</a>; <a href="#/references" role="doc-biblioref" onclick="">Fisher, Dempsey, and Marousky 1997</a>; <a href="#/references" role="doc-biblioref" onclick="">Kraus et al. 2020</a>)</span>.</p>
 <div class="fragment">
 <blockquote>
-<p>Does this hold for numerical estimations from physical 3D heatmaps compared to 2D static heatmaps and interactive digital 3D heatmaps?</p>
+<p>Does this hold for numerical estimations from physical 3D heat maps compared to 2D static heat maps and interactive digital 3D heat maps?</p>
 </blockquote>
 </div>
 <div class="fragment">
@@ -470,7 +544,7 @@ Tyler Wiederich
 <p>To what extent do underlying datasets and comparison types affect numerical estimations from these charts?</p>
 </blockquote>
 </div>
-</section>
+</section></section>
 <section>
 <section id="methods" class="title-slide slide level1 center">
 <h1>Methods</h1>
@@ -484,12 +558,39 @@ S=\text{Stimuli}
 \]</span></p>
 <p>Setting 50 as the constant and 90 as the maximum, a sequence of stimuli are chosen by equally partitioning the ratios between <span class="math inline">\(50/50=1\)</span> and <span class="math inline">\(50/90\approx0.556\)</span>. The same ratios are used when setting 50 as the maximum in the stimuli pair.</p>
 </section>
-<section class="slide level2">
+<section id="stimuli-values" class="slide level2">
+<h2>Stimuli Values</h2>
 
-
-<img data-src="index_files/figure-revealjs/unnamed-chunk-2-1.png" width="960" class="r-stretch"></section>
-<section class="slide level2">
-
+<img data-src="index_files/figure-revealjs/unnamed-chunk-3-1.png" width="960" class="r-stretch"></section>
+<section id="heat-map-data" class="slide level2">
+<h2>Heat Map Data</h2>
+<p>We used two datasets created using a mixture distribution for equations for spheres and random noise as a reference distribution. Final values were scaled between 0 and 100.</p>
+<ul>
+<li>Set 1: <span class="math inline">\(f_1(X,Y)=\sqrt{7^2-(X-\bar{X})^2-(Y-\bar{Y})^2}\)</span></li>
+<li>Set 2: <span class="math inline">\(f_2(X,Y)=\sqrt{7^2+(X-\bar{X})^2+(Y-\bar{Y})^2}\)</span></li>
+</ul>
+</section>
+<section id="set-1" class="slide level2">
+<h2>Set 1</h2>
+<div class="cell">
+<div class="cell-output-display">
+<div class="plotly html-widget html-fill-item" id="htmlwidget-a35fccef5168ad0d9cd8" style="width:960px;height:480px;"></div>
+<script type="application/json" data-for="htmlwidget-a35fccef5168ad0d9cd8">{"x":{"visdat":{"13fd89dbd2a6":["function () ","plotlyVisDat"]},"cur_data":"13fd89dbd2a6","attrs":{"13fd89dbd2a6":{"x":{},"y":{},"z":{},"alpha_stroke":1,"sizes":[10,100],"spans":[1,20],"type":"surface","showlegend":false,"showscale":false,"inherit":true}},"layout":{"margin":{"b":40,"l":60,"t":25,"r":10},"scene":{"xaxis":{"title":"x"},"yaxis":{"title":"y"},"zaxis":{"title":"z1"}},"hovermode":"closest","showlegend":false},"source":"A","config":{"modeBarButtonsToAdd":["hoverclosest","hovercompare"],"showSendToCloud":false},"data":[{"colorbar":{"title":"z1","ticklen":2},"colorscale":[["0","rgba(68,1,84,1)"],["0.0416666666666667","rgba(70,19,97,1)"],["0.0833333333333333","rgba(72,32,111,1)"],["0.125","rgba(71,45,122,1)"],["0.166666666666667","rgba(68,58,128,1)"],["0.208333333333333","rgba(64,70,135,1)"],["0.25","rgba(60,82,138,1)"],["0.291666666666667","rgba(56,93,140,1)"],["0.333333333333333","rgba(49,104,142,1)"],["0.375","rgba(46,114,142,1)"],["0.416666666666667","rgba(42,123,142,1)"],["0.458333333333333","rgba(38,133,141,1)"],["0.5","rgba(37,144,140,1)"],["0.541666666666667","rgba(33,154,138,1)"],["0.583333333333333","rgba(39,164,133,1)"],["0.625","rgba(47,174,127,1)"],["0.666666666666667","rgba(53,183,121,1)"],["0.708333333333333","rgba(79,191,110,1)"],["0.75","rgba(98,199,98,1)"],["0.791666666666667","rgba(119,207,85,1)"],["0.833333333333333","rgba(147,214,70,1)"],["0.875","rgba(172,220,52,1)"],["0.916666666666667","rgba(199,225,42,1)"],["0.958333333333333","rgba(226,228,40,1)"],["1","rgba(253,231,37,1)"]],"showscale":false,"x":[1,2,3,4,5,6,7,8,9,10],"y":[1,2,3,4,5,6,7,8,9,10],"z":[[8.5,16.5,22.5,26.5,28.5,28.5,26.5,22.5,16.5,8.5],[16.5,24.5,30.5,34.5,36.5,36.5,34.5,30.5,24.5,16.5],[22.5,30.5,36.5,40.5,42.5,42.5,40.5,36.5,30.5,22.5],[26.5,34.5,40.5,44.5,46.5,46.5,44.5,40.5,34.5,26.5],[28.5,36.5,42.5,46.5,48.5,48.5,46.5,42.5,36.5,28.5],[28.5,36.5,42.5,46.5,48.5,48.5,46.5,42.5,36.5,28.5],[26.5,34.5,40.5,44.5,46.5,46.5,44.5,40.5,34.5,26.5],[22.5,30.5,36.5,40.5,42.5,42.5,40.5,36.5,30.5,22.5],[16.5,24.5,30.5,34.5,36.5,36.5,34.5,30.5,24.5,16.5],[8.5,16.5,22.5,26.5,28.5,28.5,26.5,22.5,16.5,8.5]],"type":"surface","showlegend":false,"frame":null}],"highlight":{"on":"plotly_click","persistent":false,"dynamic":false,"selectize":false,"opacityDim":0.20000000000000001,"selected":{"opacity":1},"debounce":0},"shinyEvents":["plotly_hover","plotly_click","plotly_selected","plotly_relayout","plotly_brushed","plotly_brushing","plotly_clickannotation","plotly_doubleclick","plotly_deselect","plotly_afterplot","plotly_sunburstclick"],"base_url":"https://plot.ly"},"evals":[],"jsHooks":[]}</script>
+</div>
+</div>
+</section>
+<section id="set-2" class="slide level2">
+<h2>Set 2</h2>
+<div class="cell">
+<div class="cell-output-display">
+<div class="plotly html-widget html-fill-item" id="htmlwidget-218a375607ff866516fb" style="width:960px;height:480px;"></div>
+<script type="application/json" data-for="htmlwidget-218a375607ff866516fb">{"x":{"visdat":{"13fd868fa1a49":["function () ","plotlyVisDat"]},"cur_data":"13fd868fa1a49","attrs":{"13fd868fa1a49":{"x":{},"y":{},"z":{},"alpha_stroke":1,"sizes":[10,100],"spans":[1,20],"type":"surface","showlegend":false,"showscale":false,"inherit":true}},"layout":{"margin":{"b":40,"l":60,"t":25,"r":10},"scene":{"xaxis":{"title":"x"},"yaxis":{"title":"y"},"zaxis":{"title":"z2"}},"hovermode":"closest","showlegend":false},"source":"A","config":{"modeBarButtonsToAdd":["hoverclosest","hovercompare"],"showSendToCloud":false},"data":[{"colorbar":{"title":"z2","ticklen":2},"colorscale":[["0","rgba(68,1,84,1)"],["0.0416666666666666","rgba(70,19,97,1)"],["0.0833333333333334","rgba(72,32,111,1)"],["0.125","rgba(71,45,122,1)"],["0.166666666666667","rgba(68,58,128,1)"],["0.208333333333333","rgba(64,70,135,1)"],["0.25","rgba(60,82,138,1)"],["0.291666666666667","rgba(56,93,140,1)"],["0.333333333333333","rgba(49,104,142,1)"],["0.375","rgba(46,114,142,1)"],["0.416666666666667","rgba(42,123,142,1)"],["0.458333333333334","rgba(38,133,141,1)"],["0.5","rgba(37,144,140,1)"],["0.541666666666667","rgba(33,154,138,1)"],["0.583333333333334","rgba(39,164,133,1)"],["0.625","rgba(47,174,127,1)"],["0.666666666666667","rgba(53,183,121,1)"],["0.708333333333334","rgba(79,191,110,1)"],["0.75","rgba(98,199,98,1)"],["0.791666666666667","rgba(119,207,85,1)"],["0.833333333333334","rgba(147,214,70,1)"],["0.875","rgba(172,220,52,1)"],["0.916666666666667","rgba(199,225,42,1)"],["0.958333333333334","rgba(226,228,40,1)"],["1","rgba(253,231,37,1)"]],"showscale":false,"x":[1,2,3,4,5,6,7,8,9,10],"y":[1,2,3,4,5,6,7,8,9,10],"z":[[89.5,81.5,75.5,71.5,69.5,69.5,71.5,75.5,81.5,89.5],[81.5,73.5,67.5,63.5,61.5,61.5,63.5,67.5,73.5,81.5],[75.5,67.5,61.5,57.5,55.5,55.5,57.5,61.5,67.5,75.5],[71.5,63.5,57.5,53.5,51.5,51.5,53.5,57.5,63.5,71.5],[69.5,61.5,55.5,51.5,49.5,49.5,51.5,55.5,61.5,69.5],[69.5,61.5,55.5,51.5,49.5,49.5,51.5,55.5,61.5,69.5],[71.5,63.5,57.5,53.5,51.5,51.5,53.5,57.5,63.5,71.5],[75.5,67.5,61.5,57.5,55.5,55.5,57.5,61.5,67.5,75.5],[81.5,73.5,67.5,63.5,61.5,61.5,63.5,67.5,73.5,81.5],[89.5,81.5,75.5,71.5,69.5,69.5,71.5,75.5,81.5,89.5]],"type":"surface","showlegend":false,"frame":null}],"highlight":{"on":"plotly_click","persistent":false,"dynamic":false,"selectize":false,"opacityDim":0.20000000000000001,"selected":{"opacity":1},"debounce":0},"shinyEvents":["plotly_hover","plotly_click","plotly_selected","plotly_relayout","plotly_brushed","plotly_brushing","plotly_clickannotation","plotly_doubleclick","plotly_deselect","plotly_afterplot","plotly_sunburstclick"],"base_url":"https://plot.ly"},"evals":[],"jsHooks":[]}</script>
+</div>
+</div>
+</section>
+<section id="stimuli-placement" class="slide level2">
+<h2>Stimuli Placement</h2>
+<p>We strategically placed stimuli so that they looked natural with respect to the simulated dataset.</p>
 <div>
 
 </div>
@@ -504,16 +605,16 @@ S=\text{Stimuli}
 <div class="quarto-layout-cell" style="flex-basis: 50.0%;justify-content: flex-start;">
 <div class="quarto-figure quarto-figure-center">
 <figure>
-<p><img data-src="placement-set1-2dd.png" style="width:100.0%"></p>
-<figcaption>Stimuli pair placement on Set 1</figcaption>
+<p><img data-src="placement-set1-2dd.png"></p>
+<figcaption>Placement of stimuli on Set 1</figcaption>
 </figure>
 </div>
 </div>
 <div class="quarto-layout-cell" style="flex-basis: 50.0%;justify-content: flex-start;">
 <div class="quarto-figure quarto-figure-center">
 <figure>
-<p><img data-src="placement-set2-2dd.png" style="width:100.0%"></p>
-<figcaption>Stimuli pair placement on Set 2</figcaption>
+<p><img data-src="placement-set2-2dd.png"></p>
+<figcaption>Placement of stimuli on Set 2</figcaption>
 </figure>
 </div>
 </div>
@@ -565,7 +666,7 @@ S=\text{Stimuli}
 </div>
 </div>
 <figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-charts-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-Figure&nbsp;1: Chart types representing heatmap Set 1.
+Figure&nbsp;1: Chart types representing heat map Set 1.
 </figcaption>
 </figure>
 </div>
@@ -586,12 +687,6 @@ Figure&nbsp;1: Chart types representing heatmap Set 1.
 \]</span></p>
 </div>
 </section>
-<section class="slide level2">
-
-
-<img data-src="index_files/figure-revealjs/fig-block-design-1.png" class="quarto-figure quarto-figure-center r-stretch" width="960"><p class="caption">
-Figure&nbsp;2: Balanced Incomplete Block Design. Each stimuli pair in a block is fully crossed with media type and dataset.
-</p></section>
 <section id="responses" class="slide level2">
 <h2>Responses</h2>
 <p>For each trial in the experiment, we ask two question adapted from <span class="citation" data-cites="cleveland1984">Cleveland and McGill (<a href="#/references" role="doc-biblioref" onclick="">1984</a>)</span>.</p>
@@ -630,114 +725,40 @@ Figure&nbsp;2: Balanced Incomplete Block Design. Each stimuli pair in a block is
 <h1>Results</h1>
 
 </section>
-<section id="demographics" class="slide level2 scrollable">
+<section id="demographics" class="slide level2">
 <h2>Demographics</h2>
 <p>259 students completed the entirety of the experiment. Of these, 92 students were enrolled in online sections of the course.</p>
-<div class="cell">
+<div class="cell" data-layout-align="center">
 <div class="cell-output-display">
-<table class="lightable-paper caption-top" data-quarto-postprocess="true" style="font-family: &quot;Arial Narrow&quot;, arial, helvetica, sans-serif; margin-left: auto; margin-right: auto;">
-<caption>Demographic Information</caption>
-<thead>
-<tr class="header">
-<th style="text-align: left;" data-quarto-table-cell-role="th"></th>
-<th style="text-align: right;" data-quarto-table-cell-role="th">Count</th>
-<th style="text-align: right;" data-quarto-table-cell-role="th">Proportion</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd" data-grouplength="4">
-<td colspan="3" style="border-bottom: 1px solid #00000020"><strong>Gender</strong></td>
-</tr>
-<tr class="even">
-<td style="text-align: left; padding-left: 2em;" data-indentlevel="1">Female</td>
-<td style="text-align: right;">166</td>
-<td style="text-align: right;">0.64</td>
-</tr>
-<tr class="odd">
-<td style="text-align: left; padding-left: 2em;" data-indentlevel="1">Male</td>
-<td style="text-align: right;">90</td>
-<td style="text-align: right;">0.35</td>
-</tr>
-<tr class="even">
-<td style="text-align: left; padding-left: 2em;" data-indentlevel="1">Variant/Nonconforming</td>
-<td style="text-align: right;">1</td>
-<td style="text-align: right;">0.00</td>
-</tr>
-<tr class="odd">
-<td style="text-align: left; padding-left: 2em;" data-indentlevel="1">Prefer not to answer</td>
-<td style="text-align: right;">2</td>
-<td style="text-align: right;">0.01</td>
-</tr>
-<tr class="even" data-grouplength="6">
-<td colspan="3" style="border-bottom: 1px solid #00000020"><strong>Age</strong></td>
-</tr>
-<tr class="odd">
-<td style="text-align: left; padding-left: 2em;" data-indentlevel="1">19-25</td>
-<td style="text-align: right;">252</td>
-<td style="text-align: right;">0.97</td>
-</tr>
-<tr class="even">
-<td style="text-align: left; padding-left: 2em;" data-indentlevel="1">26-30</td>
-<td style="text-align: right;">2</td>
-<td style="text-align: right;">0.01</td>
-</tr>
-<tr class="odd">
-<td style="text-align: left; padding-left: 2em;" data-indentlevel="1">31-35</td>
-<td style="text-align: right;">0</td>
-<td style="text-align: right;">0.00</td>
-</tr>
-<tr class="even">
-<td style="text-align: left; padding-left: 2em;" data-indentlevel="1">36-40</td>
-<td style="text-align: right;">1</td>
-<td style="text-align: right;">0.00</td>
-</tr>
-<tr class="odd">
-<td style="text-align: left; padding-left: 2em;" data-indentlevel="1">41-45</td>
-<td style="text-align: right;">3</td>
-<td style="text-align: right;">0.01</td>
-</tr>
-<tr class="even">
-<td style="text-align: left; padding-left: 2em;" data-indentlevel="1">Prefer not to answer</td>
-<td style="text-align: right;">1</td>
-<td style="text-align: right;">0.00</td>
-</tr>
-<tr class="odd" data-grouplength="6">
-<td colspan="3" style="border-bottom: 1px solid #00000020"><strong>Education</strong></td>
-</tr>
-<tr class="even">
-<td style="text-align: left; padding-left: 2em;" data-indentlevel="1">High School or Less</td>
-<td style="text-align: right;">23</td>
-<td style="text-align: right;">0.09</td>
-</tr>
-<tr class="odd">
-<td style="text-align: left; padding-left: 2em;" data-indentlevel="1">Some Undergraduate Courses</td>
-<td style="text-align: right;">214</td>
-<td style="text-align: right;">0.83</td>
-</tr>
-<tr class="even">
-<td style="text-align: left; padding-left: 2em;" data-indentlevel="1">Undergraduate Degree</td>
-<td style="text-align: right;">12</td>
-<td style="text-align: right;">0.05</td>
-</tr>
-<tr class="odd">
-<td style="text-align: left; padding-left: 2em;" data-indentlevel="1">Some Graduate Courses</td>
-<td style="text-align: right;">4</td>
-<td style="text-align: right;">0.02</td>
-</tr>
-<tr class="even">
-<td style="text-align: left; padding-left: 2em;" data-indentlevel="1">Graduate Degree</td>
-<td style="text-align: right;">2</td>
-<td style="text-align: right;">0.01</td>
-</tr>
-<tr class="odd">
-<td style="text-align: left; padding-left: 2em;" data-indentlevel="1">Prefer not to answer</td>
-<td style="text-align: right;">4</td>
-<td style="text-align: right;">0.02</td>
-</tr>
-</tbody>
-</table>
+<div class="quarto-figure quarto-figure-center">
+<figure>
+<p><img data-src="index_files/figure-revealjs/unnamed-chunk-11-1.png" class="quarto-figure quarto-figure-center" style="height:100.0%" width="960"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+<section class="slide level2">
 
+<div class="cell" data-layout-align="center">
+<div class="cell-output-display">
+<div class="quarto-figure quarto-figure-center">
+<figure>
+<p><img data-src="index_files/figure-revealjs/unnamed-chunk-12-1.png" class="quarto-figure quarto-figure-center" style="height:100.0%" width="960"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+<section class="slide level2">
 
+<div class="cell" data-layout-align="center">
+<div class="cell-output-display">
+<div class="quarto-figure quarto-figure-center">
+<figure>
+<p><img data-src="index_files/figure-revealjs/unnamed-chunk-13-1.png" class="quarto-figure quarto-figure-center" style="height:100.0%" width="960"></p>
+</figure>
+</div>
 </div>
 </div>
 </section>
@@ -745,13 +766,13 @@ Figure&nbsp;2: Balanced Incomplete Block Design. Each stimuli pair in a block is
 <h2>Completion Times</h2>
 
 <img data-src="index_files/figure-revealjs/fig-total-time-1.png" class="quarto-figure quarto-figure-center r-stretch" width="960"><p class="caption">
-Figure&nbsp;3: Histogram of experiment completion times. Online participants had generally shorter completion times due to a decreased number of trials.
+Figure&nbsp;2: Histogram of experiment completion times. Online participants had generally shorter completion times due to a decreased number of trials.
 </p></section>
 <section id="careless-respondents" class="slide level2">
 <h2>Careless Respondents</h2>
 
 <img data-src="index_files/figure-revealjs/fig-user-strategies-1.png" width="3600" class="r-stretch quarto-figure-center"><p class="caption">
-Figure&nbsp;4: Three potential estimation strategies from participants. Many participants followed instructions to estimate ratios. However, some participants appeared to estimate the difference between stimuli pairs or submitted random values.
+Figure&nbsp;3: Three potential estimation strategies from participants. Many participants followed instructions to estimate ratios. However, some participants appeared to estimate the difference between stimuli pairs or submitted random values.
 </p></section>
 <section id="how-to-deal-with-careless-respondents" class="slide level2">
 <h2>How to deal with careless respondents?</h2>
@@ -788,42 +809,16 @@ H_0: \pi\leq2/3\text{ vs. }H_1:\pi&gt;2/3
 </section>
 <section class="slide level2">
 
-<div id="fig-q1-eda" class="quarto-layout-panel">
-<figure class="quarto-float quarto-float-fig">
-<div aria-describedby="fig-q1-eda-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-<div class="quarto-layout-row">
-<div class="cell-output-display quarto-layout-cell-subref quarto-layout-cell" data-ref-parent="fig-q1-eda" style="flex-basis: 50.0%;justify-content: flex-start;">
-<div id="fig-q1-eda-1" class="quarto-float quarto-figure quarto-figure-center">
-<figure class="quarto-float quarto-subfloat-fig">
-<div aria-describedby="fig-q1-eda-1-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-<img data-src="index_files/figure-revealjs/fig-q1-eda-1.png" style="width:90.0%" data-ref-parent="fig-q1-eda">
-</div>
-<figcaption class="quarto-float-caption-bottom quarto-subfloat-caption quarto-subfloat-fig" id="fig-q1-eda-1-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-(a) No participant filtering
-</figcaption>
-</figure>
-</div>
-</div>
-<div class="cell-output-display quarto-layout-cell-subref quarto-layout-cell" data-ref-parent="fig-q1-eda" style="flex-basis: 50.0%;justify-content: flex-start;">
-<div id="fig-q1-eda-2" class="quarto-float quarto-figure quarto-figure-center">
-<figure class="quarto-float quarto-subfloat-fig">
-<div aria-describedby="fig-q1-eda-2-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-<img data-src="index_files/figure-revealjs/fig-q1-eda-2.png" style="width:90.0%" data-ref-parent="fig-q1-eda">
-</div>
-<figcaption class="quarto-float-caption-bottom quarto-subfloat-caption quarto-subfloat-fig" id="fig-q1-eda-2-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-(b) Exclude random guessers
-</figcaption>
-</figure>
-</div>
-</div>
-</div>
-</div>
-<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-q1-eda-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-Figure&nbsp;5: Proportion of correct responses to Question 1 across stimuli pairs and media types. For all pairs, with the exception of Pair 5, a correct answer was ‘Larger value’. Stimuli Pair 5 had two identical values, meaning that options other than ‘Both values are the same’ were incorrect.
-</figcaption>
-</figure>
-</div>
-</section>
+
+<img data-src="index_files/figure-revealjs/fig-q1-eda-1.png" class="quarto-figure quarto-figure-center r-stretch" style="width:100.0%"><p class="caption">
+Figure&nbsp;4: Proportion of correct responses to Question 1 with all participants
+</p></section>
+<section class="slide level2">
+
+
+<img data-src="index_files/figure-revealjs/fig-q1-eda2-1.png" class="quarto-figure quarto-figure-center r-stretch" style="width:100.0%"><p class="caption">
+Figure&nbsp;5: Proportion of correct responses to Question 1 without random guessers
+</p></section>
 <section id="analyzing-error" class="slide level2">
 <h2>Analyzing Error</h2>
 <p>We calculate error as follows:</p>
@@ -935,15 +930,43 @@ Y_{ijklm}=\mu+S_i\times M_j\times P_k+\gamma_{lm}+\omega_{ijlm}+\epsilon_{ijklm}
 </section>
 <section class="slide level2">
 
+<div class="cell">
+<div class="cell-output-display">
+<div id="fig-em-media" class="quarto-float quarto-figure quarto-figure-center">
+<figure class="quarto-float quarto-float-fig">
+<div aria-describedby="fig-em-media-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img data-src="index_files/figure-revealjs/fig-em-media-1.png" style="height:100.0%" width="960">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-em-media-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;6: Distributions of log error overlaid with estimated marginal means and their 95% confidence intervals. Differences were only detected between the 2D heat map and both types of 3D heat maps, where the 2D heat map had evidence of larger errors.
+</figcaption>
+</figure>
+</div>
+</div>
+</div>
+</section>
+<section class="slide level2">
 
-<img data-src="index_files/figure-revealjs/fig-em-media-1.png" width="960" class="r-stretch quarto-figure-center"><p class="caption">
-Figure&nbsp;6: Distributions of log error overlaid with estimated marginal means and their 95% confidence intervals. Differences were only detected between the 2D heatmap and both types of 3D heatmaps, where the 2D heatmap had evidence of larger errors.
-</p></section>
+<div class="cell">
+<div class="cell-output-display">
+<div id="fig-em-media2" class="quarto-float quarto-figure quarto-figure-center">
+<figure class="quarto-float quarto-float-fig">
+<div aria-describedby="fig-em-media2-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img data-src="index_files/figure-revealjs/fig-em-media2-1.png" style="height:100.0%" width="960">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-em-media2-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;7: Estimated marginal means for media types and their 95% confidence intervals.
+</figcaption>
+</figure>
+</div>
+</div>
+</div>
+</section>
 <section class="slide level2">
 
 
 <img data-src="index_files/figure-revealjs/fig-em-set-pair-1.png" class="quarto-figure quarto-figure-center r-stretch" width="960"><p class="caption">
-Figure&nbsp;7: Estimated marginal means of stimuli pair and dataset. Bars sharing the same letter are not significantly different from one another.
+Figure&nbsp;8: Estimated marginal means of stimuli pair and dataset. Bars sharing the same letter are not significantly different from one another.
 </p></section>
 <section id="time-per-trial" class="slide level2">
 <h2>Time per trial</h2>
@@ -978,7 +1001,7 @@ Figure&nbsp;7: Estimated marginal means of stimuli pair and dataset. Bars sharin
 </div>
 </div>
 <figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-time-summary-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-Figure&nbsp;8: Visual summary of time spent on each trial. 137 trials are omitted due to lasting longer than 60 seconds.
+Figure&nbsp;9: Visual summary of time spent on each trial. 137 trials are omitted due to lasting longer than 60 seconds.
 </figcaption>
 </figure>
 </div>
@@ -1016,7 +1039,7 @@ Figure&nbsp;8: Visual summary of time spent on each trial. 137 trials are omitte
 </div>
 </div>
 <figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-clicks3dd-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-Figure&nbsp;9: Participant interactions with the digital 3D heatmaps.
+Figure&nbsp;10: Participant interactions with the digital 3D heat maps.
 </figcaption>
 </figure>
 </div>
@@ -1054,7 +1077,7 @@ Figure&nbsp;9: Participant interactions with the digital 3D heatmaps.
 </div>
 </div>
 <figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-slider-clicks-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-Figure&nbsp;10: Participant interactions with the slider.
+Figure&nbsp;11: Participant interactions with the slider.
 </figcaption>
 </figure>
 </div>
@@ -1064,19 +1087,19 @@ Figure&nbsp;10: Participant interactions with the slider.
 <p>For each trial, the slider was randomly positioned between 0 and 100.</p>
 
 <img data-src="index_files/figure-revealjs/fig-slider-start-1.png" width="960" class="r-stretch quarto-figure-center"><p class="caption">
-Figure&nbsp;11: Effect of initial slider position on the submitted slider value.
+Figure&nbsp;12: Effect of initial slider position on the submitted slider value.
 </p></section></section>
 <section>
-<section id="conclusion" class="title-slide slide level1 center">
-<h1>Conclusion</h1>
+<section id="conclusions-and-future-work" class="title-slide slide level1 center">
+<h1>Conclusions and Future Work</h1>
 
 </section>
 <section id="main-findings" class="slide level2">
 <h2>Main findings</h2>
 <p>We note the following results:</p>
 <ul>
-<li>Digital and physical 3D heatmaps produced lower error than 2D heatmaps</li>
-<li>No detectable differences between digital and physical 3D heatmaps</li>
+<li>Digital and physical 3D heat maps produced lower error than 2D heat maps</li>
+<li>No detectable differences between digital and physical 3D heat maps</li>
 <li>Differences attributed to dataset and stimuli pair</li>
 </ul>
 </section>
@@ -1085,7 +1108,7 @@ Figure&nbsp;11: Effect of initial slider position on the submitted slider value.
 <p>As one of the first studies to empirically evaluate physical 3D charts, there are many areas left to explore.</p>
 <div>
 <ul>
-<li class="fragment">Colors and fills of 2D and 3D heatmaps</li>
+<li class="fragment">Colors and fills of 2D and 3D heat maps</li>
 <li class="fragment">Just noticeable differences</li>
 <li class="fragment">Types of estimations (<span class="math inline">\(A/B\)</span>, <span class="math inline">\(A/(A+B)\)</span>, <span class="math inline">\(B-A\)</span>, etc.)</li>
 <li class="fragment">Development of tools to produce 3D charts with considerations for 3D printing</li>
@@ -1103,7 +1126,8 @@ Figure&nbsp;11: Effect of initial slider position on the submitted slider value.
 <blockquote>
 <p>No significant differences in ratio estimations detected from type of chart (<span class="math inline">\(n=38\)</span>)</p>
 </blockquote>
-</section>
+
+<img data-src="images/barchat-3dp.jpg" class="quarto-figure quarto-figure-center r-stretch" data-out-height="100%"></section>
 <section id="contributions-1" class="slide level2">
 <h2>Contributions</h2>
 <p><strong>Study 2</strong>: Students completed a series of reflections regarding their participation in the experiment.</p>
@@ -1111,19 +1135,24 @@ Figure&nbsp;11: Effect of initial slider position on the submitted slider value.
 <p>What information do students learn from participating in an experiment, both as participants and consumers of scientific knowledge?</p>
 </blockquote>
 <blockquote>
-<p>(W.I.P.) Did the results from Study 1 change when using a much larger sample?</p>
+<p>Many students connected ideas from the course material! (e.g., variable identification and generalizability)</p>
 </blockquote>
 </section>
 <section id="contributions-2" class="slide level2">
 <h2>Contributions</h2>
-<p><strong>Study 3</strong>: taking inspiration from <span class="citation" data-cites="cleveland1984">Cleveland and McGill (<a href="#/references" role="doc-biblioref" onclick="">1984</a>)</span> and Study 1, we extend our scope to use heatmaps.</p>
+<p><strong>Study 3</strong>: taking inspiration from <span class="citation" data-cites="cleveland1984">Cleveland and McGill (<a href="#/references" role="doc-biblioref" onclick="">1984</a>)</span> and Study 1, we extend our scope to use heat maps.</p>
 <blockquote>
-<p>When all dimensions are used for conveying information, 3D heatmaps produced lower error rates for estimations of ratios than 2D heatmaps.</p>
+<p>When all dimensions are used for conveying information, 3D heat maps produced lower error rates for estimations of ratios than 2D heat maps.</p>
 </blockquote>
 <blockquote>
-<p>No detectable differences between digital and physical 3D heatmaps.</p>
+<p>No detectable differences between digital and physical 3D heat maps.</p>
 </blockquote>
 </section></section>
+<section id="questions" class="title-slide slide level1 center">
+<h1>Questions?</h1>
+
+</section>
+
 <section>
 <section id="appendix" class="title-slide slide level1 center">
 <h1>Appendix</h1>
@@ -1210,20 +1239,118 @@ Figure&nbsp;11: Effect of initial slider position on the submitted slider value.
 
 
 <img data-src="index_files/figure-revealjs/fig-model-int1-1.png" width="3600" class="r-stretch quarto-figure-center"><p class="caption">
-Figure&nbsp;12: Interaction plots for media type and response filtering, facetted by stimuli pair and dataset.
+Figure&nbsp;13: Interaction plots for media type and response filtering, facetted by stimuli pair and dataset.
 </p></section>
 <section class="slide level2">
 
 
 <img data-src="index_files/figure-revealjs/fig-model-int2-1.png" width="3600" class="r-stretch quarto-figure-center"><p class="caption">
-Figure&nbsp;13: Interaction plots for dataset and response filtering, facetted by stimuli pair and media type.
+Figure&nbsp;14: Interaction plots for dataset and response filtering, facetted by stimuli pair and media type.
 </p></section>
 <section class="slide level2">
 
 
 <img data-src="index_files/figure-revealjs/fig-model-int3-1.png" width="3600" class="r-stretch quarto-figure-center"><p class="caption">
-Figure&nbsp;14: Interaction plots for stimuli pairs and response filtering, facetted by dataset and media type.
+Figure&nbsp;15: Interaction plots for stimuli pairs and response filtering, facetted by dataset and media type.
 </p></section>
+<section id="excluding-stimuli-pair-5" class="slide level2">
+<h2>Excluding Stimuli Pair 5</h2>
+<div class="cell">
+<div class="cell-output-display">
+<div id="fig-pair5-issues" class="quarto-float quarto-figure quarto-figure-center" data-fig-scap="Response behavior for identical-value stimuli pair">
+<figure class="quarto-float quarto-float-fig">
+<div aria-describedby="fig-pair5-issues-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img data-src="index_files/figure-revealjs/fig-pair5-issues-1.png" style="height:100.0%" data-fig-scap="Response behavior for identical-value stimuli pair" width="960">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-pair5-issues-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;16: Counts of response behavior for Stimuli Pair 5. This pair had identical values, which means that true solutions indicates marking that they were the same value and positioning the slider at 100.
+</figcaption>
+</figure>
+</div>
+</div>
+</div>
+</section>
+<section id="generalized-additive-model" class="slide level2">
+<h2>Generalized Additive Model</h2>
+<p><span id="eq-gam"><span class="math display">\[
+y=\mu+S_i\times M_j + s_i^S(R)+s_j^M(R)+P_m+\epsilon
+\qquad(1)\]</span></span></p>
+<p>where</p>
+<ul>
+<li><p><span class="math inline">\(y=\log_2(|\text{Error}|+1/8)\)</span></p></li>
+<li><p><span class="math inline">\(S_i\times M_j\)</span> is the fixed effects for main effect and two-way interactions of dataset <span class="math inline">\(S_i\)</span> and media type <span class="math inline">\(M_j\)</span></p></li>
+<li><p><span class="math inline">\(S_i^S(R)\)</span> is a thin-plate spline function for ratio accounting for dataset</p></li>
+<li><p><span class="math inline">\(S_j^M(R)\)</span> is a thin-plate spline function for ratio accounting for media type</p></li>
+<li><p><span class="math inline">\(P_m\)</span> is the random effect of the <span class="math inline">\(m^{th}\)</span> participant</p></li>
+<li><p><span class="math inline">\(\epsilon\)</span> is random error</p></li>
+</ul>
+</section>
+<section id="gam-all-participants" class="slide level2">
+<h2>GAM (All Participants)</h2>
+<div class="cell">
+<div class="cell-output cell-output-stdout">
+<pre><code>
+Family: gaussian 
+Link function: identity 
+
+Formula:
+q2_error_cm ~ set * media + s(target_ratio, k = 4, by = media) + 
+    s(target_ratio, k = 4, by = set) + s(user_id, bs = "re")
+
+Parametric Terms:
+          df      F  p-value
+set        1  0.030    0.863
+media      2 12.190 5.29e-06
+set:media  2  0.211    0.810
+
+Approximate significance of smooth terms:
+                             edf  Ref.df     F p-value
+s(target_ratio):media2dd   1.002   1.003 0.058   0.813
+s(target_ratio):media3dd   1.972   2.350 1.476   0.200
+s(target_ratio):media3dp   1.047   1.428 1.612   0.268
+s(target_ratio):setset1    1.005   1.009 0.650   0.422
+s(target_ratio):setset2    1.022   1.042 0.165   0.719
+s(user_id)               217.826 258.000 6.423  &lt;2e-16</code></pre>
+</div>
+</div>
+</section>
+<section class="slide level2">
+
+
+<img data-src="index_files/figure-revealjs/unnamed-chunk-27-1.png" width="960" class="r-stretch"></section>
+<section id="gam-filtered-participants" class="slide level2">
+<h2>GAM (Filtered Participants)</h2>
+<div class="cell">
+<div class="cell-output cell-output-stdout">
+<pre><code>
+Family: gaussian 
+Link function: identity 
+
+Formula:
+q2_error_cm ~ set * media + s(target_ratio, k = 4, by = media) + 
+    s(target_ratio, k = 4, by = set) + s(user_id, bs = "re")
+
+Parametric Terms:
+          df      F  p-value
+set        1  0.279    0.598
+media      2 13.634 1.28e-06
+set:media  2  0.450    0.638
+
+Approximate significance of smooth terms:
+                               edf    Ref.df     F  p-value
+s(target_ratio):media2dd 3.368e-04 6.524e-04 0.186 0.991204
+s(target_ratio):media3dd 1.006e+00 1.011e+00 2.510 0.111735
+s(target_ratio):media3dp 1.011e+00 1.022e+00 0.791 0.369414
+s(target_ratio):setset1  2.232e+00 2.599e+00 7.748 0.000327
+s(target_ratio):setset2  2.349e+00 2.702e+00 6.397 0.000404
+s(user_id)               1.396e+02 1.600e+02 7.105  &lt; 2e-16</code></pre>
+</div>
+</div>
+</section>
+<section class="slide level2">
+
+
+<img data-src="index_files/figure-revealjs/unnamed-chunk-29-1.png" width="960" class="r-stretch"></section>
 <section id="references" class="slide level2 smaller scrollable">
 <h2>References</h2>
 <div id="refs" class="references csl-bib-body hanging-indent" data-entry-spacing="0" role="list">
@@ -1254,7 +1381,7 @@ Stusak, Simon, Jeannette Schwarz, and Andreas Butz. 2015. <span>“Evaluating th
 </div>
 <div class="quarto-auto-generated-content">
 <div class="footer footer-default">
-
+<p>Ph.D.&nbsp;Final Examination</p>
 </div>
 </div>
 </section></section>

@@ -1,0 +1,14 @@
+/*-- scss:rules --*/
+
+#title-slide .title {
+  font-size: 2em;
+  color: #1a80bb;
+}
+
+#title-slide .footer {
+  opacity: 0;
+}
+
+.reveal figure.center-caption figcaption {
+  text-align: center !important;
+}

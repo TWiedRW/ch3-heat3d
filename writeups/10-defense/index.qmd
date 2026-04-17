@@ -1,13 +1,18 @@
 ---
-title: "Heat to Height"
-subtitle: "A study comparing the physical dimensionality of heatmaps"
+title: "Heat to Height: Comparing the Physical Dimensionality of Heat Maps"
+subtitle: "Ph.D. Final Examination"
 author: "Tyler Wiederich"
+institution: "University of Nebraska-Lincoln"
+footer: "Ph.D. Final Examination"
 date: today
 date-format: long
 format:
   revealjs:
     smaller: true
+    theme: [default, styles.scss]
 bibliography: references.bib
+execute:
+  cache: true
 ---
 
 ```{r}
@@ -21,44 +26,47 @@ solutions <- readRDS('../../data/solutions.rda')
 theme_set(theme_bw() + theme(aspect.ratio = 1))
 ```
 
+## Outline
+
+-   Motivation
+-   Study Design
+-   Results
+-   Conclusions
+-   Contributions and Future Work
+
+# Motivation
 
 ## Motivation
 
 Data is everywhere, but how do we communicate it through visualizations? We design graphics to account for:
 
-:::::::{.columns}
-
-:::{.column}
-
-:::{.incremental}
-
+::::::: columns
+::::: column
+::: incremental
 -   Audience
 -   Clarity
 -   Accessibility
-
-
 :::
 
+::: fragment
+Many types of charts exist for displaying different types of data.
 :::
+:::::
 
-:::{.column}
-
+::: column
 ![](images/random-chart.png)
 :::
-
 :::::::
 
-:::{.fragment}
-
+::: fragment
 > What alternative methods can we use to better display it?
-
 :::
 
-## Heatmaps
+## Heat maps
 
 ::::: columns
 ::: column
-Heatmaps are a type of data visualization that convey data in three dimensions.
+Heat maps are a type of data visualization that convey data in three dimensions.
 
 -   Two dimensions represented by spatial coordinates
 
@@ -68,106 +76,97 @@ Heatmaps are a type of data visualization that convey data in three dimensions.
 :::
 
 ::: column
-
 ![](images/heatmap3d.png)
-
 :::
 :::::
 
 ## Data Physicalization
 
-
-
 Many advancements in technology have allowed for greater artistic creativity in displaying data.
 
-:::{.columns}
-
-:::{.column}
+::::: columns
+::: column
 -   Physical representations of data [@huronMakingDataPhysical2023]
 -   3D-printed charts
 :::
 
-:::{.column}
+::: column
 ![One of the earliest 3D-printed data visualizations. Source: Wall Street Journal](images/first-3d-printed-chart.jpg){align="center"}
 :::
-
-:::
-
+:::::
 
 ## 3D-printed charts
 
 What are the potential benefits of using 3D-printed charts for statistical graphics?
 
-
-
-:::::{.columns}
-
-::: {.column}
-
-:::{.incremental}
-
-- Increased interaction
-- Less reliance on color
-- Engagement and attention
-- Better accessibility
-
+:::::: columns
+:::: column
+::: incremental
+-   Increased interaction
+-   Less reliance on color
+-   Engagement and attention
+-   Better accessibility
 :::
+::::
 
-
+::: column
+![](images/IMG_3923.JPG){height="15em" fig-align="center"}
 :::
-
-:::{.column}
-
-![](images/IMG_3923.JPG){height=15em fig-align='center'}
-
-:::
-
-:::::
-
+::::::
 
 ## Previous Research
 
 To date, very few empirical studies have been conducted using physical 3D charts.
 
-:::{.incremental}
-
--   Physical 3D heatmaps suggested to be more efficient at estimations ($n=16$) [@jansen2013]
+::: incremental
+-   Physical 3D heat maps suggested to be more efficient at estimations ($n=16$) [@jansen2013]
 
 -   Physical bar charts may be more memorable than digital charts ($n=40,16$) [@stusak2015; @stusakIfYourMind2016]
 
-- Some studies show smaller error rates for 3D charts using virtual reality [e.g., @kraus2020]
-
+-   Some studies show smaller error rates for 3D charts using virtual reality [e.g., @kraus2020]
 :::
 
-:::{.fragment}
-
+::: fragment
 > Many instances of 3D-printed charts are created for artistic representations!
-
 :::
+
+## Examples {.scrollable}
+
+
+```{r}
+#| layout-ncol: 2
+#| out-height: 7em
+#| out-width: auto
+#| fig-cap: "Examples of 3D-printed charts"
+#| fig-subcap: 
+#| - "@jansen2013"
+#| - "Blog post from VisWorld"
+#| - "Tree map [@huronMakingDataPhysical2023]"
+#| - "Wall Street Journal"
+#| fig-class: center-caption
+knitr::include_graphics(c(
+  "images/jansen.jpg",
+  "images/visworld.jpg",
+  "images/treemap-3d.png",
+  "images/first-3d-printed-chart.jpg"
+))
+```
 
 ## Overview of Our Research
 
 Previous research suggests that 3D charts may perform better when all three dimensions are used for displaying information [@barfield1989; @fisher1997; @kraus2020].
 
-:::{.fragment}
-
-> Does this hold for numerical estimations from physical 3D heatmaps compared to 2D static heatmaps and interactive digital 3D heatmaps?
-
+::: fragment
+> Does this hold for numerical estimations from physical 3D heat maps compared to 2D static heat maps and interactive digital 3D heat maps?
 :::
 
-
-:::{.fragment}
-
+::: fragment
 There are many possible conditions for which charts can be rendered that could influence numerical estimations.
-
 :::
 
-:::{.fragment}
-
+::: fragment
 > To what extent do underlying datasets and comparison types affect numerical estimations from these charts?
-
 :::
-
 
 # Methods
 
@@ -181,7 +180,7 @@ $$
 
 Setting 50 as the constant and 90 as the maximum, a sequence of stimuli are chosen by equally partitioning the ratios between $50/50=1$ and $50/90\approx0.556$. The same ratios are used when setting 50 as the maximum in the stimuli pair.
 
-------------------------------------------------------------------------
+## Stimuli Values
 
 ```{r}
 load('../../data/stimuli.rda')
@@ -207,7 +206,47 @@ stimuli %>%
         aspect.ratio = 1/2)
 ```
 
----
+
+## Heat Map Data
+
+We used two datasets created using a mixture distribution for equations for spheres and random noise as a reference distribution. Final values were scaled between 0 and 100.
+
+- Set 1: $f_1(X,Y)=\sqrt{7^2-(X-\bar{X})^2-(Y-\bar{Y})^2}$
+- Set 2: $f_2(X,Y)=\sqrt{7^2+(X-\bar{X})^2+(Y-\bar{Y})^2}$
+
+## Set 1
+
+```{r}
+library(plotly)
+
+x <- 1:10
+y <- 1:10
+xbar <- mean(x)
+ybar <- mean(y)
+
+z1 <- outer(x, y, function(X, Y) {
+  49 - (X - xbar)^2 - (Y - ybar)^2
+})
+
+z2 <- outer(x, y, function(X, Y) {
+  49 + (X - xbar)^2 + (Y - ybar)^2
+})
+
+plot_ly(x = ~x, y = ~y, z = ~z1) %>%
+  add_surface(showlegend = FALSE, showscale = FALSE)
+```
+
+## Set 2
+
+```{r}
+plot_ly(x = ~x, y = ~y, z = ~z2) %>%
+  add_surface(showlegend = FALSE, showscale = FALSE)
+```
+
+
+## Stimuli Placement
+
+We strategically placed stimuli so that they looked natural with respect to the simulated dataset.
 
 ```{r}
 #| layout-ncol: 2
@@ -244,15 +283,13 @@ ggsave('placement-set1-2dd.png', p1)
 ggsave('placement-set2-2dd.png', p2)
 ```
 
-::: {layout-ncol=2}
-
-![Stimuli pair placement on Set 1](placement-set1-2dd.png){width=100%}
-
-![Stimuli pair placement on Set 2](placement-set2-2dd.png){width=100%}
 
 
+::: {layout-ncol="2"}
+![Placement of stimuli on Set 1](placement-set1-2dd.png){height="60vh"}
+
+![Placement of stimuli on Set 2](placement-set2-2dd.png){height="60vh"}
 :::
-
 
 ## Chart Types
 
@@ -263,7 +300,7 @@ ggsave('placement-set2-2dd.png', p2)
 
 ![3D Printed](images/examp3dp.png){#fig-3dp}
 
-Chart types representing heatmap Set 1.
+Chart types representing heat map Set 1.
 :::
 
 ## Experimental Design
@@ -284,22 +321,6 @@ $$
 $$
 :::
 
-------------------------------------------------------------------------
-
-```{r}
-#| label: fig-block-design
-#| fig-cap: "Balanced Incomplete Block Design. Each stimuli pair in a block is fully crossed with media type and dataset."
-#| fig-align: center
-
-plan %>% 
-  ggplot(mapping = aes(x = factor(block), y = factor(pair_id))) + 
-  geom_tile(fill = '#1a80bb', color = 'black') + 
-  scale_y_discrete(limits = rev) +
-  theme(aspect.ratio = 1/2, axis.title = element_text(size = 18),
-        axis.text = element_text(size = 14)) + 
-  labs(y = 'Stimuli Pair Identifier', x = 'Block') 
-```
-
 ## Responses
 
 For each trial in the experiment, we ask two question adapted from @cleveland1984.
@@ -307,38 +328,31 @@ For each trial in the experiment, we ask two question adapted from @cleveland198
 1.  Which value in a stimuli pair represents a larger quantity?
 2.  If the larger value in the stimuli pair represents 100 units, how many units is the smaller value?
 
-:::{.fragment}
-
+::: fragment
 Question 1 has three options: one for each value in the pair and one option for if the values are the same.
-
 :::
 
-:::{.fragment}
-
+::: fragment
 Question 2 has a slider ranging from 0 to 100, and the initial position is randomly positioned
-
 :::
 
----
+------------------------------------------------------------------------
 
-![Shiny application](images/shiny-app.png){fig-align='center'}
-
+![Shiny application](images/shiny-app.png){fig-align="center"}
 
 ## Participant Recruitment
 
-We recruited our subjects by integrating an experiential learning project into the STAT 218 curriculum at UNL. The data collection period was from Summer 2025 to Fall 2025. 
+We recruited our subjects by integrating an experiential learning project into the STAT 218 curriculum at UNL. The data collection period was from Summer 2025 to Fall 2025.
 
 For data to be collected, students had to meet the following criteria:
 
-1. Be at least 19 years of age
-2. Consent to participation
+1.  Be at least 19 years of age
+2.  Consent to participation
 
-:::{.fragment}
-
+::: fragment
 Students were instructed to complete the experiment at communal office hour locations.
 
-- Online sections were exempt from this, and 3D-printed charts were removed from their trials.
-
+-   Online sections were exempt from this, and 3D-printed charts were removed from their trials.
 :::
 
 # Results
@@ -473,13 +487,13 @@ res_q2 <- results %>%
 res_q2_filtered <- res_q2 %>% inner_join(res_q1_filtered)
 ```
 
+## Demographics
 
-## Demographics {.scrollable}
-
-`r nrow(users_clean)` students completed the entirety of the experiment. Of these, `r nrow(users_clean)-nrow(users_in_person)` students were enrolled in online sections of the course. 
+`r nrow(users_clean)` students completed the entirety of the experiment. Of these, `r nrow(users_clean)-nrow(users_in_person)` students were enrolled in online sections of the course.
 
 ```{r}
-#| tbl-cap: "Demographic Information"
+#| fig-align: 'center'
+#| out-height: 100%
 
 library(kableExtra)
 tbl_gender <- users_clean %>% 
@@ -488,35 +502,75 @@ tbl_gender <- users_clean %>%
   ungroup() %>% 
   mutate(prop = n/sum(n)) %>% 
   mutate(user = user_gender)
+ggplot(tbl_gender, mapping = aes(x = user_gender, y = n)) + 
+  geom_col(fill = '#1a80bb', color = 'black') + 
+  geom_text(aes(label = n, y = n + 5)) + 
+  labs(x = 'Gender', y = 'Count', title = 'Participant Gender') + 
+  theme_bw() + 
+  theme(aspect.ratio = 1/2,
+        panel.grid.major.x = element_blank(),
+        plot.title = element_text(face = 'bold', hjust = 0.5))
+```
 
+------------------------------------------------------------------------
+
+```{r}
+#| fig-align: 'center'
+#| out-height: 100%
 tbl_age <- users_clean %>% 
   group_by(user_age) %>% 
   summarize(n = n()) %>% 
   ungroup() %>% 
   mutate(prop = n/sum(n)) %>% 
-  mutate(user = user_age)
+  mutate(user = user_age) %>% 
+  bind_rows(data.frame(
+    user_age = '31-35',
+    n = 0,
+    prop = 0
+  ))
 
+ggplot(tbl_age, mapping = aes(x = user_age, y = n)) + 
+  geom_col(fill = '#1a80bb', color = 'black') + 
+  geom_text(aes(label = n, y = n + 10)) + 
+  labs(x = 'Age', y = 'Count', title = 'Participant Age Category') + 
+  theme_bw() + 
+  theme(aspect.ratio = 1/2,
+        panel.grid.major.x = element_blank(),
+        plot.title = element_text(face = 'bold', hjust = 0.5))
+```
+
+------------------------------------------------------------------------
+
+```{r}
+#| fig-align: 'center'
+#| out-height: 100%
 tbl_education <- users_clean %>% 
   group_by(user_education) %>% 
   summarize(n = n()) %>% 
   ungroup() %>% 
   mutate(prop = n/sum(n)) %>% 
-  mutate(user = user_education)
-
-tbl_demographics <- bind_rows(tbl_gender, tbl_age, tbl_education) %>% 
-  select(-c(user_gender, user_age, user_education)) %>% 
-  bind_rows(data.frame(
-    user = '31-35',
-    n = 0,
-    prop = 0
+  mutate(user = user_education) %>% 
+  mutate(user_education = factor(
+    user_education,
+    levels = c(
+      'High School or Less',
+      'Some Undergraduate Courses',
+      'Undergraduate Degree',
+      'Some Graduate Courses',
+      'Graduate Degree',
+      'Prefer not to answer'
+    )
   ))
-  
-tbl_demographics[c(1,2,4,3, 5, 6, 16, 7, 8, 9, 11, 14, 15, 13, 10, 12), c(3,1,2)] %>% 
-kbl(digits = 2, booktabs = T, col.names = c('', 'Count', 'Proportion')) %>% 
-  kable_paper() %>% 
-  pack_rows('Gender', 1, 4) %>% 
-  pack_rows('Age', 5, 10) %>% 
-  pack_rows('Education', 11, 16)
+
+ggplot(tbl_education, mapping = aes(x = user_education, y = n)) + 
+  geom_col(fill = '#1a80bb', color = 'black') + 
+  geom_text(aes(label = n, y = n + 10)) + 
+  labs(x = 'Education', y = 'Count', title = 'Participant Education Category') + 
+  theme_bw() + 
+  theme(aspect.ratio = 1/2,
+        panel.grid.major.x = element_blank(),
+        plot.title = element_text(face = 'bold', hjust = 0.5),
+        axis.text.x = element_text(angle = 30, hjust = 1))
 ```
 
 ## Completion Times
@@ -549,7 +603,6 @@ df_time %>%
   theme_bw() + 
   theme(aspect.ratio = 1/2)
 ```
-
 
 ## Careless Respondents
 
@@ -602,47 +655,39 @@ results %>%
 
 While careless respondents are an acknowledged issue, there is no general consensus on how to handle them.
 
-- Preventative actions (attention checks, etc.)
-- Post-hoc analysis (removal, mixture models, etc.)
+-   Preventative actions (attention checks, etc.)
+-   Post-hoc analysis (removal, mixture models, etc.)
 
-
-:::{.fragment}
-
+::: fragment
 Our first question was actually designed as a quasi-attention check! For each participant, we calculate p-values using a one-sided Binomial test:
 
 $$
 H_0: \pi\leq2/3\text{ vs. }H_1:\pi>2/3
 $$
 
-where $\pi$ is the probability of correctly guessing the larger value. 
-
+where $\pi$ is the probability of correctly guessing the larger value.
 :::
 
-:::{.fragment}
-
+::: fragment
 > Was this participant answering Q1 correctly at least twice as often as incorrect options?
-
 :::
 
-
-:::{.notes}
+::: notes
 This test removed the instances where the values were the same size.
 :::
 
----
+------------------------------------------------------------------------
 
 ```{r}
 #| label: fig-q1-eda
-#| layout-ncol: 2
-#| out-width: 90%
-#| fig-cap: "Proportion of correct responses to Question 1 across stimuli pairs and media types. For all pairs, with the exception of Pair 5, a correct answer was 'Larger value'. Stimuli Pair 5 had two identical values, meaning that options other than 'Both values are the same' were incorrect."
-#| fig-subcap:
-#| - "No participant filtering"
-#| - "Exclude random guessers"
+#| fig-cap: "Proportion of correct responses to Question 1 with all participants"
+#| fig-align: 'center'
+#| out-width: 100%
+
 res_q1 %>% 
   ggplot(mapping = aes(y = media, fill = q1_label)) + 
   geom_bar(position = position_fill()) + 
-  labs(x = 'Proportion', y = 'Media type', fill = 'Participant Selection') + 
+  labs(x = 'Proportion', y = 'Media type', fill = 'Participant Selection', title = 'All participants') + 
   facet_wrap(~facet_label) + 
   scale_fill_manual(values = c(
     'Larger value' = '#2066a8',
@@ -652,13 +697,22 @@ res_q1 %>%
   theme_bw() + 
   theme(aspect.ratio = 1/3,
         panel.grid = element_blank(),
-        legend.position = 'bottom')
+        legend.position = 'bottom',
+        plot.title = element_text(face = 'bold', hjust = 0.5))
+```
 
+------------------------------------------------------------------------
+
+```{r}
+#| label: fig-q1-eda2
+#| fig-cap: "Proportion of correct responses to Question 1 without random guessers"
+#| fig-align: 'center'
+#| out-width: 100%
 res_q1 %>% 
   inner_join(res_q1_filtered) %>% 
   ggplot(mapping = aes(y = media, fill = q1_label)) + 
   geom_bar(position = position_fill()) + 
-  labs(x = 'Proportion', y = 'Media type', fill = 'Participant Selection') + 
+  labs(x = 'Proportion', y = 'Media type', fill = 'Participant Selection', title = 'Participants without random guessers') + 
   facet_wrap(~facet_label) + 
   scale_fill_manual(values = c(
     'Larger value' = '#2066a8',
@@ -668,7 +722,8 @@ res_q1 %>%
   theme_bw() + 
   theme(aspect.ratio = 1/3,
         panel.grid = element_blank(),
-        legend.position = 'bottom')
+        legend.position = 'bottom',
+        plot.title = element_text(face = 'bold', hjust = 0.5))
 ```
 
 ## Analyzing Error
@@ -681,14 +736,12 @@ $$
 
 We excluded:
 
-- suspected random guessers 
-- stimuli pair where values were the same
-- estimates where Q1 were incorrect
+-   suspected random guessers
+-   stimuli pair where values were the same
+-   estimates where Q1 were incorrect
 
-:::{.fragment}
-
+::: fragment
 Various models produced the same conclusions!
-
 :::
 
 ## Linear Mixed Model
@@ -714,30 +767,30 @@ $$
 
 where
 
-- $Y=\log_2(|\text{User Response}-100\times(\text{True ratio})|+1/8)$
-- $\mu$ is the intercept
-- $S_i\times M_j \times P_k$ is the fixed effects (and interactions) of **S**et, **M**edia type, and stimuli **P**air
-- $\gamma_{lm}$ is the random effect of participant and block
-- $\omega_{ijklm}$ is the random effect of media and set for each participant
-- $\epsilon_{ijklm}$ is the random error
-- All random effects i.i.d. $N(0,\sigma^2)$ with separate $\sigma^2$ and are independent
+-   $Y=\log_2(|\text{User Response}-100\times(\text{True ratio})|+1/8)$
+-   $\mu$ is the intercept
+-   $S_i\times M_j \times P_k$ is the fixed effects (and interactions) of **S**et, **M**edia type, and stimuli **P**air
+-   $\gamma_{lm}$ is the random effect of participant and block
+-   $\omega_{ijklm}$ is the random effect of media and set for each participant
+-   $\epsilon_{ijklm}$ is the random error
+-   All random effects i.i.d. $N(0,\sigma^2)$ with separate $\sigma^2$ and are independent
 
-
----
+------------------------------------------------------------------------
 
 ```{r}
 knitr::kable(mod_q2_anova, caption = 'ANOVA Table', digits = 3)
 ```
 
----
+------------------------------------------------------------------------
 
 ```{r}
 #| label: fig-em-media
-#| fig-cap: "Distributions of log error overlaid with estimated marginal means and their 95% confidence intervals. Differences were only detected between the 2D heatmap and both types of 3D heatmaps, where the 2D heatmap had evidence of larger errors."
+#| fig-cap: "Distributions of log error overlaid with estimated marginal means and their 95% confidence intervals. Differences were only detected between the 2D heat map and both types of 3D heat maps, where the 2D heat map had evidence of larger errors."
+#| out-height: 100%
 library(ggsignif)
 res_q2_filtered %>% 
   ggplot(mapping = aes(x = media)) + 
-  geom_violin(aes(y = q2_error_cm), fill = '#2066a8') + 
+  geom_violin(aes(y = q2_error_cm), fill = '#1a80bb') + 
   geom_point(aes(y = emmean),
            data = data.frame(em), size = 1) + 
   geom_errorbar(aes(ymin = lower.CL, ymax = upper.CL),
@@ -758,8 +811,28 @@ res_q2_filtered %>%
 
 ```
 
+------------------------------------------------------------------------
 
----
+```{r}
+#| label: fig-em-media2
+#| fig-cap: "Estimated marginal means for media types and their 95% confidence intervals. "
+#| out-height: 100%
+library(ggsignif)
+data.frame(em) %>% 
+  ggplot(mapping = aes(x = media)) + 
+  geom_col(aes(y = emmean), fill = '#1a80bb',
+           width = 1/2) + 
+  geom_errorbar(aes(ymin = lower.CL, ymax = upper.CL),
+                data = data.frame(em), width = 1/10) + 
+
+  labs(x = 'Chart Type', y = 'log2(|Error|+1/8)') + 
+  # scale_y_continuous(limits = c(0, 5)) +
+  theme_bw() + 
+  theme(aspect.ratio = 1/2, panel.grid.major.x = element_blank())
+
+```
+
+------------------------------------------------------------------------
 
 ```{r}
 em2 <- emmeans(mod_q2, ~pair_id + set)
@@ -814,6 +887,7 @@ multcomp::cld(em2, Letters = letters) %>%
 ## Time per trial
 
 ```{r}
+
 time <- res_q2_filtered %>% 
   ungroup() %>% 
   mutate(ttc = end_time - start_time)
@@ -844,7 +918,7 @@ time %>%
   labs(x = 'Time spent per trial\n(in seconds)',
        color = 'Chart type') + 
   theme_bw() + 
-  theme(aspect.ratio = 1)
+  theme(aspect.ratio = 1/2)
   
 time %>% 
   ggplot(mapping = aes(x = ttc, y = q2_error_cm, color = media)) + 
@@ -855,9 +929,8 @@ time %>%
        y = 'log2(|Error|+1/8)',
        color = 'Chart type') + 
   theme_bw() + 
-  theme(aspect.ratio = 1)
+  theme(aspect.ratio = 1/2)
 ```
-
 
 ## Interactions with digital 3D heat map
 
@@ -866,7 +939,7 @@ time %>%
 #| label: fig-clicks3dd
 #| fig-align: center
 #| out-width: 90%
-#| fig-cap: "Participant interactions with the digital 3D heatmaps."
+#| fig-cap: "Participant interactions with the digital 3D heat maps."
 #| fig-subcap: 
 #| - "Histogram"
 #| - "WebGL clicks vs. Error"
@@ -875,7 +948,7 @@ clicks %>%
   geom_histogram(binwidth = 1, color = 'black', fill = '#1a80bb',
                  boundary = 0) + 
   theme_bw() + 
-  theme(aspect.ratio = 1) + 
+  theme(aspect.ratio = 1/2) + 
   labs(x = 'Number of WebGL clicks',
        y = 'Count of clicks')
 
@@ -885,7 +958,7 @@ clicks %>%
   geom_smooth() +
   # scale_x_log10() +
   theme_bw() + 
-  theme(aspect.ratio = 1) + 
+  theme(aspect.ratio = 1/2) + 
   labs(x = 'Number of WebGL clicks',
        y = 'log2(|Error|+1/8)')
 ```
@@ -905,7 +978,7 @@ res_q2_filtered %>%
   geom_histogram(binwidth = 1, fill = '#1a80bb', color = 'black') + 
   theme_bw() + 
   labs(x = 'Number of slider clicks', y = 'Count') + 
-  theme(aspect.ratio = 1)
+  theme(aspect.ratio = 1/2)
 
 res_q2_filtered %>% 
   ggplot(mapping = aes(x = slider_clicks, y = q2_error_cm)) + 
@@ -913,12 +986,12 @@ res_q2_filtered %>%
   geom_smooth() +
   labs(x = 'Number of slider clicks', y = 'log2(|Error|+1/8') + 
   theme_bw() + 
-  theme(aspect.ratio = 1)
+  theme(aspect.ratio = 1/2)
 ```
 
 ## Initial Placement of Slider
 
-For each trial, the slider was randomly positioned between 0 and 100. 
+For each trial, the slider was randomly positioned between 0 and 100.
 
 ```{r}
 #| label: fig-slider-start
@@ -932,27 +1005,25 @@ res_q2_filtered %>%
   theme(aspect.ratio = 1/1)
 ```
 
-# Conclusion
+# Conclusions and Future Work
 
 ## Main findings
 
 We note the following results:
 
-- Digital and physical 3D heatmaps produced lower error than 2D heatmaps
-- No detectable differences between digital and physical 3D heatmaps
-- Differences attributed to dataset and stimuli pair
+-   Digital and physical 3D heat maps produced lower error than 2D heat maps
+-   No detectable differences between digital and physical 3D heat maps
+-   Differences attributed to dataset and stimuli pair
 
 ## Areas for future work
 
 As one of the first studies to empirically evaluate physical 3D charts, there are many areas left to explore.
 
-:::{.incremental}
-
-- Colors and fills of 2D and 3D heatmaps
-- Just noticeable differences
-- Types of estimations ($A/B$, $A/(A+B)$, $B-A$, etc.)
-- Development of tools to produce 3D charts with considerations for 3D printing
-
+::: incremental
+-   Colors and fills of 2D and 3D heat maps
+-   Just noticeable differences
+-   Types of estimations ($A/B$, $A/(A+B)$, $B-A$, etc.)
+-   Development of tools to produce 3D charts with considerations for 3D printing
 :::
 
 # Contributions to literature
@@ -963,21 +1034,25 @@ As one of the first studies to empirically evaluate physical 3D charts, there ar
 
 > No significant differences in ratio estimations detected from type of chart ($n=38$)
 
+![](images/barchat-3dp.jpg){out-height="100%" fig-align="center"}
+
 ## Contributions
 
 **Study 2**: Students completed a series of reflections regarding their participation in the experiment.
 
 > What information do students learn from participating in an experiment, both as participants and consumers of scientific knowledge?
 
-> (W.I.P.) Did the results from Study 1 change when using a much larger sample?
+> Many students connected ideas from the course material! (e.g., variable identification and generalizability)
 
 ## Contributions
 
-**Study 3**: taking inspiration from @cleveland1984 and Study 1, we extend our scope to use heatmaps. 
+**Study 3**: taking inspiration from @cleveland1984 and Study 1, we extend our scope to use heat maps.
 
-> When all dimensions are used for conveying information, 3D heatmaps produced lower error rates for estimations of ratios than 2D heatmaps. 
+> When all dimensions are used for conveying information, 3D heat maps produced lower error rates for estimations of ratios than 2D heat maps.
 
-> No detectable differences between digital and physical 3D heatmaps.
+> No detectable differences between digital and physical 3D heat maps.
+
+# Questions?
 
 # Appendix
 
@@ -1054,7 +1129,7 @@ em_q1_all <- emmeans(mod_q1_all, ~media+set+pair_id, pbkrtest.limit = 5800)
 em_q1_q1 <- emmeans(mod_q1_q1, ~media+set+pair_id, pbkrtest.limit = 5800)
 ```
 
----
+------------------------------------------------------------------------
 
 ```{r}
 #| eval: true
@@ -1090,7 +1165,7 @@ bind_rows(
         legend.position = 'bottom')
 ```
 
----
+------------------------------------------------------------------------
 
 ```{r}
 #| eval: true
@@ -1126,7 +1201,7 @@ bind_rows(
         legend.position = 'bottom')
 ```
 
----
+------------------------------------------------------------------------
 
 ```{r}
 #| eval: true
@@ -1160,6 +1235,143 @@ bind_rows(
   theme(aspect.ratio = 1/1,
         # strip.text.y = element_text(size = 6),
         legend.position = 'bottom')
+```
+
+## Excluding Stimuli Pair 5
+
+```{r}
+#| out-height: 100%
+#| fig-cap: "Counts of response behavior for Stimuli Pair 5. This pair had identical values, which means that true solutions indicates marking that they were the same value and positioning the slider at 100."
+#| fig-scap: "Response behavior for identical-value stimuli pair"
+#| label: fig-pair5-issues
+infilter.labs <- c('Included Participants', 'Excluded Participants')
+names(infilter.labs) <- c(TRUE, FALSE)
+
+res_q2 %>% 
+  filter(pair_id == 5) %>% 
+  mutate(infilter = user_id %in% res_q2_filtered$user_id) %>% 
+  group_by(q1_correct = user_larger == true_larger,
+           slider100 = user_slider == 100,
+           infilter) %>% 
+  count() %>% 
+  arrange(infilter, q1_correct) %>% 
+  ggplot(mapping = aes(x = slider100, y = n, fill = q1_correct)) + 
+  geom_col(position = position_dodge()) + 
+  geom_text(aes(label = n, y = n+8), position = position_dodge(width = 1),
+            size = 3) + 
+  labs(x = 'Slider position', y = 'Count',
+       fill = 'Correct solution\nto Q1?') +
+  facet_wrap(~infilter, labeller = labeller(infilter = infilter.labs)) + 
+  scale_fill_manual(labels = c("No", "Yes"),
+                    values = c('#b8b8b8', '#1a80bb')) +
+  scale_x_discrete(labels = c('Not at 100', 'At 100')) + 
+  theme_bw() + 
+  theme(aspect.ratio = 1/2, legend.position = 'bottom')
+```
+
+## Generalized Additive Model
+
+$$
+y=\mu+S_i\times M_j + s_i^S(R)+s_j^M(R)+P_m+\epsilon
+$$ {#eq-gam}
+
+where
+
+-   $y=\log_2(|\text{Error}|+1/8)$
+
+-   $S_i\times M_j$ is the fixed effects for main effect and two-way interactions of dataset $S_i$ and media type $M_j$
+
+-   $S_i^S(R)$ is a thin-plate spline function for ratio accounting for dataset
+
+-   $S_j^M(R)$ is a thin-plate spline function for ratio accounting for media type
+
+-   $P_m$ is the random effect of the $m^{th}$ participant
+
+-   $\epsilon$ is random error
+
+------------------------------------------------------------------------
+
+```{r}
+#| cache: true
+# GAM
+library(mgcv)
+library(gratia)
+mod_gam <- gam(
+  q2_error_cm ~ 
+    set*media + 
+    s(target_ratio, k = 4, by = media) + 
+    s(target_ratio, k = 4, by = set) + 
+    s(user_id, bs='re'),
+  method = 'REML',
+  data = filter(res_q2, pair_id != 5 & user_larger == true_larger) %>% 
+    mutate(set = factor(set),
+           media = factor(media),
+           user_id = factor(user_id))
+)
+gam_sum <- summary(mod_gam)
+
+```
+
+```{r}
+#| cache: true
+mod_gam_flt <- gam(
+  q2_error_cm ~ 
+    set*media + 
+    s(target_ratio, k = 4, by = media) + 
+    s(target_ratio, k = 4, by = set) + 
+    s(user_id, bs='re'),
+  method = 'REML',
+  data = filter(res_q2_filtered, pair_id != 5 & user_larger == true_larger) %>% 
+    mutate(set = factor(set),
+           media = factor(media),
+           user_id = factor(user_id))
+)
+```
+
+## GAM (All Participants)
+
+```{r}
+anova(mod_gam)
+```
+
+------------------------------------------------------------------------
+
+```{r}
+em_gam <- emmeans(mod_gam, ~media|set + target_ratio, at = list(target_ratio = unique(res_q2$target_ratio)))
+em_gam %>% 
+  data.frame() %>% 
+  ggplot(mapping = aes(x = factor(round(target_ratio,2)), y = emmean, color = media, group = media)) + 
+  geom_point(position = position_dodge(width = 1/3)) + 
+  geom_errorbar(aes(ymin = lower.CL, ymax = upper.CL, width = 1/4),
+                position = position_dodge(width = 1/3)) + 
+  labs(x = 'Ratio', y = 'log2(Error + 1/8)', title = 'GAM with all participants') + 
+  facet_wrap(~set) + 
+  theme(aspect.ratio = 1/2,
+        plot.title = element_text(hjust = 0.5, face = 'bold')) + 
+  scale_y_continuous(limits = c(1.9, 4.15))
+```
+
+## GAM (Filtered Participants)
+
+```{r}
+anova(mod_gam_flt)
+```
+
+------------------------------------------------------------------------
+
+```{r}
+em_gam_flt <- emmeans(mod_gam_flt, ~media|set + target_ratio, at = list(target_ratio = unique(res_q2$target_ratio)))
+em_gam_flt %>% 
+  data.frame() %>% 
+  ggplot(mapping = aes(x = factor(round(target_ratio,2)), y = emmean, color = media, group = media)) + 
+  geom_point(position = position_dodge(width = 1/3)) + 
+  geom_errorbar(aes(ymin = lower.CL, ymax = upper.CL, width = 1/4),
+                position = position_dodge(width = 1/3)) + 
+  labs(x = 'Ratio', y = 'log2(Error + 1/8)', title = 'GAM without Random Guessers') + 
+  facet_wrap(~set) + 
+  theme(aspect.ratio = 1/2,
+        plot.title = element_text(hjust = 0.5, face = 'bold')) + 
+  scale_y_continuous(limits = c(1.9, 4.15))
 ```
 
 ## References
