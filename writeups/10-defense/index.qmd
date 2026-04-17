@@ -9,6 +9,7 @@ date-format: long
 format:
   revealjs:
     smaller: true
+    margin: 0.1
     theme: [default, styles.scss]
 bibliography: references.bib
 execute:
