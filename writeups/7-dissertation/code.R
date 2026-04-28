@@ -1,15 +1,19 @@
-## -----------------------------------------------------------------------
-#| message: false
-#| warning: false
-#| echo: false
-library(tidyverse)
 
+library(tidyverse)
+library(lme4)
+library(lmerTest)
+library(emmeans)
+library(kableExtra)
+
+load('../../data/stimuli.rda')
+load('../../data/data1.rda')
+load('../../data/data2.rda')
 set.seed(3141)
 
 # Data from Shiny app
 library(RSQLite)
 conn <- dbConnect(SQLite(), "../../shiny-apps/experiment-heat3d/data/stat218-summer2025.db")
-dbListTables(conn)
+# dbListTables(conn)
 blocks <- dbReadTable(conn, "blocks")
 exp_results <- dbReadTable(conn, "exp_results")
 users <- dbReadTable(conn, "users")
@@ -17,6 +21,8 @@ dbDisconnect(conn)
 
 # Solutions
 solutions <- readRDS("../../data/solutions.rda")
+load("../../data/data1.rda")
+load("../../data/data2.rda")
 
 library(tidyverse)
 # Pre-processing of results
@@ -36,9 +42,9 @@ results <- exp_results %>%
 
   # Join with blocks
   left_join(blocks, by = "user_id", relationship = 'many-to-many') %>%
-  group_by(user_id, user_seq) %>%
 
   # Remove blocks that were assigned after the trials started
+  group_by(user_id, user_seq) %>%
   filter(system_time < min(start_time)) %>%
 
   # Get time difference with block and filter for smallest difference
@@ -63,12 +69,23 @@ results <- inner_join(results, full_completions) %>%
 results <- left_join(results, solutions) %>%
   ungroup() %>%
   group_by(user_id) %>%
-  filter(system_time == min(system_time))
+  filter(system_time == min(system_time)) %>%
+  ungroup() %>%
+  filter(between(as_datetime(system_time), as_date('2025-08-01'), as_date('2025-12-31'))) %>%
+  mutate(target_ratio = 100*true_ratio,
+         target_size = ifelse(z > 50, 50, z*true_ratio),
+         target_diff = z-target_size)
 
 results$pair_id <- factor(results$pair_id)
 
+# All instances of starting the experiment
+all_starts <- inner_join(blocks, users) %>%
+  filter(!str_detect(tolower(user_unique), 'test,'))
 
-## -----------------------------------------------------------------------
+
+
+## -------------------------------------------------------------
+# Combine users and results, remove all "test" entries
 users_clean <- results %>%
   inner_join(users, by = 'user_id', relationship = 'many-to-many') %>%
   select(user_id, user_age:user_unique) %>%
@@ -76,7 +93,8 @@ users_clean <- results %>%
   dplyr::filter(!str_detect(tolower(user_unique), 'test,'))
 
 
-## -----------------------------------------------------------------------
+## -------------------------------------------------------------
+# Get in-person users (have at least 1 3dp trial)
 users_in_person <- users_clean %>%
   inner_join(results) %>%
   group_by(user_id, media) %>%
@@ -85,230 +103,404 @@ users_in_person <- users_clean %>%
   select(user_id)
 
 
+## -------------------------------------------------------------
+res_q1 <- results %>%
+  inner_join(users_clean, by = 'user_id') %>%
+  mutate(q1 = case_when(
+    user_larger == 'Both values are the same' ~ 'Equal',
+    (user_larger != true_larger) & (user_larger != 'Both values are the same') ~ 'Smaller',
+    user_larger != 'Both values are the same' & user_larger == true_larger ~ 'Larger'
+  ), correct_label = ifelse(user_larger == true_larger, '*', NA)) %>%
+  mutate(q1_label = factor(q1, labels = c('Smaller value\n(or incorrect)',
+                                          'Equal', 'Larger value'),
+                           levels = c('Smaller', 'Equal', 'Larger'), ordered = T),
+         prop = round(100*true_ratio,1),
+         facet_label = paste0('Stimuli Pair ', pair_id, ' (', prop, '%)'),
+         q1 = factor(q1, levels = c('Smaller', 'Equal', 'Larger'), ordered = F))
 
-
-
-## -----------------------------------------------------------------------
-res_q2 <- results %>%
-  mutate(target_ratio = 100*true_ratio,
-         target_size = ifelse(z > 50, 50, z*true_ratio),
-         target_diff = z-target_size) %>%
-  # filter(pair_id != 5) %>%
-  group_by(user_id, block) %>%
-  mutate(prop_correct = mean(user_larger==true_larger),
-         trial_correct = factor(user_larger==true_larger))
-
-
-## -----------------------------------------------------------------------
-library(flexmix)
-
-# At least 87.5% correct
-res_q2_filter_q1_875 <- res_q2 %>%
-  group_by(user_id, block) %>%
-  filter(mean(user_larger==true_larger) >= 0.875)
-length(unique(res_q2$user_id)) - length(unique(res_q2_filter_q1_875$user_id))
-all_users <- unique(res_q2$user_id); length(all_users)
-sub_users <- unique(res_q2_filter_q1_875$user_id); length(sub_users)
-
-
-users %>%
-  filter(user_id %in% sub_users) %>%
-  group_by(user_reason) %>%
-  summarize(count = n()) %>%
-  mutate(included = 'yes',
-         prop = count/sum(count))
-
-users %>%
-  filter(!(user_id %in% sub_users)) %>%
-  group_by(user_reason) %>%
-  summarize(count = n()) %>%
-  mutate(included = 'no',
-         prop = count/sum(count))
-
-mod.sf <- stepFlexmix(user_slider ~ target_ratio:media  | user_id:block,
-            k = 1:7, nrep = 10,
-        data = res_q2_filter_q1_875)
-
-mod.f <- getModel(mod.sf, which = which.min(AIC(mod.sf)))
-parameters(mod.f)
-summary(mod.f)
-
-# Define the variables
-variables <- c("target_ratio", "target_diff", "target_size", "media", "set")
-
-# Generate all possible combinations of variables
-all_formulas <- unlist(
-  lapply(1:length(variables), function(m) {
-    combn(variables, m, function(x) {
-      # Main effects only
-      main_effects <- paste(x, collapse = " + ")
-      # Interaction terms (includes main effects + interactions)
-      interaction_terms <- paste(x, collapse = " * ")
-      c(
-        paste("user_slider ~", main_effects, "| user_id:block"),       # Main effects only
-        paste("user_slider ~", interaction_terms, "| user_id:block")  # Main effects + interactions
-      )
-    })
-  })
-)
-
-# View all generated formulas
-all_combs <- data.frame()
-for(i in seq_along(all_formulas)) {
-  try({
-    mod.sf <- stepFlexmix(as.formula(all_formulas[i]),
-                          data = res_q2_filter_q1_875,
-                          k = 1:5, nrep = 4)
-    k <- 1:5; aic <- AIC(mod.sf)
-    tmp.df <- data.frame(formula = all_formulas[i], k = k, aic = aic)
-    all_combs <- rbind(all_combs, tmp.df)
-  }, silent = T)
-}
-best_aic <- all_combs %>%
-  filter(aic == min(aic)) %>%
-  pull(formula) %>%
-  first()
-best_k <- all_combs %>%
-  filter(aic == min(aic)) %>%
-  pull(k) %>%
-  first()
-set.seed(431)
-fm.mod <- flexmix(as.formula(best_aic),
-        k = best_k,
-        data = res_q2_filter_q1_875)
-summary(fm.mod)
-parameters(fm.mod)
-
-# Clusters 1 and 5 seem to be the people on task correctly
-# Clusters 3 and 4 seem to be different strategies.
-# Not sure what cluster 2 is doing
-
-res_q2_clustered <- res_q2_filter_q1_875 %>%
+res_q1_filtered <- res_q1 %>%
+  filter(pair_id != 5) %>%
+  group_by(user_id) %>%
+  summarize(n_trials = n(),
+            n_correct = sum(user_larger == true_larger),
+            p.value = pbinom(n_correct, size = n_trials, prob = 2/3, lower.tail = F)) %>%
   ungroup() %>%
-  mutate(cluster = clusters(fm.mod))
+  filter(p.value <= 0.05)
 
-p <- ggplot(res_q2_clustered, mapping = aes(x = user_slider-target_ratio, group = user_id)) +
-  geom_density() +
-  facet_wrap(~cluster)
+res_q2 <- results %>%
+  mutate(q2_error = user_slider - target_ratio,
+         q2_error_cm = log2(abs(user_slider - target_ratio) + 1/8))
+res_q2_filtered <- res_q2 %>% inner_join(res_q1_filtered)
 
 
-# Models for sensitivity
-library(lme4)
-library(lmerTest)
 
-mod.cluster.all <- lmer(user_slider ~ set*media*pair_id + (1|user_id:block/set:media),
-     data = filter(res_q2_clustered, pair_id != 5))
-mod.cluster.1 <- lmer(user_slider ~ set*media*pair_id + (1|user_id:block/set:media),
-                        data = filter(res_q2_clustered, pair_id != 5, cluster == 1))
-mod.cluster.2 <- lmer(user_slider ~ set*media*pair_id + (1|user_id:block/set:media),
-                        data = filter(res_q2_clustered, pair_id != 5, cluster == 2))
-mod.cluster.3 <- lmer(user_slider ~ set*media*pair_id + (1|user_id:block/set:media),
-                        data = filter(res_q2_clustered, pair_id != 5, cluster == 3))
-mod.cluster.4 <- lmer(user_slider ~ set*media*pair_id + (1|user_id:block/set:media),
-                        data = filter(res_q2_clustered, pair_id != 5, cluster == 4))
-mod.cluster.5 <- lmer(user_slider ~ set*media*pair_id + (1|user_id:block/set:media),
-                        data = filter(res_q2_clustered, pair_id != 5, cluster == 5))
-car::Anova(mod.cluster.1, type = 3) %>% data.frame()
+## -------------------------------------------------------------
+df_time <- res_q2 %>%
+  group_by(user_id, block) %>%
+  summarise(total_time = (max(end_time)-min(start_time))/60)
+
+median_time_in_person <- df_time %>% filter(user_id %in% users_in_person$user_id) %>%
+  pull(total_time) %>%
+  median()
+
+median_time_online <- df_time %>% filter(!(user_id %in% users_in_person$user_id)) %>%
+  pull(total_time) %>%
+  median()
+
+
+## -------------------------------------------------------------
+
+df_time_grouped <- df_time %>%
+  mutate(Section = ifelse(user_id %in% users_in_person$user_id, 'In-person', 'Online')) %>%
+  group_by(Section) %>%
+  summarise(Mean = mean(total_time),
+            SD = sd(total_time),
+            Median = median(total_time))
+df_time_total <- df_time %>%
+  mutate(Section = 'All Participants') %>%
+  group_by(Section) %>%
+  summarise(Mean = mean(total_time),
+            SD = sd(total_time),
+            Median = median(total_time))
+
+
+## -------------------------------------------------------------
+#| fig-width: 6
+#| fig-height: 4
+#| fig-dpi: 600
+#| fig-cap: "Three potential estimation strategies from participants. Many participants followed instructions to estimate ratios. However, some participants appeared to estimate the difference between stimuli pairs or submitted random values."
+#| fig-scap: "Examples of participant estimation strategies"
+#| label: fig-user-strategies
+
+# results %>%
+#   group_by(user_id) %>%
+#   summarize(corr_ratio = cor(user_slider, target_ratio)) %>%
+#   arrange(-corr_ratio)
+
+
+
+## -------------------------------------------------------------
+res_q1 <- results %>%
+  inner_join(users_clean, by = 'user_id') %>%
+  mutate(q1 = case_when(
+    user_larger == 'Both values are the same' ~ 'Equal',
+    (user_larger != true_larger) & (user_larger != 'Both values are the same') ~ 'Smaller',
+    user_larger != 'Both values are the same' & user_larger == true_larger ~ 'Larger'
+  ), correct_label = ifelse(user_larger == true_larger, '*', NA)) %>%
+  mutate(q1_label = factor(q1, labels = c('Smaller value\n(or incorrect)',
+                                          'Equal', 'Larger value'),
+                           levels = c('Smaller', 'Equal', 'Larger'), ordered = T),
+         prop = round(100*true_ratio,1),
+         facet_label = paste0('Stimuli Pair ', pair_id, ' (', prop, '%)'),
+         q1 = factor(q1, levels = c('Smaller', 'Equal', 'Larger'), ordered = F))
+
+res_q1_filtered <- res_q1 %>%
+  filter(pair_id != 5) %>%
+  group_by(user_id) %>%
+  summarize(n_trials = n(),
+            n_correct = sum(user_larger == true_larger),
+            p.value = pbinom(n_correct, size = n_trials, prob = 2/3, lower.tail = F)) %>%
+  ungroup() %>%
+  filter(p.value <= 0.05)
+
+
+
+
+## ----appendix-setup, message=FALSE, warning=FALSE, echo = F----
+library(tidyverse)
+
+
+## -------------------------------------------------------------
+#| fig-height: 3
+#| fig-cap: "Counts of response behavior for Stimuli Pair 5. This pair had identical values, which means that true solutions indicates marking that they were the same value and positioning the slider at 100."
+#| fig-scap: "Response behavior for identical-value stimuli pair"
+#| label: fig-pair5-issues
+infilter.labs <- c('Included Participants', 'Excluded Participants')
+names(infilter.labs) <- c(TRUE, FALSE)
+
+res_q2 %>%
+  filter(pair_id == 5) %>%
+  mutate(infilter = user_id %in% res_q2_filtered$user_id) %>%
+  group_by(q1_correct = user_larger == true_larger,
+           slider100 = user_slider == 100,
+           infilter) %>%
+  count() %>%
+  arrange(infilter, q1_correct) %>%
+  ggplot(mapping = aes(x = slider100, y = n, fill = q1_correct)) +
+  geom_col(position = position_dodge()) +
+  geom_text(aes(label = n, y = n+8), position = position_dodge(width = 1),
+            size = 3) +
+  labs(x = 'Slider position', y = 'Count',
+       fill = 'Correct solution\nto Q1?') +
+  facet_wrap(~infilter, labeller = labeller(infilter = infilter.labs)) +
+  scale_fill_manual(labels = c("No", "Yes"),
+                    values = c('#b8b8b8', '#1a80bb')) +
+  scale_x_discrete(labels = c('Not at 100', 'At 100')) +
+  theme_bw() +
+  theme(aspect.ratio = 1, legend.position = 'bottom')
+
+
+## -------------------------------------------------------------
+# Format: mod_(participant)_(response)
+
+# All participants
+mod_all_all <- lmer(q2_error_cm ~ set*media*pair_id + (1|user_id:block/set:media),
+     data = filter(res_q2, pair_id != 5))
+mod_all_q1 <- lmer(q2_error_cm ~ set*media*pair_id + (1|user_id:block/set:media),
+     data = filter(res_q2, pair_id != 5 & user_larger == true_larger))
+
+# Filtered participants
+mod_q1_all <- lmer(q2_error_cm ~ set*media*pair_id + (1|user_id:block/set:media),
+     data = filter(res_q2_filtered, pair_id != 5))
+mod_q1_q1 <- lmer(q2_error_cm ~ set*media*pair_id + (1|user_id:block/set:media),
+     data = filter(res_q2_filtered, pair_id != 5 & user_larger == true_larger))
+
+
+
+
+## -------------------------------------------------------------
+#| eval: true
+bind_rows(
+  car::Anova(mod_all_all, type = 3, test = 'F') %>%
+  data.frame() %>%
+  janitor::clean_names() %>%
+  rownames_to_column('effect'),
+  car::Anova(mod_all_q1, type = 3, test = 'F') %>%
+  data.frame() %>%
+  janitor::clean_names() %>%
+  rownames_to_column('effect'),
+  car::Anova(mod_q1_all, type = 3, test = 'F') %>%
+  data.frame() %>%
+  janitor::clean_names() %>%
+  rownames_to_column('effect'),
+  car::Anova(mod_q1_q1, type = 3, test = 'F') %>%
+  data.frame() %>%
+  janitor::clean_names() %>%
+  rownames_to_column('effect'),
+  .id = 'model'
+) %>%
+  filter(effect != '(Intercept)') %>%
+  select(model, effect, pr_f) %>%
+  pivot_wider(names_from = effect, values_from = pr_f) %>%
+  mutate(across(where(is.numeric), round, 3)) %>%
+  mutate(model = case_when(
+    model=='1' ~ 'All participants, all responses',
+    model=='2' ~ 'All participants, Q1 correct',
+    model=='3' ~ 'Filtered participants, all responses',
+    model=='4' ~ 'Filtered participants, Q1 correct'
+  )) %>%
+  column_to_rownames('model') %>%
+  t() %>%
+  as.data.frame() %>%
+  rownames_to_column('Term') %>%
+  kable(caption = 'ANOVA Table p-values for model terms', digits = 3, booktabs = T,
+        label = 'tbl-all-models-anova')
+
+
+# car::Anova(mod_all_all, type = 3, test = 'F')
+# car::Anova(mod_all_q1, type = 3, test = 'F')
+# car::Anova(mod_q1_all, type = 3, test = 'F')
+# car::Anova(mod_q1_q1, type = 3, test = 'F')
+
+
+## -------------------------------------------------------------
+#| fig-height: 8
+em_all_all <- emmeans(mod_all_all, ~media+set+pair_id, pbkrtest.limit = 5800)
+em_all_q1 <- emmeans(mod_all_q1, ~media+set+pair_id, pbkrtest.limit = 5800)
+em_q1_all <- emmeans(mod_q1_all, ~media+set+pair_id, pbkrtest.limit = 5800)
+em_q1_q1 <- emmeans(mod_q1_q1, ~media+set+pair_id, pbkrtest.limit = 5800)
+
+
+## -------------------------------------------------------------
+#| eval: true
+#| label: fig-model-int1
+#| fig-width: 6
+#| fig-height: 6
+#| fig-dpi: 600
+#| fig-cap: "Interaction plots for media type and response filtering, facetted by stimuli pair and dataset."
+#| fig-scap: "Media by filtering interaction effects"
+
 
 bind_rows(
-  car::Anova(mod.cluster.all, type = 3) %>% data.frame() %>% mutate(model = 'all') %>% rownames_to_column(var = 'term'),
-  car::Anova(mod.cluster.1, type = 3) %>% data.frame() %>% mutate(model = 'c1') %>% rownames_to_column(var = 'term'),
-  car::Anova(mod.cluster.2, type = 3) %>% data.frame() %>% mutate(model = 'c2') %>% rownames_to_column(var = 'term'),
-  car::Anova(mod.cluster.3, type = 3) %>% data.frame() %>% mutate(model = 'c3') %>% rownames_to_column(var = 'term'),
-  car::Anova(mod.cluster.4, type = 3) %>% data.frame() %>% mutate(model = 'c4') %>% rownames_to_column(var = 'term'),
-  car::Anova(mod.cluster.5, type = 3) %>% data.frame() %>% mutate(model = 'c5') %>% rownames_to_column(var = 'term')
+  data.frame(em_all_all),
+  data.frame(em_all_q1),
+  data.frame(em_q1_all),
+  data.frame(em_q1_q1),
+  .id = 'model'
 ) %>%
-  janitor::clean_names() %>%
-  mutate(pr_chisq = round(pr_chisq, 4)) %>%
-  mutate(sig = ifelse(pr_chisq < 0.05, "*", "")) %>%
-  select(term, sig, model) %>%
-  pivot_wider(names_from = term, values_from = sig)
+  mutate(model = case_when(
+    model=='1' ~ 'All participants, all responses',
+    model=='2' ~ 'All participants, Q1 correct',
+    model=='3' ~ 'Filtered participants, all responses',
+    model=='4' ~ 'Filtered participants, Q1 correct'
+  )) %>%
+  ggplot(mapping = aes(x = media, y = emmean, color = model, group = model)) +
+  geom_point(size = 1) +
+  geom_line() +
+  facet_wrap(~set+pair_id, labeller = label_both) +
+  # facet_grid(set ~ pair_id) +
+  # facet_grid(pair_id ~ set) +
+  theme_bw() +
+  guides(color=guide_legend(nrow=2,byrow=TRUE)) +
+  theme(aspect.ratio = 1/2,
+        legend.position = 'bottom')
+
+
+## -------------------------------------------------------------
+#| eval: true
+#| label: fig-model-int2
+#| fig-width: 6
+#| fig-dpi: 600
+#| fig-cap: "Interaction plots for dataset and response filtering, facetted by stimuli pair and media type."
+#| fig-scap: "Data set by filtering interaction effects"
+
+
+bind_rows(
+  data.frame(em_all_all),
+  data.frame(em_all_q1),
+  data.frame(em_q1_all),
+  data.frame(em_q1_q1),
+  .id = 'model'
+) %>%
+  mutate(model = case_when(
+    model=='1' ~ 'All participants, all responses',
+    model=='2' ~ 'All participants, Q1 correct',
+    model=='3' ~ 'Filtered participants, all responses',
+    model=='4' ~ 'Filtered participants, Q1 correct'
+  )) %>%
+  ggplot(mapping = aes(x = set, y = emmean, color = model, group = model)) +
+  geom_point(size = 1) +
+  geom_line() +
+  facet_grid(media~pair_id, labeller = label_both) +
+  # facet_grid(set ~ pair_id) +
+  # facet_grid(pair_id ~ set) +
+  theme_bw() +
+  guides(color=guide_legend(nrow=2,byrow=TRUE)) +
+  theme(aspect.ratio = 1/1,
+        strip.text.y = element_text(size = 6),
+        legend.position = 'bottom')
+
+
+## -------------------------------------------------------------
+#| eval: true
+#| label: fig-model-int3
+#| fig-width: 6
+#| fig-dpi: 600
+#| fig-cap: "Interaction plots for stimuli pairs and response filtering, facetted by dataset and media type."
+#| fig-scap: "Stimuli pair by filtering interaction effects"
+
+
+bind_rows(
+  data.frame(em_all_all),
+  data.frame(em_all_q1),
+  data.frame(em_q1_all),
+  data.frame(em_q1_q1),
+  .id = 'model'
+) %>%
+  mutate(model = case_when(
+    model=='1' ~ 'All participants, all responses',
+    model=='2' ~ 'All participants, Q1 correct',
+    model=='3' ~ 'Filtered participants, all responses',
+    model=='4' ~ 'Filtered participants, Q1 correct'
+  )) %>%
+  ggplot(mapping = aes(x = pair_id, y = emmean, color = model, group = model)) +
+  geom_point(size = 1) +
+  geom_line() +
+  facet_grid(set~media, labeller = label_both) +
+  # facet_grid(set ~ pair_id) +
+  # facet_grid(pair_id ~ set) +
+  theme_bw() +
+  guides(color=guide_legend(nrow=2,byrow=TRUE)) +
+  theme(aspect.ratio = 1/1,
+        # strip.text.y = element_text(size = 6),
+        legend.position = 'bottom')
+
+
+## -------------------------------------------------------------
+#| cache: true
+# GAM
+library(mgcv)
+library(gratia)
+mod_gam <- gam(
+  q2_error_cm ~
+    set*media +
+    s(target_ratio, k = 4, by = media) +
+    s(target_ratio, k = 4, by = set) +
+    s(user_id, bs='re'),
+  method = 'REML',
+  data = filter(res_q2, pair_id != 5 & user_larger == true_larger) %>%
+    mutate(set = factor(set),
+           media = factor(media),
+           user_id = factor(user_id))
+)
+gam_sum <- summary(mod_gam)
 
 
 
-library(emmeans)
-em.all <- emmeans(mod.cluster.all, ~media|set:pair_id)
-em.c1  <- emmeans(mod.cluster.1, ~media|set:pair_id)
-
-em.all %>%
-  data.frame() %>%
-  ggplot(mapping = aes(x = pair_id, y = emmean, fill = media)) +
-  geom_col(position = position_dodge())
-
-
-
-
-
-## -----------------------------------------------------------------------
-# I want to see what happens if I take three strong candidates from each possible method
-
-res_q2 %>%
-  group_by(user_id, block) %>%
-  summarize(corr_ratio = cor(user_slider, target_ratio),
-            corr_diffs = cor(user_slider, target_diff),
-            corr_sizes = cor(user_slider, target_size)) %>%
-  arrange(-corr_sizes)
-
-random <- c('e4ed91f352e11ebe21767afd40fc6cb8',
-            '86b67875e21e7d434bf3f29b31406b71',
-            '2225f1dc80a8164c419fc542469b24c3')
-ratio <- c('58aae8847286cdd92c64512cc75df648',
-           'ad77f0143c14addacacff5161e20bfd8',
-           '10f5a26c206e890b4c34bc1a32ff98f3')
-diffs <- c('9ac7adb2fbb60cb32273f6c7fc8a7e90',
-           '205bf71a59c22ca230bcbf31be0d4373',
-           '9fd7c7ca2fa26afd0b2ab532442a27c0')
-
-# Strategy switchers: 35f4e2131484e131d0c760cfa29bd0d8, User ID: 3e3a45e2b6960fde4d3e4eae18553a53
-
-res_tmp <- res_q2 %>%
-  filter(user_id %in% c(random, ratio, diffs)) %>%
-  mutate(ttc = end_time - start_time,
-         q1_status = user_larger==true_larger)
-set.seed(23123)
-fm <- stepFlexmix(user_slider ~ 0 + target_ratio + target_diff | user_id:block,
-        data = res_tmp, k = 1:10)
-
-summary(getModel(fm, which.min(AIC(fm))))
-parameters(getModel(fm, which.min(AIC(fm))))
-plot(fm)
-
-res_tmp %>%
-  ungroup() %>%
-  mutate(cluster = clusters(getModel(fm, which.min(AIC(fm))))) %>%
-  ggplot(mapping = aes(x = target_diff, y = user_slider, group = user_id)) +
-  geom_point() +
-  geom_smooth(method = 'lm') +
-  facet_wrap(~cluster)
+## -------------------------------------------------------------
+#| cache: true
+mod_gam_flt <- gam(
+  q2_error_cm ~
+    set*media +
+    s(target_ratio, k = 4, by = media) +
+    s(target_ratio, k = 4, by = set) +
+    s(user_id, bs='re'),
+  method = 'REML',
+  data = filter(res_q2_filtered, pair_id != 5 & user_larger == true_larger) %>%
+    mutate(set = factor(set),
+           media = factor(media),
+           user_id = factor(user_id))
+)
 
 
-names(res_tmp)
+## -------------------------------------------------------------
+gam_sum <- summary(mod_gam)
+gam_sum2 <- summary(mod_gam_flt)
+
+gam_sum$p.table %>% knitr::kable(digits = 3, caption = "Parametric coefficients in gam model with all participants.", label = "gam-param1", booktabs = T)
+
+gam_sum$s.table %>% as.data.frame() %>%
+  mutate(Smooth = rownames(.),
+         Smooth = str_replace(Smooth, "ratio_prop", "Ratio")) %>%
+  select(Smooth, everything()) %>%
+  knitr::kable(digits = 3, row.names = F, caption = "Approximate significance of smooth terms in gam mode with all participants.", label = "gam-smooth1", booktabs = T)
+
+gam_sum$p.table %>% knitr::kable(digits = 3, caption = "Parametric coefficients in gam model without random guessers.", label = "gam-param2", booktabs = T)
+
+gam_sum$s.table %>% as.data.frame() %>%
+  mutate(Smooth = rownames(.),
+         Smooth = str_replace(Smooth, "ratio_prop", "Ratio")) %>%
+  select(Smooth, everything()) %>%
+  knitr::kable(digits = 3, row.names = F, caption = "Approximate significance of smooth terms in gam model without random guessers.", label = "gam-smooth2", booktabs = T)
 
 
-res_tmp %>%
-  ggplot(mapping = aes(x = ttc)) +
-  geom_histogram() + facet_wrap(~user_id)
+## -------------------------------------------------------------
+em_gam1 <- emmeans(mod_gam, ~media|set)
+em_gam2 <- emmeans(mod_gam_flt, ~media|set)
 
-res_tmp$true_larger
-
-mod <- lmer(user_slider ~ set*media + (0 + target_ratio || user_id:block),
-     data = res_tmp)
-summary(mod)
-ranef(mod)
-
-## -----------------------------------------------------------------------
-fm <- stepFlexmix(user_slider ~ target_ratio | user_id,
-        k = 1:10,
-        data = res_q2)
-summary(getModel(fm, which = which.min(BIC(fm))))
-parameters(getModel(fm, which = which.min(BIC(fm))))
+bind_rows(
+  em_gam1 %>% data.frame() %>% mutate(flt = 'All participants'),
+  em_gam2 %>% data.frame() %>% mutate(flt = 'Random guessers removed')
+) %>%
+  select(`Data filtering` = flt, set, emmean:upper.CL) %>%
+  kbl(caption = 'Estimated marginal means for generalized additive model', digits = 3,
+      booktabs = T, label = 'tbl-gam-emmeans') %>%
+  collapse_rows()
 
 
-res_q2 %>%
-  ggplot(mapping = aes(x = target_diff, y = user_slider)) +
-  geom_point() +
-  geom_smooth(aes(group = user_id), se = F, method = 'lm')
 
-ranef(mod)
+## -------------------------------------------------------------
+bind_rows(
+  pairs(em_gam1) %>% data.frame() %>% mutate(flt = 'All participants'),
+  pairs(em_gam2) %>% data.frame() %>% mutate(flt = 'Random guessers removed')
+) %>%
+  select(`Data filtering` = flt, set, contrast, estimate:p.value) %>%
+  kbl(caption = 'Pairwise differences for generalized additive model', digits = 3,
+      booktabs = T, label = 'tbl-gam-diffs') %>%
+  collapse_rows()
 
+
+
+## -------------------------------------------------------------
+knitr::purl(input = 'index.qmd', output = 'code.R')
 
